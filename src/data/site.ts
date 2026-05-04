@@ -16,10 +16,14 @@ export const site = {
     ctaLive: "Live erleben",
   },
   about: {
+    eyebrow: "Typhoon",
+    headline:
+      "Amerikanisches Feeling. Europäische Seele. Türkische Texte.",
     lead:
       "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.",
     body:
-      "Die Band steht für erfahrene Musiker, warme Live-Energie, starke Bläser, groovende Rhythmusgruppe und ein musikalisches Gesamtbild, das sich vom Mainstream abhebt.",
+      "Typhoon sprengt Genregrenzen, ohne die eigene Handschrift zu verlieren: markante Blues-Riffs, funkige Grooves, soulige Melodien, jazzige Finessen und türkischsprachige Texte. Eine erfahrene Band, die live sofort zündet.",
+    cta: "Mehr über die Band",
   },
   contact: {
     info: "info@typhoon.band",

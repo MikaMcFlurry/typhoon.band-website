@@ -17,10 +17,11 @@ export default function HomePage() {
         releaseTag="Aktueller Demo · Single"
         song={featuredSong}
       />
+      {/* Termine directly under the featured player per docs/v5 §3 */}
+      <Shows />
       <About />
       <Members />
       <Demos />
-      <Shows />
       <Gallery />
       <Booking />
     </>

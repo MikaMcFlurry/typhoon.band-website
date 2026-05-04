@@ -59,7 +59,7 @@ export function Booking() {
       <SectionHeader kicker="Booking" />
       <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-[6px] md:grid-cols-[1.45fr_1fr] md:gap-[10px]">
         <form
-          className="flex min-w-0 flex-col gap-[6px] rounded-[6px] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-2.5 md:grid md:grid-cols-2 md:gap-[10px] md:p-[18px]"
+          className="flex min-w-0 flex-col gap-[6px] rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-2.5 md:grid md:grid-cols-2 md:gap-[10px] md:p-[18px]"
           id="booking-form"
           noValidate
           onSubmit={onSubmit}
@@ -110,7 +110,7 @@ export function Booking() {
           </p>
         </form>
 
-        <aside className="relative flex min-h-full flex-col justify-end overflow-hidden rounded-[6px] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-3 md:p-[18px]">
+        <aside className="relative flex min-h-full flex-col justify-end overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-3 md:p-[18px]">
           {/*
             Per docs/14: use the gallery image that shows the band with the
             Typhoon signature (gallery-3.jpg), not the singer close-up.
@@ -134,7 +134,7 @@ export function Booking() {
             }}
           />
           <button
-            className="btn btn-primary relative z-[2] self-end !px-3 !py-2 !text-[9px] md:!px-[22px] md:!py-3 md:!text-[11px]"
+            className="btn btn-primary relative z-[2] self-end"
             disabled={status.kind === "submitting"}
             form="booking-form"
             type="submit"

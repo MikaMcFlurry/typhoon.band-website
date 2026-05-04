@@ -9,8 +9,8 @@ type Props = {
   song: Song;
 };
 
-// Compact demo-row, derived from typhoon-app.js renderDemos:
-// number, play, title, mini waveform.
+// Compact demo-row matching docs/AA4180EB (player-example for demo list):
+// 01 · round gold play · title · waveform.
 //
 // Mobile is tight (~390px) so we keep bar counts low and clip overflow on
 // every layer (`min-w-0` on grid children, `overflow-hidden` on the row
@@ -21,13 +21,13 @@ export function DemoRow({ index, song }: Props) {
   const playing = isCurrent && isPlaying;
 
   return (
-    <div className="grid w-full max-w-full grid-cols-[24px_32px_minmax(0,1.4fr)_minmax(0,1.6fr)] items-center gap-2 overflow-hidden rounded-[6px] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] px-2.5 py-2 transition hover:border-[color:var(--line-strong)] md:grid-cols-[36px_44px_minmax(0,1fr)_minmax(0,2fr)] md:gap-4 md:px-4 md:py-3">
+    <div className="grid w-full max-w-full grid-cols-[24px_36px_minmax(0,1.3fr)_minmax(0,1.6fr)] items-center gap-3 overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.55)] px-3 py-2.5 transition hover:border-[color:var(--line-strong)] hover:bg-[rgba(11,8,5,0.7)] md:grid-cols-[36px_44px_minmax(0,1fr)_minmax(0,2fr)] md:gap-4 md:px-5 md:py-3.5">
       <span className="font-mono text-[10px] text-[color:var(--muted)] md:text-xs">
         {String(index + 1).padStart(2, "0")}
       </span>
       <button
         aria-label={playing ? `Pause ${song.title}` : `Play ${song.title}`}
-        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-[rgba(232,201,130,0.5)] bg-[linear-gradient(180deg,#e8c982_0%,#b8873b_100%)] text-[#060403] transition hover:brightness-110 md:h-10 md:w-10"
+        className="btn-icon btn-icon-xs md:btn-icon-sm flex-shrink-0"
         onClick={() => toggle(song.id, song.src)}
         type="button"
       >
@@ -36,17 +36,12 @@ export function DemoRow({ index, song }: Props) {
             <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
           </svg>
         ) : (
-          <svg
-            aria-hidden
-            className="ml-[1px] h-3 w-3"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg aria-hidden className="ml-[1px] h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z" />
           </svg>
         )}
       </button>
-      <span className="min-w-0 truncate font-display text-[13px] font-semibold tracking-[-0.01em] text-[color:var(--cream)] md:text-base">
+      <span className="min-w-0 truncate font-display text-[13px] font-semibold tracking-[-0.01em] text-[color:var(--cream)] md:text-[15px]">
         {song.title}
       </span>
       <Waveform

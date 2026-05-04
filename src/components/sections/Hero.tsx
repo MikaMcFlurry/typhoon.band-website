@@ -99,25 +99,14 @@ export function Hero() {
             <p className="mt-[14px] max-w-[200px] text-[11px] leading-[1.5] text-[color:var(--muted-cream)] md:mt-[22px] md:max-w-[360px] md:text-[14px] md:leading-[1.6]">
               {site.hero.description}
             </p>
-            <div className="mt-4 flex flex-wrap gap-1.5 md:mt-[26px] md:gap-2.5">
-              <a
-                className="btn btn-primary !px-4 !py-2.5 !text-[10px] md:!px-[22px] md:!py-3 md:!text-[11px]"
-                href="#music"
-              >
-                <svg
-                  aria-hidden
-                  className="h-2.5 w-2.5 md:h-3 md:w-3"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
+            <div className="mt-4 flex flex-wrap gap-2 md:mt-[26px] md:gap-2.5">
+              <a className="btn btn-primary" href="#music">
+                <svg aria-hidden className="h-2.5 w-2.5 md:h-3 md:w-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
                 {site.hero.ctaListen}
               </a>
-              <a
-                className="btn btn-secondary !px-4 !py-2.5 !text-[10px] md:!px-[22px] md:!py-3 md:!text-[11px]"
-                href="#booking"
-              >
+              <a className="btn btn-secondary" href="#booking">
                 {site.hero.ctaBook}
               </a>
             </div>
