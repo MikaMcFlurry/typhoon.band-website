@@ -92,32 +92,37 @@ body::before {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 38px rgba(0, 0, 0, 0.34);
 }
 
-/* Editorial label */
+/* Editorial label — handoff `.section-kicker` (10px desktop / 9px mobile) */
 .kicker {
   font-family: Inter, system-ui, sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   color: var(--muted-cream);
+}
+@media (min-width: 768px) {
+  .kicker { font-size: 10px; }
 }
 
 /* Sepia-treated editorial image */
 .sepia-img { filter: sepia(0.32) saturate(0.78) contrast(1.05); }
 .sepia-img-strong { filter: sepia(0.4) saturate(0.85) contrast(1.08) brightness(0.78); }
 
-/* Form fields */
+/* Form fields — mobile values from handoff/.field, desktop from .booking-form-box */
+.field { display: flex; flex-direction: column; min-width: 0; }
 .field input,
 .field textarea,
 .field select {
   width: 100%;
+  box-sizing: border-box;
   background: rgba(232, 201, 130, 0.04);
   border: 1px solid var(--line);
   border-radius: 4px;
-  padding: 12px 14px;
+  padding: 9px 10px;
   color: var(--cream);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 11px;
   outline: none;
   transition: border-color .15s, background .15s;
 }
@@ -131,4 +136,13 @@ body::before {
   border-color: var(--gold);
   background: rgba(232, 201, 130, 0.07);
 }
-.field textarea { min-height: 110px; resize: vertical; }
+.field textarea { min-height: 70px; resize: vertical; }
+@media (min-width: 768px) {
+  .field input,
+  .field textarea,
+  .field select {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .field textarea { min-height: 110px; }
+}

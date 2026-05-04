@@ -4,9 +4,9 @@ import { gallery } from "@/data/gallery";
 
 export function Gallery() {
   return (
-    <section className="mx-auto mt-10 max-w-container px-4 md:mt-12 md:px-8" id="media">
+    <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="media">
       <SectionHeader kicker="Media" />
-      <div className="grid grid-cols-4 gap-2 md:grid-cols-8 md:gap-2">
+      <div className="grid grid-cols-4 gap-1 md:grid-cols-8 md:gap-2">
         {gallery.map((g) => (
           <a
             aria-label={g.alt}

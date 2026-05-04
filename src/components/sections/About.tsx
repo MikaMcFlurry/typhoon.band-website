@@ -2,7 +2,7 @@ import { SectionHeader } from "@/components/sections/SectionHeader";
 
 export function About() {
   return (
-    <section className="mx-auto mt-10 max-w-container px-4 md:mt-12 md:px-8">
+    <section className="mx-auto mt-7 max-w-container px-4 md:px-8">
       <SectionHeader kicker="Über Typhoon" />
       <div className="rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-5 md:p-7">
         <p className="font-display text-xl leading-snug tracking-[-0.02em] text-[color:var(--cream)] md:text-2xl">

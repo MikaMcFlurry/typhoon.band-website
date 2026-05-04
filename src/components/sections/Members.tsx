@@ -4,9 +4,9 @@ import { members } from "@/data/members";
 
 export function Members() {
   return (
-    <section className="mx-auto mt-10 max-w-container px-4 md:mt-12 md:px-8" id="band">
+    <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="band">
       <SectionHeader kicker="Band Mitglieder" />
-      <div className="grid grid-cols-4 gap-2 md:grid-cols-8 md:gap-3">
+      <div className="grid grid-cols-4 gap-[5px] md:grid-cols-8 md:gap-[10px]">
         {members.map((m) => (
           <article className="flex flex-col gap-2" key={m.id}>
             <div className="aspect-square overflow-hidden rounded border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)]">

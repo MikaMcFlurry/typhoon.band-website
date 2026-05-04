@@ -7,11 +7,15 @@ type WaveformProps = {
   songId: string;
   bars?: number;
   className?: string;
+  /** Tailwind height utility for the waveform container. */
   heightClass?: string;
+  /** When true, paused bars render at very low amplitude (compact look). */
   flatWhenPaused?: boolean;
+  /** Click-to-seek callback. */
   onSeek?: (ratio: number) => void;
 };
 
+/** Hash a string into a stable seed (xfnv1a). */
 function seedFromId(id: string) {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < id.length; i++) {
@@ -21,6 +25,7 @@ function seedFromId(id: string) {
   return h;
 }
 
+/** Tiny seeded PRNG (mulberry32). */
 function mulberry32(a: number) {
   return function next() {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -31,6 +36,16 @@ function mulberry32(a: number) {
   };
 }
 
+/**
+ * Live waveform visualiser. Visual styling matches the Claude Design handoff
+ * (`.waveform .wave-bar` in handoff/assets/typhoon-shared.css):
+ *   - 3px-wide bars, 2px gap
+ *   - unplayed = bronze (#6f4a1f), played = champagne gold (#e8c982)
+ * Behaviour matches the old Claude branch AudioPlayerProvider/Waveform:
+ *   - deterministic idle shape per song id
+ *   - live FFT-driven amplitude when this song is the active player
+ *   - smooth scale-Y transition back to idle when paused
+ */
 export function Waveform({
   songId,
   bars = 64,
@@ -49,7 +64,8 @@ export function Waveform({
     const rng = mulberry32(seedFromId(songId));
     return Array.from({ length: bars }, (_, i) => {
       const t = i / Math.max(1, bars - 1);
-      const envelope = 0.5 + 0.4 * Math.sin(Math.PI * t) + 0.18 * Math.sin(Math.PI * t * 3);
+      const envelope =
+        0.5 + 0.4 * Math.sin(Math.PI * t) + 0.18 * Math.sin(Math.PI * t * 3);
       const jitter = 0.55 + 0.85 * rng();
       const v = envelope * jitter;
       return Math.min(1, Math.max(0.16, v));
@@ -112,16 +128,18 @@ export function Waveform({
   return (
     <div
       aria-hidden
-      className={`relative flex items-center gap-[2px] ${heightClass} ${onSeek ? "cursor-pointer" : ""} ${className}`}
-      ref={containerRef}
+      className={`relative flex min-w-0 items-center gap-[2px] ${heightClass} ${
+        onSeek ? "cursor-pointer" : ""
+      } ${className}`}
       onClick={onSeek ? handleClick : undefined}
+      ref={containerRef}
     >
       {idleHeights.map((_, i) => (
         <span
-          className={`origin-center w-[2px] flex-1 max-w-[3px] rounded-full ${
+          className={`origin-center w-[2px] min-w-[2px] flex-1 max-w-[3px] rounded-[1px] ${
             i < playedTo
               ? "bg-[color:var(--gold-soft)]"
-              : "bg-[color:var(--gold-soft)]/35"
+              : "bg-[color:var(--bronze)]"
           }`}
           key={i}
           ref={(el) => {
