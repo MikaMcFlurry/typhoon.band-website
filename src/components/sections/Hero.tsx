@@ -1,36 +1,40 @@
 import Image from "next/image";
 import { site } from "@/data/site";
 
-// Layout matches handoff/desktop.html `.hero` and handoff/mobile.html `.hero-m`.
-// - hero-image: right side, 62% (desktop) / 70% (mobile), sepia + brightness.
-// - hero-signature: oversized gold wordmark rotated -4deg, overflow-visible
-//   so it bleeds below the section edge.
-// - hero-inner: 132px / 100px top padding, 420 / 220 max-width copy column.
+// Three distinct visual layers from handoff/desktop.html `.hero` and
+// handoff/mobile.html `.hero-m`:
+//   1. TEXT block      — left-aligned headline + lede + CTAs (z 5)
+//   2. IMAGE block     — band collage on the right 62%/70% (z 1)
+//   3. SIGNATURE block — oversized gold wordmark, rotated -4deg, bleeds
+//                        below the section edge (z 50)
+// The section uses `overflow-visible` so the signature can extend past it.
 export function Hero() {
   return (
     <section className="relative overflow-visible" id="home">
+      {/* Stage container — gradient backdrop only */}
       <div
-        className="relative min-h-[540px] md:min-h-[620px]"
+        className="relative min-h-[540px] overflow-visible md:min-h-[620px]"
         style={{
           background:
             "radial-gradient(circle at 75% 30%, rgba(199,154,75,0.20), transparent 38%), linear-gradient(90deg, #030201 0%, #050302 38%, #0c0805 100%)",
         }}
       >
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-[70%] md:w-[62%]">
+        {/* ── Block 2: IMAGE ───────────────────────────────────────────── */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-[70%] overflow-hidden md:w-[62%]">
           <Image
-            alt="Typhoon Band Live"
-            className="h-full w-full object-cover object-top"
-            fill
+            alt="Typhoon — Band Live Collage"
+            className="h-full w-full object-cover"
+            height={1500}
             priority
-            sizes="(max-width: 768px) 70vw, 62vw"
             src="/assets/hero/hero-collage.jpeg"
             style={{
-              objectFit: "cover",
               objectPosition: "center top",
               filter:
                 "sepia(0.4) saturate(0.85) contrast(1.08) brightness(0.78)",
             }}
+            width={1500}
           />
+          {/* Left fade so the band collage blends into the dark text area */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
@@ -38,6 +42,7 @@ export function Hero() {
                 "linear-gradient(90deg, rgba(3,2,1,1) 0%, rgba(3,2,1,0.85) 8%, rgba(3,2,1,0.35) 22%, transparent 40%)",
             }}
           />
+          {/* Vignette + top/bottom fade per handoff */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
@@ -47,7 +52,7 @@ export function Hero() {
           />
         </div>
 
-        {/* Gold wordmark — desktop */}
+        {/* ── Block 3: SIGNATURE — desktop ─────────────────────────────── */}
         <Image
           alt=""
           aria-hidden
@@ -64,7 +69,7 @@ export function Hero() {
           }}
           width={2099}
         />
-        {/* Gold wordmark — mobile */}
+        {/* ── Block 3: SIGNATURE — mobile ──────────────────────────────── */}
         <Image
           alt=""
           aria-hidden
@@ -81,6 +86,7 @@ export function Hero() {
           width={2099}
         />
 
+        {/* ── Block 1: TEXT ────────────────────────────────────────────── */}
         <div className="relative z-[5] mx-auto max-w-container px-4 pt-[100px] md:px-8 md:pt-[132px]">
           <div className="max-w-[220px] md:max-w-[420px]">
             <h1 className="m-0 font-display text-[38px] font-bold leading-[0.96] tracking-[-0.04em] text-[color:var(--cream)] md:text-[76px]">
@@ -94,7 +100,10 @@ export function Hero() {
               {site.hero.description}
             </p>
             <div className="mt-4 flex flex-wrap gap-1.5 md:mt-[26px] md:gap-2.5">
-              <a className="btn btn-primary !px-4 !py-2.5 !text-[10px] md:!px-[22px] md:!py-3 md:!text-[11px]" href="#music">
+              <a
+                className="btn btn-primary !px-4 !py-2.5 !text-[10px] md:!px-[22px] md:!py-3 md:!text-[11px]"
+                href="#music"
+              >
                 <svg
                   aria-hidden
                   className="h-2.5 w-2.5 md:h-3 md:w-3"
@@ -105,7 +114,10 @@ export function Hero() {
                 </svg>
                 {site.hero.ctaListen}
               </a>
-              <a className="btn btn-secondary !px-4 !py-2.5 !text-[10px] md:!px-[22px] md:!py-3 md:!text-[11px]" href="#booking">
+              <a
+                className="btn btn-secondary !px-4 !py-2.5 !text-[10px] md:!px-[22px] md:!py-3 md:!text-[11px]"
+                href="#booking"
+              >
                 {site.hero.ctaBook}
               </a>
             </div>

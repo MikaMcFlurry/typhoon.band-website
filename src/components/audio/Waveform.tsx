@@ -128,7 +128,7 @@ export function Waveform({
   return (
     <div
       aria-hidden
-      className={`relative flex min-w-0 items-center gap-[2px] ${heightClass} ${
+      className={`relative flex min-w-0 items-center gap-[2px] overflow-hidden ${heightClass} ${
         onSeek ? "cursor-pointer" : ""
       } ${className}`}
       onClick={onSeek ? handleClick : undefined}
@@ -136,7 +136,7 @@ export function Waveform({
     >
       {idleHeights.map((_, i) => (
         <span
-          className={`origin-center w-[2px] min-w-[2px] flex-1 max-w-[3px] rounded-[1px] ${
+          className={`origin-center w-[1px] flex-1 max-w-[3px] rounded-[1px] ${
             i < playedTo
               ? "bg-[color:var(--gold-soft)]"
               : "bg-[color:var(--bronze)]"

@@ -5,6 +5,7 @@ import { Demos } from "@/components/sections/Demos";
 import { Gallery } from "@/components/sections/Gallery";
 import { Hero } from "@/components/sections/Hero";
 import { Members } from "@/components/sections/Members";
+import { Shows } from "@/components/sections/Shows";
 import { featuredSong } from "@/data/songs";
 
 export default function HomePage() {
@@ -19,6 +20,7 @@ export default function HomePage() {
       <About />
       <Members />
       <Demos />
+      <Shows />
       <Gallery />
       <Booking />
     </>

@@ -89,7 +89,8 @@ export function FeaturedPlayer({
             <NextIcon size={14} />
           </button>
           <Waveform
-            bars={48}
+            bars={36}
+            className="min-w-0"
             heightClass="h-[22px]"
             onSeek={(ratio) => seek(song.id, ratio)}
             songId={song.id}

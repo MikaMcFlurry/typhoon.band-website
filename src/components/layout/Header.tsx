@@ -23,13 +23,13 @@ export function Header() {
         <div className="pointer-events-auto mx-auto flex h-full max-w-container items-center justify-between gap-8 px-4 md:px-8">
           <Link
             aria-label="Typhoon"
-            className="block"
+            className="flex items-center"
             href="#home"
             onClick={() => setOpen(false)}
           >
             <Image
               alt="Typhoon"
-              className="h-9 w-auto md:h-12"
+              className="ml-1 block h-[38px] w-auto md:h-12"
               height={48}
               priority
               src="/assets/branding/typhoon-signature-gold-bold.png"

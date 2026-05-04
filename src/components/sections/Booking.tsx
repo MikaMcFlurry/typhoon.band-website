@@ -111,18 +111,26 @@ export function Booking() {
         </form>
 
         <aside className="relative flex min-h-full flex-col justify-end overflow-hidden rounded-[6px] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-3 md:p-[18px]">
+          {/*
+            Per docs/14: use the gallery image that shows the band with the
+            Typhoon signature (gallery-3.jpg), not the singer close-up.
+          */}
           <Image
-            alt=""
-            aria-hidden
-            className="absolute inset-0 h-full w-full object-cover sepia-img-strong"
+            alt="Typhoon — Band mit Signatur"
+            className="absolute inset-0 h-full w-full object-cover"
             fill
-            src="/assets/hero/singer-stage.jpeg"
+            sizes="(max-width: 768px) 40vw, 33vw"
+            src="/assets/gallery/gallery-3.jpg"
+            style={{
+              objectPosition: "center",
+              filter: "saturate(0.95) contrast(1.05) brightness(0.95)",
+            }}
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(3,2,1,0.15) 0%, rgba(3,2,1,0.55) 100%)",
+                "linear-gradient(180deg, rgba(3,2,1,0.05) 0%, rgba(3,2,1,0.55) 70%, rgba(3,2,1,0.78) 100%)",
             }}
           />
           <button

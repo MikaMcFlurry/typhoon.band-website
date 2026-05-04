@@ -1,21 +1,40 @@
+import { LegalH2, LegalShell } from "@/components/legal/LegalShell";
+
 export const metadata = { title: "Cookies" };
 
 export default function CookiesPage() {
   return (
-    <article className="mx-auto max-w-2xl px-4 pb-16 pt-24 text-sm leading-relaxed text-[color:var(--cream)] md:pt-32">
-      <h1 className="font-display text-3xl font-bold tracking-[-0.02em] md:text-4xl">
-        Cookie-Hinweise
-      </h1>
-      <p className="mt-6 text-[color:var(--muted-cream)]">
+    <LegalShell
+      draftNote="Initialer Stand · wird ergänzt, sobald optionale Embeds aktiv sind"
+      kicker="Legal"
+      title="Cookie-Hinweise"
+    >
+      <p className="text-[color:var(--muted-cream)]">
         Diese Website verwendet aktuell ausschließlich technisch notwendige
-        Cookies. Es findet keine Einbindung externer Tracker oder Analyse-Tools
-        ohne ausdrückliche Einwilligung statt.
+        Cookies. Es findet keine Einbindung externer Tracker oder
+        Analyse-Tools ohne ausdrückliche Einwilligung statt.
       </p>
-      <p className="mt-4 text-[color:var(--muted-cream)]">
-        Sobald optionale Embeds (z. B. YouTube, Spotify) aktiviert werden,
-        erscheint hier ein Consent-Banner, mit dem Sie Ihre Auswahl jederzeit
-        anpassen können.
+
+      <LegalH2>Technisch notwendige Cookies</LegalH2>
+      <p className="mt-2 text-[color:var(--muted-cream)]">
+        Notwendige Cookies sorgen für grundlegende Funktionen wie sichere
+        Verbindungsaufbauten und werden ohne eure Einwilligung gesetzt
+        (Art. 6 Abs. 1 lit. f DSGVO).
       </p>
-    </article>
+
+      <LegalH2>Optionale Embeds</LegalH2>
+      <p className="mt-2 text-[color:var(--muted-cream)]">
+        Sobald optionale Embeds (z. B. YouTube, Spotify, SoundCloud)
+        aktiviert werden, erscheint hier ein Consent-Banner. Erst nach eurer
+        aktiven Zustimmung werden Verbindungen zu den jeweiligen Anbietern
+        aufgebaut.
+      </p>
+
+      <LegalH2>Auswahl ändern</LegalH2>
+      <p className="mt-2 text-[color:var(--muted-cream)]">
+        Eure Einstellungen könnt ihr jederzeit anpassen, sobald die
+        Consent-Funktion in einem späteren Release aktiv ist.
+      </p>
+    </LegalShell>
   );
 }
