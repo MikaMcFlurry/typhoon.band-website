@@ -223,6 +223,24 @@ body::before {
   .field textarea { min-height: 110px; }
 }
 
+/* iOS/Safari render <input type="date"> with their own min-width. Force the
+   input back into its grid cell so the booking form never overflows. */
+.field input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+  display: block;
+}
+.field input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85) sepia(1) saturate(1.4) hue-rotate(355deg);
+  cursor: pointer;
+  margin-left: 4px;
+}
+
 /* Horizontal scroll-snap rail (used by Termine on mobile) */
 .scroll-rail {
   display: flex;

@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         <br />
         {site.imprint.city}, {site.imprint.country}
         <br />
-        {site.contact.info} · {site.contact.phone}
+        {site.contact.booking} · {site.contact.phone}
       </address>
 
       <LegalH2>Booking-Anfragen</LegalH2>
@@ -58,9 +58,9 @@ export default function PrivacyPage() {
         dafür an{" "}
         <a
           className="text-[color:var(--gold-soft)] hover:text-[color:var(--gold)]"
-          href={`mailto:${site.contact.info}`}
+          href={`mailto:${site.contact.booking}`}
         >
-          {site.contact.info}
+          {site.contact.booking}
         </a>
         .
       </p>

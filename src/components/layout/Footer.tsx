@@ -70,11 +70,6 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-[color:var(--muted-cream)]">
               <li>
-                <a className="hover:text-[color:var(--gold-soft)]" href={`mailto:${site.contact.info}`}>
-                  {site.contact.info}
-                </a>
-              </li>
-              <li>
                 <a className="hover:text-[color:var(--gold-soft)]" href={`mailto:${site.contact.booking}`}>
                   {site.contact.booking}
                 </a>

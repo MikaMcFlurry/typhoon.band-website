@@ -110,10 +110,12 @@ export function Booking() {
           </p>
         </form>
 
-        <aside className="relative flex min-h-full flex-col justify-end overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-3 md:p-[18px]">
+        <aside className="relative flex min-h-[180px] min-w-0 flex-col items-stretch justify-end overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-2.5 md:min-h-full md:p-[18px]">
           {/*
             Per docs/14: use the gallery image that shows the band with the
-            Typhoon signature (gallery-3.jpg), not the singer close-up.
+            Typhoon signature (gallery-3.jpg). object-position keeps the
+            band figures + the gold signature inside the visible crop on
+            both mobile (very narrow column) and desktop.
           */}
           <Image
             alt="Typhoon — Band mit Signatur"
@@ -122,19 +124,20 @@ export function Booking() {
             sizes="(max-width: 768px) 40vw, 33vw"
             src="/assets/gallery/gallery-3.jpg"
             style={{
-              objectPosition: "center",
-              filter: "saturate(0.95) contrast(1.05) brightness(0.95)",
+              objectPosition: "60% 65%",
+              filter: "saturate(0.95) contrast(1.05) brightness(0.92)",
             }}
           />
           <div
+            aria-hidden
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(3,2,1,0.05) 0%, rgba(3,2,1,0.55) 70%, rgba(3,2,1,0.78) 100%)",
+                "linear-gradient(180deg, rgba(3,2,1,0.05) 0%, rgba(3,2,1,0.55) 60%, rgba(3,2,1,0.85) 100%)",
             }}
           />
           <button
-            className="btn btn-primary relative z-[2] self-end"
+            className="btn btn-primary relative z-[2] w-full !px-2 !py-2 !text-[9px] md:w-auto md:self-end md:!px-[22px] md:!py-3 md:!text-[11px]"
             disabled={status.kind === "submitting"}
             form="booking-form"
             type="submit"

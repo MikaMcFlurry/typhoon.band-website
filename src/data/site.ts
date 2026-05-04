@@ -26,7 +26,8 @@ export const site = {
     cta: "Mehr über die Band",
   },
   contact: {
-    info: "info@typhoon.band",
+    // Only booking@typhoon.band is active for now; info@typhoon.band is
+    // not yet provisioned and is intentionally not exposed anywhere.
     booking: "booking@typhoon.band",
     phone: "+49 176 64472296",
   },

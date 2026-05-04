@@ -26,9 +26,9 @@ export default function ImprintPage() {
         E-Mail:{" "}
         <a
           className="text-[color:var(--gold-soft)] hover:text-[color:var(--gold)]"
-          href={`mailto:${site.contact.info}`}
+          href={`mailto:${site.contact.booking}`}
         >
-          {site.contact.info}
+          {site.contact.booking}
         </a>
         <br />
         Telefon: {site.contact.phone}
