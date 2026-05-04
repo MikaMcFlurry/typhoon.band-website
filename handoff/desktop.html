@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Typhoon · Desktop</title>
+<meta name="viewport" content="width=1440">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="assets/typhoon-shared.css" rel="stylesheet">
+<style>
+  body { font-family: Inter, system-ui, sans-serif; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+  /* ============ HEADER ============ */
+  .site-header {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: 72px;
+    pointer-events: none;
+  }
+  .site-header-inner {
+    max-width: 1180px; height: 100%; margin: 0 auto;
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    pointer-events: auto;
+  }
+  .site-header .signature-img {
+    height: 48px; width: auto; margin-left: 4px;
+    filter: drop-shadow(0 2px 10px rgba(0,0,0,0.8));
+  }
+  .nav-list { display: flex; gap: 28px; }
+  .nav-link {
+    color: var(--muted-cream); padding-bottom: 4px; position: relative;
+    transition: color .2s; font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 600; font-family: Inter, sans-serif;
+  }
+  .nav-link:hover { color: var(--cream); }
+  .nav-link.active { color: var(--gold-soft); }
+  .nav-link.active::after { content:''; position:absolute; left:0; right:0; bottom:-6px; height:1.5px; background: var(--gold-soft); }
+
+  /* ============ HERO ============ */
+  .hero {
+    position: relative; min-height: 620px; overflow: visible;
+    background:
+      radial-gradient(circle at 75% 30%, rgba(199, 154, 75, 0.20), transparent 38%),
+      linear-gradient(90deg, #030201 0%, #050302 38%, #0c0805 100%);
+  }
+  .hero-image {
+    position: absolute; right: 0; top: 0; width: 62%; height: 100%;
+    z-index: 1; pointer-events: none;
+  }
+  .hero-image img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center top;
+    filter: sepia(0.4) saturate(0.85) contrast(1.08) brightness(0.78);
+  }
+  /* soft left fade so band collage blends into the dark text area */
+  .hero-image::before {
+    content:''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, rgba(3,2,1,1) 0%, rgba(3,2,1,0.85) 8%, rgba(3,2,1,0.35) 22%, transparent 40%);
+  }
+  .hero-image::after {
+    content:''; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 60% 50%, transparent 30%, rgba(3,2,1,0.5) 90%),
+      linear-gradient(180deg, rgba(3,2,1,0.45) 0%, transparent 18%, transparent 78%, rgba(3,2,1,0.65) 100%);
+  }
+
+  .hero-signature {
+    position: absolute; right: -2%; bottom: -40px; width: 700px; height: auto;
+    z-index: 50; pointer-events: none;
+    transform: rotate(-4deg);
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.85));
+    mix-blend-mode: screen;
+  }
+
+  .hero-inner {
+    max-width: 1180px; margin: 0 auto; padding: 132px 32px 0;
+    position: relative; z-index: 5;
+  }
+  .hero-copy { max-width: 420px; }
+  .hero-title {
+    font-family: Georgia, 'Times New Roman', ui-serif, serif;
+    font-size: 76px;
+    line-height: 0.96; letter-spacing: -0.04em; font-weight: 700;
+    color: var(--cream); margin: 0 0 22px;
+  }
+  .hero-title .gold { color: var(--gold); }
+  .hero-lede { color: var(--muted-cream); font-size: 14px; line-height: 1.6; margin: 0 0 26px; max-width: 360px; }
+  .hero-ctas { display: flex; gap: 10px; }
+  .hero-ctas .btn { padding: 12px 22px; font-size: 11px; }
+
+  /* ============ AUDIO PLAYER (overlapping hero) — 2-row layout like mobile ============ */
+  .featured-player {
+    max-width: 1180px; margin: -48px auto 0; padding: 0 32px;
+    position: relative; z-index: 20;
+  }
+  .audio-card {
+    padding: 18px 24px;
+    background: rgba(11, 8, 5, 0.86);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 22px 44px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+  }
+  .audio-top { display: grid; grid-template-columns: 76px 1fr; gap: 18px; align-items: center; margin-bottom: 14px; }
+  .audio-cover { width: 76px; height: 76px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .audio-cover img { width:100%; height:100%; object-fit:cover; filter: sepia(0.35) saturate(0.85); }
+  .audio-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .audio-tag { font-family: Inter, sans-serif; font-size: 10px; letter-spacing: 0.22em; font-weight: 600; text-transform: uppercase; color: var(--muted-cream); margin-bottom: 4px; }
+  .audio-title { font-family: Georgia, serif; font-size: 22px; font-weight: 700; color: var(--cream); letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+  .audio-artist { font-size: 13px; color: var(--muted-cream); }
+  .audio-controls-row { display: grid; grid-template-columns: 46px 36px 36px 1fr auto auto auto; align-items: center; gap: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .audio-btn { background: transparent; border: none; color: var(--muted-cream); cursor: pointer; padding: 4px; display: grid; place-items: center; transition: color .15s; }
+  .audio-btn:hover { color: var(--gold-soft); }
+  .audio-btn svg { width: 18px; height: 18px; }
+  .audio-play {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(180deg, #e8c982 0%, #b8873b 100%);
+    color: #060403;
+    border: 1px solid rgba(232, 201, 130, 0.6);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .audio-play svg { width: 14px; height: 14px; }
+  .audio-waveform { min-width: 0; height: 36px; }
+  .audio-time { font-size: 12px; color: var(--muted-cream); white-space: nowrap; font-variant-numeric: tabular-nums; padding: 0 8px; }
+  .audio-vol { display: flex; align-items: center; gap: 8px; padding-left: 14px; border-left: 1px solid var(--line); }
+  .audio-vol svg { width: 16px; height: 16px; color: var(--muted-cream); }
+  .audio-more { color: var(--muted-cream); font-size: 22px; padding: 0 4px; cursor: pointer; line-height: 1; }
+
+  /* ============ SECTION ============ */
+  .section { max-width: 1180px; margin: 28px auto 0; padding: 0 32px; }
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; gap: 24px; }
+  .section-kicker {
+    font-family: Inter, sans-serif; font-size: 10px; letter-spacing: 0.22em; font-weight: 600;
+    text-transform: uppercase; color: var(--muted-cream);
+  }
+  .section-link { color: var(--muted-cream); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; transition: color .2s; }
+  .section-link:hover { color: var(--gold-soft); }
+
+  /* ============ SHOWS — clean horizontal cards, no tickets button ============ */
+  .shows-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .show-card {
+    background: rgba(11,8,5,0.6); border: 1px solid var(--line);
+    border-radius: 6px; padding: 16px 18px;
+    display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center;
+    transition: border-color .2s;
+  }
+  .show-card:hover { border-color: var(--line-strong); }
+  .show-card .show-tickets { display: none; }
+  .show-date { display: flex; flex-direction: column; align-items: flex-start; min-width: 38px; padding-right: 12px; border-right: 1px solid var(--line); }
+  .show-date .day { font-family: Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1; color: var(--gold-soft); letter-spacing: -0.02em; }
+  .show-date .month { font-size: 9px; letter-spacing: 0.18em; color: var(--muted-cream); text-transform: uppercase; margin-top: 5px; font-weight: 600; }
+  .show-info .venue { font-family: Inter, sans-serif; font-weight: 600; font-size: 14px; color: var(--cream); margin-bottom: 4px; letter-spacing: -0.005em; }
+  .show-info .city { font-size: 11px; color: var(--muted-cream); display: flex; align-items: center; gap: 4px; }
+  .show-info .city::before { content: '◉'; color: var(--gold-soft); font-size: 8px; }
+  .show-info .time { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ============ MEMBERS — 7-col, no border, just photo + name + role under ============ */
+  .members-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .member-card { display: flex; flex-direction: column; gap: 8px; }
+  .member-photo {
+    aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; border: 1px solid var(--line);
+    background: rgba(11,8,5,0.6);
+  }
+  .member-photo img { width:100%; height:100%; object-fit:cover; filter: sepia(0.3) saturate(0.78) contrast(1.05); transition: transform .4s; }
+  .member-card:hover .member-photo img { transform: scale(1.05); }
+  .member-name { font-family: Inter, sans-serif; font-weight: 600; font-size: 12px; color: var(--cream); text-align: center; line-height: 1.2; }
+  .member-role { font-family: Inter, sans-serif; font-size: 9px; color: var(--muted-cream); text-align: center; margin-top: 2px; letter-spacing: 0.16em; text-transform: uppercase; }
+
+  /* ============ MEDIA — 7 tiles in row ============ */
+  .media-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .media-tile { aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; border: 1px solid var(--line); position: relative; cursor: pointer; }
+  .media-tile img { width:100%; height:100%; object-fit:cover; filter: sepia(0.3) saturate(0.78) contrast(1.05); transition: transform .4s; }
+  .media-tile:hover img { transform: scale(1.05); }
+  .media-tile .play-ind { position: absolute; left: 10px; bottom: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(232,201,130,0.92); display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+  .media-tile .play-ind svg { width: 9px; height: 9px; color: #060403; }
+
+  /* ============ BOOKING ============ */
+  .booking-grid { display: grid; grid-template-columns: 1.45fr 1fr; gap: 10px; }
+  .booking-form-box {
+    background: rgba(11,8,5,0.6); border: 1px solid var(--line);
+    border-radius: 6px; padding: 18px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .field { display: flex; flex-direction: column; }
+  .field.full { grid-column: 1 / -1; }
+  .field input, .field textarea {
+    background: rgba(232, 201, 130, 0.04); border: 1px solid var(--line); border-radius: 4px;
+    padding: 12px 14px; color: var(--cream); font-family: inherit; font-size: 13px;
+  }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--gold); background: rgba(232, 201, 130, 0.07); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+  .field textarea { min-height: 110px; resize: vertical; }
+
+  .booking-side {
+    background: rgba(11,8,5,0.6); border: 1px solid var(--line); border-radius: 6px;
+    position: relative; overflow: hidden; min-height: 100%;
+    display: flex; flex-direction: column; justify-content: flex-end; padding: 18px;
+  }
+  .booking-side .stage-img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    filter: sepia(0.4) saturate(0.85) contrast(1.05) brightness(0.95);
+  }
+  .booking-side::after {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(3,2,1,0.15) 0%, rgba(3,2,1,0.55) 100%);
+  }
+  .booking-side .submit-btn {
+    position: relative; z-index: 2; align-self: flex-end;
+  }
+
+  /* hide elements not in mockup */
+  .booking-form-box .consent-row,
+  .booking-form-box .submit-row,
+  .booking-form-box .submit-note { display: none; }
+
+  /* ============ NEWS — 3 cards horizontal ============ */
+  .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .news-card {
+    background: rgba(11,8,5,0.6); border: 1px solid var(--line);
+    border-radius: 6px; padding: 14px;
+    display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: start;
+    transition: border-color .2s;
+  }
+  .news-card:hover { border-color: var(--line-strong); }
+  .news-thumb { aspect-ratio: 1/1; border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+  .news-thumb img { width:100%; height:100%; object-fit:cover; filter: sepia(0.32) saturate(0.78); }
+  .news-tag { font-family: Inter, sans-serif; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-soft); font-weight: 600; margin-bottom: 6px; }
+  .news-title { font-family: Inter, sans-serif; font-weight: 600; font-size: 14px; color: var(--cream); margin-bottom: 6px; line-height: 1.3; }
+  .news-excerpt { font-size: 11px; color: var(--muted-cream); line-height: 1.55; margin-bottom: 8px; }
+  .news-date { font-family: Inter, sans-serif; font-size: 10px; color: var(--muted); letter-spacing: 0.12em; }
+
+  /* ============ FOOTER ============ */
+  .footer { padding: 56px 0 22px; border-top: 1px solid var(--line); margin-top: 48px; }
+  .footer-inner { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+  .footer-grid {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr 0.8fr; gap: 40px;
+    align-items: start;
+  }
+  .footer-brand .signature-img {
+    height: 56px; width: auto; margin-bottom: 14px;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+  }
+  .footer-brand p {
+    color: var(--muted-cream); font-size: 12px; line-height: 1.7;
+    margin: 0; max-width: 320px;
+  }
+  .footer-col h4 {
+    font-family: Inter, sans-serif; text-transform: uppercase; letter-spacing: 0.22em;
+    font-size: 10px; color: var(--cream); margin: 0 0 14px; font-weight: 600;
+  }
+  .footer-col .row { display: flex; align-items: center; gap: 8px; color: var(--muted-cream); font-size: 12px; margin-bottom: 8px; }
+  .footer-col .row svg { width: 14px; height: 14px; color: var(--gold-soft); flex-shrink: 0; }
+  .footer-col .row a:hover { color: var(--gold-soft); }
+  .footer-socials { display: flex; gap: 8px; flex-wrap: wrap; }
+  .footer-socials a {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--line);
+    display: grid; place-items: center; color: var(--muted-cream);
+    transition: all .2s;
+  }
+  .footer-socials a:hover { color: var(--gold-soft); border-color: var(--gold); }
+  .footer-socials svg { width: 14px; height: 14px; }
+  .footer-legal-list a {
+    display: block; color: var(--muted-cream); font-size: 10px; letter-spacing: 0.22em;
+    text-transform: uppercase; margin-bottom: 10px; font-weight: 600;
+  }
+  .footer-legal-list a:hover { color: var(--gold-soft); }
+  .footer-bottom {
+    max-width: 1180px; margin: 32px auto 0; padding: 18px 32px 0;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    color: var(--muted); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600;
+  }
+
+  /* show kicker uppercase like mockup */
+  .section-kicker { color: var(--muted-cream); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="#home" aria-label="Typhoon" style="pointer-events:auto;"><img src="assets/typhoon-signature-gold-bold.png" alt="Typhoon" class="signature-img"></a>
+    <nav class="nav-list" aria-label="Hauptnavigation">
+      <a href="#home" class="nav-link active">Home</a>
+      <a href="#band" class="nav-link">Band</a>
+      <a href="#musik" class="nav-link">Music</a>
+      <a href="#shows" class="nav-link">Termine</a>
+      <a href="#media" class="nav-link">Media</a>
+      <a href="#booking" class="nav-link">Booking</a>
+      <a href="#news" class="nav-link">News</a>
+      <a href="#kontakt" class="nav-link">Kontakt</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-image">
+    <img src="assets/hero-collage.jpeg" alt="Typhoon Band Live Collage">
+  </div>
+  <img class="hero-signature" src="assets/typhoon-signature-gold.png" alt="" aria-hidden="true">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <h1 class="hero-title">Smooth.<br>Exzeptionell.<br><span class="gold">Funk.</span></h1>
+      <p class="hero-lede">Typhoon bringt den authentischen Sound des türkischen Funk &amp; Soul auf die Bühne — energiegeladen, groovig und einzigartig.</p>
+      <div class="hero-ctas">
+        <a href="#musik" class="btn btn-primary">▶ Listen now</a>
+        <a href="#booking" class="btn btn-secondary">Book now</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIO PLAYER (overlapping hero) — 2-row layout -->
+<div class="featured-player">
+  <div class="audio-card" id="hero-player">
+    <div class="audio-top">
+      <div class="audio-cover"><img src="assets/hero-collage.jpeg" alt=""></div>
+      <div class="audio-meta">
+        <span class="audio-tag">Neuster Release Song</span>
+        <h3 class="audio-title">Find A Way</h3>
+        <span class="audio-artist">Typhoon</span>
+      </div>
+    </div>
+    <div class="audio-controls-row">
+      <button class="audio-btn audio-play" data-action="play" aria-label="Play">
+        <svg viewBox="0 0 24 24" fill="currentColor" data-icon="play"><path d="M8 5v14l11-7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" data-icon="pause" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <button class="audio-btn" aria-label="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg></button>
+      <button class="audio-btn" aria-label="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+      <div class="waveform audio-waveform" data-waveform data-seed="hero"></div>
+      <span class="audio-time"><span data-current>0:00</span> / <span data-duration>4:12</span></span>
+      <button class="audio-btn" aria-label="Volume"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19" fill="currentColor"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg></button>
+      <span class="audio-more" aria-label="Mehr">⋯</span>
+    </div>
+  </div>
+</div>
+
+<!-- SHOWS -->
+<section class="section" id="shows">
+  <div class="section-header">
+    <span class="section-kicker">Termine</span>
+    <a href="#" class="section-link">Alle Termine ansehen →</a>
+  </div>
+  <div class="shows-grid" id="shows-grid"></div>
+</section>
+
+<!-- MEMBERS -->
+<section class="section" id="band">
+  <div class="section-header">
+    <span class="section-kicker">Band Mitglieder</span>
+    <a href="#" class="section-link">Mehr über die Band →</a>
+  </div>
+  <div class="members-grid" id="members-grid"></div>
+</section>
+
+<!-- MEDIA -->
+<section class="section" id="media">
+  <div class="section-header">
+    <span class="section-kicker">Media</span>
+    <a href="#" class="section-link">Alle Videos &amp; Bilder ansehen →</a>
+  </div>
+  <div class="media-grid" id="media-grid"></div>
+</section>
+
+<!-- BOOKING -->
+<section class="section" id="booking">
+  <div class="section-header">
+    <span class="section-kicker">Booking</span>
+  </div>
+  <div class="booking-grid">
+    <form class="booking-form-box" id="booking-form" novalidate>
+      <input type="text" name="hp_field" tabindex="-1" autocomplete="off" style="position:absolute; left:-9999px;" aria-hidden="true">
+      <div class="field"><input type="text" name="name" placeholder="Name" required></div>
+      <div class="field"><input type="email" name="email" placeholder="E-Mail" required></div>
+      <div class="field full"><input type="text" name="location" placeholder="Ort"></div>
+      <div class="field full"><input type="date" name="eventDate" placeholder="Veranstaltungsdatum"></div>
+      <div class="field full"><textarea name="message" placeholder="Nachricht" required></textarea></div>
+      <input type="hidden" name="consent" value="on">
+    </form>
+    <div class="booking-side">
+      <img class="stage-img" src="assets/singer-stage.jpeg" alt="">
+      <button type="submit" form="booking-form" class="btn btn-primary submit-btn">Booking anfragen</button>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section class="section" id="news">
+  <div class="section-header">
+    <span class="section-kicker">News</span>
+    <a href="#" class="section-link">Alle News ansehen →</a>
+  </div>
+  <div class="news-grid" id="news-grid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="kontakt">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="assets/typhoon-signature-gold.png" alt="Typhoon" class="signature-img">
+        <p>Typhoon ist die türkische Funk &amp; Soul Band, die seit Jahren die Bühnen mit Leidenschaft, Groove und authentischem Sound erobert.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kontakt</h4>
+        <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> <a href="mailto:info@typhoonband.com">info@typhoonband.com</a></div>
+        <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.21a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> +90 532 123 45 67</div>
+        <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Istanbul, Türkiye</div>
+      </div>
+      <div class="footer-col">
+        <h4>Folge uns</h4>
+        <div class="footer-socials">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h2.5V5.5H14c-1.7 0-3 1.3-3 3V11H9v2.5h2V21h2.5v-7.5H16L16.5 11H13.5V9c0-.6.4-1 1-1z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M10.5 9.5l4.5 2.5-4.5 2.5z" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="Spotify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M7 10c3-1 7-1 10 1M7.5 13c2.5-.8 6-.6 8.5.8M8 16c2-.6 4.5-.5 6.5.6"/></svg></a>
+          <a href="#" aria-label="Apple Music"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 4l-8 1.5v9.7c-.5-.3-1-.4-1.5-.4-1.4 0-2.5 1-2.5 2.4s1.1 2.4 2.5 2.4 2.5-1 2.5-2.4V8.6L15 7.4v6.4c-.5-.3-1-.4-1.5-.4-1.4 0-2.5 1-2.5 2.4s1.1 2.4 2.5 2.4S16 17.2 16 15.8V4z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-legal-list">
+          <a href="#">Impressum</a>
+          <a href="#">Datenschutz</a>
+          <a href="#">AGB</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2024 Typhoon. Alle Rechte vorbehalten.</div>
+</footer>
+
+<script src="assets/typhoon-data.js"></script>
+<script src="assets/typhoon-app.js"></script>
+</body>
+</html>
