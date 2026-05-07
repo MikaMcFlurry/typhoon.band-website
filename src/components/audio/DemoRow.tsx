@@ -7,6 +7,7 @@ import {
 } from "@/components/audio/AudioPlayerProvider";
 import { Waveform } from "@/components/audio/Waveform";
 import { useTrackDuration } from "@/components/audio/useTrackDuration";
+import { useDict } from "@/components/i18n/DictProvider";
 import type { Song } from "@/data/songs";
 
 type Props = {
@@ -17,18 +18,19 @@ type Props = {
 
 const DEFAULT_COVER = "/assets/hero/hero-collage.jpeg";
 
-// Premium demo row, matching the featured/player-example aesthetic:
-//   cover · number · round gold play · title · waveform · duration · volume
-//
-// Mobile: 2-row layout so nothing is squeezed. Top row carries the
-// thumbnail, play button, title and duration; the waveform spans the
-// full card width below. Desktop keeps the single-row layout.
-//
-// AudioPlayerProvider stays the single source of truth — `toggle()` keeps
-// "one song at a time" guarantee. No download button, no native controls.
 export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
-  const { currentId, isPlaying, position, duration, toggle, seek } =
-    useAudioPlayer();
+  const {
+    currentId,
+    isPlaying,
+    position,
+    duration,
+    muted,
+    volume,
+    toggle,
+    seek,
+    toggleMute,
+  } = useAudioPlayer();
+  const { dict } = useDict();
   const isCurrent = currentId === song.id;
   const playing = isCurrent && isPlaying;
   const metadataDuration = useTrackDuration(song.src);
@@ -46,7 +48,7 @@ export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
           {String(index + 1).padStart(2, "0")}
         </span>
         <button
-          aria-label={playing ? `Pause ${song.title}` : `Play ${song.title}`}
+          aria-label={playing ? `${dict.player.pause} ${song.title}` : `${dict.player.play} ${song.title}`}
           className="btn-icon btn-icon-xs flex-shrink-0"
           onClick={() => toggle(song.id, song.src)}
           type="button"
@@ -63,7 +65,7 @@ export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
       {/* ── Mobile: waveform row ────────────────────────────────────── */}
       <div className="mt-2 md:hidden">
         <Waveform
-          bars={36}
+          bars={48}
           className="min-w-0"
           heightClass="h-5"
           onSeek={(ratio) => seek(song.id, ratio)}
@@ -71,14 +73,14 @@ export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
         />
       </div>
 
-      {/* ── Desktop: single row ─────────────────────────────────────── */}
-      <div className="hidden grid-cols-[44px_28px_44px_minmax(0,1fr)_minmax(0,2fr)_auto_auto] items-center gap-4 md:grid">
+      {/* ── Desktop: single row, waveform fills remaining width ─────── */}
+      <div className="hidden grid-cols-[44px_28px_44px_minmax(140px,0.9fr)_minmax(0,3fr)_auto_auto] items-center gap-4 md:grid">
         <Cover cover={cover} title={song.title} />
         <span className="font-mono text-xs text-[color:var(--muted)]">
           {String(index + 1).padStart(2, "0")}
         </span>
         <button
-          aria-label={playing ? `Pause ${song.title}` : `Play ${song.title}`}
+          aria-label={playing ? `${dict.player.pause} ${song.title}` : `${dict.player.play} ${song.title}`}
           className="btn-icon btn-icon-sm"
           onClick={() => toggle(song.id, song.src)}
           type="button"
@@ -89,7 +91,7 @@ export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
           {song.title}
         </span>
         <Waveform
-          bars={48}
+          bars={72}
           className="min-w-0"
           heightClass="h-7"
           onSeek={(ratio) => seek(song.id, ratio)}
@@ -99,13 +101,12 @@ export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
           {isCurrent ? `${positionLabel} / ${durationLabel}` : durationLabel}
         </span>
         <button
-          aria-hidden
-          aria-label="Lautstärke"
+          aria-label={muted ? dict.player.unmute : dict.player.mute}
           className="btn-ghost-icon"
-          tabIndex={-1}
+          onClick={toggleMute}
           type="button"
         >
-          <VolumeIcon size={16} />
+          {muted || volume === 0 ? <VolumeMutedIcon size={16} /> : <VolumeIcon size={16} />}
         </button>
       </div>
     </article>
@@ -116,7 +117,7 @@ function Cover({ cover, title }: { cover: string; title: string }) {
   return (
     <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-md border border-[color:var(--line)] md:h-11 md:w-11">
       <Image
-        alt={`Cover für ${title}`}
+        alt={`Cover ${title}`}
         className="h-full w-full object-cover sepia-img"
         height={88}
         src={cover}
@@ -145,17 +146,17 @@ function PlayPauseGlyph({ playing }: { playing: boolean }) {
 
 function VolumeIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      aria-hidden
-      fill="none"
-      height={size}
-      stroke="currentColor"
-      strokeWidth={1.6}
-      viewBox="0 0 24 24"
-      width={size}
-    >
+    <svg aria-hidden fill="none" height={size} stroke="currentColor" strokeWidth={1.6} viewBox="0 0 24 24" width={size}>
       <polygon fill="currentColor" points="11 5 6 9 2 9 2 15 6 15 11 19" />
       <path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" />
+    </svg>
+  );
+}
+function VolumeMutedIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg aria-hidden fill="none" height={size} stroke="currentColor" strokeWidth={1.6} viewBox="0 0 24 24" width={size}>
+      <polygon fill="currentColor" points="11 5 6 9 2 9 2 15 6 15 11 19" />
+      <path d="M16 9l5 6M21 9l-5 6" />
     </svg>
   );
 }

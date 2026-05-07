@@ -1,17 +1,15 @@
+"use client";
+
 import Image from "next/image";
+import { useDict } from "@/components/i18n/DictProvider";
 import { SectionHeader } from "@/components/sections/SectionHeader";
 import { members } from "@/data/members";
 
-// Band-Cards module per docs/typhoon-design-fix-v5.md §5 +
-// docs/band-card-example.png:
-//   - photo (or styled "Platzhalter" panel) ─ name ─ instrument ─ short text
-//   - desktop : 4-column grid → 2 rows × 4 cards
-//   - tablet  : 2 columns
-//   - mobile  : 2 columns, compact (kein neues Layout, nur reflow)
 export function Members() {
+  const { dict } = useDict();
   return (
     <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="band">
-      <SectionHeader kicker="Band Mitglieder" />
+      <SectionHeader kicker={dict.members.kicker} />
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-2 md:grid-cols-4 md:gap-3">
         {members.map((m) => (
           <article
@@ -20,7 +18,7 @@ export function Members() {
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-[rgba(11,8,5,0.85)]">
               <Image
-                alt={`${m.name} – ${m.role}`}
+                alt={`${m.name} – ${dict.members.instrument[m.id] ?? m.role}`}
                 className="h-full w-full object-cover sepia-img"
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"
@@ -29,7 +27,7 @@ export function Members() {
               {m.isPlaceholder ? (
                 <span
                   className="absolute right-2 top-2 rounded-full border border-[color:var(--line)] bg-[rgba(3,2,1,0.7)] px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.18em] text-[color:var(--muted-cream)] backdrop-blur-sm md:text-[9px]"
-                  title="Placeholder image — final band photo to follow"
+                  title="Placeholder"
                 >
                   Platzhalter
                 </span>
@@ -40,10 +38,10 @@ export function Members() {
                 {m.name}
               </h3>
               <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[color:var(--gold-soft)] md:text-[10px]">
-                {m.role}
+                {dict.members.instrument[m.id] ?? m.role}
               </span>
               <p className="m-0 text-[11px] leading-[1.55] text-[color:var(--muted-cream)] md:text-[12px]">
-                {m.bio}
+                {dict.members.bio[m.id] ?? m.bio}
               </p>
             </div>
           </article>

@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
 import { AudioPlayerProvider } from "@/components/audio/AudioPlayerProvider";
+import { DictProvider } from "@/components/i18n/DictProvider";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
-
-const locales = ["de", "en", "tr"] as const;
-type Locale = (typeof locales)[number];
+import { getDict } from "@/i18n/dictionaries";
+import { isLocale, LOCALES } from "@/i18n/locales";
 
 export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
+  return LOCALES.map((locale) => ({ locale }));
 }
 
 export default async function LocaleLayout({
@@ -18,13 +19,17 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!locales.includes(locale as Locale)) notFound();
+  if (!isLocale(locale)) notFound();
+  const dict = getDict(locale);
 
   return (
-    <AudioPlayerProvider>
-      <Header />
-      <main>{children}</main>
-      <Footer />
-    </AudioPlayerProvider>
+    <DictProvider dict={dict} locale={locale}>
+      <AudioPlayerProvider>
+        <Header />
+        <main>{children}</main>
+        <Footer />
+        <CookieConsent />
+      </AudioPlayerProvider>
+    </DictProvider>
   );
 }

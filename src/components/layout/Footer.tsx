@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useDict } from "@/components/i18n/DictProvider";
 import { site } from "@/data/site";
 
 const socials: { href: string; label: string; icon: React.ReactNode }[] = [
@@ -46,6 +49,7 @@ const socials: { href: string; label: string; icon: React.ReactNode }[] = [
 ];
 
 export function Footer() {
+  const { dict, locale } = useDict();
   return (
     <footer className="mt-12 border-t border-[color:var(--line)] py-10 md:mt-16 md:py-14" id="contact">
       <div className="mx-auto max-w-container px-4 md:px-8">
@@ -60,13 +64,13 @@ export function Footer() {
               width={250}
             />
             <p className="max-w-[320px] text-xs leading-relaxed text-[color:var(--muted-cream)]">
-              Typhoon verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock.
+              {dict.footer.blurb}
             </p>
           </div>
 
           <div>
             <h4 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--cream)]">
-              Kontakt
+              {dict.footer.contact}
             </h4>
             <ul className="space-y-2 text-xs text-[color:var(--muted-cream)]">
               <li>
@@ -80,7 +84,7 @@ export function Footer() {
 
           <div>
             <h4 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--cream)]">
-              Folge uns
+              {dict.footer.follow}
             </h4>
             <ul className="flex flex-wrap gap-2">
               {socials.map((s) => (
@@ -101,31 +105,31 @@ export function Footer() {
 
           <div>
             <h4 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--cream)]">
-              Legal
+              {dict.footer.legal}
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted-cream)] hover:text-[color:var(--gold-soft)]"
-                  href="/de/legal/imprint"
+                  href={`/${locale}/legal/imprint`}
                 >
-                  Impressum
+                  {dict.footer.imprint}
                 </Link>
               </li>
               <li>
                 <Link
                   className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted-cream)] hover:text-[color:var(--gold-soft)]"
-                  href="/de/legal/privacy"
+                  href={`/${locale}/legal/privacy`}
                 >
-                  Datenschutz
+                  {dict.footer.privacy}
                 </Link>
               </li>
               <li>
                 <Link
                   className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted-cream)] hover:text-[color:var(--gold-soft)]"
-                  href="/de/legal/cookies"
+                  href={`/${locale}/legal/cookies`}
                 >
-                  Cookies
+                  {dict.footer.cookies}
                 </Link>
               </li>
             </ul>
@@ -133,7 +137,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 border-t border-[color:var(--line)] pt-4 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">
-          © {new Date().getFullYear()} Typhoon. Alle Rechte vorbehalten.
+          {dict.footer.copyrightTemplate.replace("{year}", String(new Date().getFullYear()))}
         </div>
       </div>
     </footer>
