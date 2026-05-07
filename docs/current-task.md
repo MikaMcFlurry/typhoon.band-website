@@ -127,3 +127,15 @@ Report:
 6. files changed
 7. lint/build result
 8. remaining gaps vs Claude Design
+
+## Current urgent fixes
+
+- Mobile hero must show the band image properly.
+- Mobile Typhoon signature overlay is too low.
+- The bottom edge of the hero image must fade out and not be visible.
+- Demo row players need cover image, duration and volume/control area.
+- Booking image crop and booking button placement must be fixed on mobile.
+- Booking date field must not overflow on any breakpoint.
+- `info@typhoon.band` does not exist and must be removed.
+- Use only `booking@typhoon.band` and `+49 176 64472296` for now.
+
