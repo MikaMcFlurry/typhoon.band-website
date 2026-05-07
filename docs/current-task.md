@@ -1,112 +1,89 @@
-# Current Task – Strict UI + Old Content Completion Fix
+# Current Task – UI Bugfix v6
 
-## Goal
+## Ziel
 
-The deployed frontend is better, but still not acceptable.
+Der aktuelle Desktop-Stand ist nah am Ziel, aber es gibt konkrete Fehler in Hero, Navigation, Cookie-Banner, Mehrsprachigkeit, Demo-Playern, Media-Viewer und Booking-Mobile.
 
-This batch is a strict correction batch. Do not add new backend features. Do not expand Admin/Shop. Do not redesign freely.
+Dies ist ein strikter Bugfix-Batch nach Nutzerangaben. Nicht frei redesignen.
 
-Main goals:
-1. Match the Claude Design handoff exactly, especially Header/Hero.
-2. Add/restore the missing old website content and agreed project information.
-3. Fix demo player overflow and preserve the visual waveform.
-4. Fix Booking layout.
-5. Fix legal pages to match the planned website content/style.
+## Nicht anfassen / nicht erweitern
 
-## Source of truth order
+Nicht implementieren:
+- vollständiges Admin CRUD
+- Shop
+- Payment
+- Analytics
+- externe Embeds
+- neue Backend-Features außerhalb der unten genannten UI-/Routing-/Cookie-/Player-Fixes
 
-1. Claude Design desktop HTML and mobile HTML for visual layout.
-2. `docs/14-old-site-content-and-ui-fix.md` for missing content and current correction notes.
-3. Existing repo assets.
-4. Existing current implementation only if it does not conflict.
+Beibehalten:
+- aktuelles Desktop-Grundlayout
+- Claude-Design-Optik
+- AudioProvider/Waveform-Grundlogik
+- Supabase/Resend-Grundlage
+- Legal Routes
+- aktuelle Assets
 
-If current code differs from Claude Design, Claude Design wins.
+## Quellen
 
-## Strict scope
+Lies:
+- `CLAUDE.md`
+- `docs/16-ui-bugfix-v6-exact-requirements.md`
 
-Do not implement:
-- full Admin CRUD
-- shop
-- analytics
-- external embeds
-- consent banner
-- new backend features beyond current foundation
+Zusätzlich die angehängten Screenshots:
+- `desktop-aktuell.png`
+- `mobil-aktuell.png`
 
-Keep:
-- existing Supabase/Resend foundation
-- existing audio provider/waveform behavior
-- current assets unless a clear replacement exists
+Die Screenshots sind der aktuelle Fehlerstand. Die Anforderungen in `docs/16-ui-bugfix-v6-exact-requirements.md` sind verbindlich.
 
-## Required fixes
+## Muss-Fixes
 
-### 1. Header/Hero must match Claude Design
+1. Desktop Hero:
+   - Bild links nicht vom schwarzen Hintergrund überdecken.
+   - Bild vollständig sichtbar machen.
+   - Header-Signatur auf Desktop ca. 5 mm nach unten und 2 cm nach links verschieben.
 
-Current problem:
-- Typhoon signature in header is too low.
-- Hero image is not in its own block and not fully/cleanly visible.
-- Text, image and signature are not structured like Claude Design.
+2. Mobile Hero:
+   - Header-Bild vollständig sichtbar machen; linker Teil darf nicht abgeschnitten sein.
+   - Signatur deutlich weiter nach unten, so dass sie unten gerade aus dem Bild herausragt.
+   - Signatur etwas nach links verschieben.
 
-Required:
-- Rebuild Hero to match Claude Design structure closely.
-- Text, image and signature must be separate visual blocks/layers exactly as in Claude Design:
-  1. text block
-  2. hero image block
-  3. signature/logo block
-- Header logo must sit exactly where Claude Design places it.
-- Do not let header signature drift down.
-- Hero image must be fully/cleanly visible according to Claude Design, not treated as a random background crop.
-- Do not invent extra hero layout.
+3. Mobile Menü:
+   - Wenn Burger-Menü offen ist, darf die Hero-/Typhoon-Signatur dahinter nicht sichtbar sein.
+   - Menü braucht eigenen deckenden Hintergrund.
+   - Im Menü-Header darf kein Teil der Website im Hintergrund sichtbar sein.
 
-### 2. Old/agreed content must be added
+4. Legal Navigation:
+   - Header-Links müssen auch von Impressum/Datenschutz/Cookies zurück zur Home-Onepager-Section führen.
+   - Links auf Legal Pages müssen `/${locale}#section` verwenden und nicht nur `#section`.
 
-Use `docs/14-old-site-content-and-ui-fix.md`.
+5. Cookie Banner:
+   - Cookie Banner mit Bestätigung umsetzen.
+   - Keine Analytics/Embeds aktivieren.
+   - Consent lokal speichern.
+   - Links zu Datenschutz/Cookies anbieten.
 
-The page currently lacks the quality and content depth we planned. Add the agreed band information, functions and sections, but keep the Claude Design layout.
+6. Sprachen:
+   - EN und TR müssen tatsächlich existieren.
+   - Header-Switch DE/EN/TR muss Inhalte in entsprechender Sprache laden.
+   - Legal Pages brauchen mindestens saubere EN/TR-Fassung oder strukturierte Übersetzung.
 
-### 3. Demo player overflow
+7. Demo-Player:
+   - Vor/Zurück, Lautstärke und Drei-Punkte Buttons müssen Funktion bekommen.
+   - Header-Player-Waveform muss über die ganze freie Breite bis zur Zeitangabe rendern.
+   - Andere Demo-Player-Waveforms müssen breiter und optisch angepasst werden.
+   - Kein Overflow, kein Download-Button.
 
-Current problem:
-- Demo song player rows leave the screen on the right.
+8. Media:
+   - Gallery/Media-Items dürfen nicht in neuem Tab öffnen.
+   - Klick öffnet eigenen Overlay-Viewer mit Vor/Zurück Buttons, Schließen und Tastatursteuerung.
 
-Required:
-- Fix all mobile overflow.
-- The demo row must stay inside the viewport.
-- Waveform must be visible but clipped/scaled inside the card.
-- Use `min-width: 0`, `overflow: hidden`, responsive bar count or CSS clamp if needed.
-- No horizontal scrolling.
+9. Booking Mobile:
+   - Kontaktformular-Bild rechts ist mobil falsch zugeschnitten.
+   - Auf Mobile muss das Bild sichtbar und sinnvoll positioniert sein, nicht links/rechts abgeschnitten.
+   - Button auf Bild muss vollständig sichtbar und korrekt ausgerichtet sein.
 
-### 4. Booking
-
-Current problem:
-- Booking form does not match the old planned website.
-- Image next to form should use the band image with signature from gallery assets.
-
-Required:
-- Booking form must follow Claude Design style.
-- Next to the form, use the gallery asset that shows the band image with Typhoon signature.
-- If filename is unclear, inspect gallery assets and choose the image with band/signature.
-- Keep booking contact details visible.
-- Keep existing backend fallback behavior.
-
-### 5. Legal pages
-
-Current problem:
-- Impressum/Datenschutz/Cookies do not fit the old website/planned content/style.
-
-Required:
-- Legal pages must visually match the website style.
-- Impressum must contain the correct initial data:
-  Mika Hertler
-  Am Schwarzen Steg 5a
-  95448 Bayreuth
-  Deutschland
-  info@typhoon.band
-  +49 176 64472296
-- Datenschutz and Cookies must be clear placeholder/legal drafts, styled consistently.
-- Do not claim final legal certainty.
-- Keep separate routes.
-
-## Before finishing
+## Vor Abschluss
 
 Run:
 ```bash
@@ -114,16 +91,19 @@ npm run lint
 npm run build
 ```
 
-Fix all errors.
+Fehler fixen.
 
-## Final summary
+## Abschlussbericht
 
-Report:
-1. Header/Hero fixes
-2. old/agreed content added
-3. demo player overflow fix
-4. booking image/form fix
-5. legal page fixes
-6. files changed
-7. lint/build result
-8. remaining gaps vs Claude Design
+Berichte:
+- Hero Desktop/Mobile Fixes
+- Mobile Menü Fix
+- Legal Navigation Fix
+- Cookie Banner
+- EN/TR Umsetzung
+- Player-Control-Funktionen
+- Waveform-Breiten
+- Media Overlay Viewer
+- Booking-Mobile Bildfix
+- geänderte Dateien
+- lint/build Ergebnis
