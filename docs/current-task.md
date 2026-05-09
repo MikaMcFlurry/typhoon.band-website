@@ -1,109 +1,72 @@
-# Current Task – UI Bugfix v6
+# Current Task – Phase 01 Booking + Content Foundation
 
-## Ziel
+## Current Phase
 
-Der aktuelle Desktop-Stand ist nah am Ziel, aber es gibt konkrete Fehler in Hero, Navigation, Cookie-Banner, Mehrsprachigkeit, Demo-Playern, Media-Viewer und Booking-Mobile.
+Active phase:
 
-Dies ist ein strikter Bugfix-Batch nach Nutzerangaben. Nicht frei redesignen.
+```text
+docs/phases/01-booking-content-foundation.md
+```
 
-## Nicht anfassen / nicht erweitern
+## Working Rule
 
-Nicht implementieren:
-- vollständiges Admin CRUD
-- Shop
-- Payment
-- Analytics
-- externe Embeds
-- neue Backend-Features außerhalb der unten genannten UI-/Routing-/Cookie-/Player-Fixes
+Claude Code must work step by step.
 
-Beibehalten:
-- aktuelles Desktop-Grundlayout
-- Claude-Design-Optik
-- AudioProvider/Waveform-Grundlogik
-- Supabase/Resend-Grundlage
-- Legal Routes
-- aktuelle Assets
+Read only:
+1. `CLAUDE.md`
+2. `docs/00-project-source-of-truth.md`
+3. `docs/02-claude-workflow.md`
+4. the active phase file listed above
 
-## Quellen
+Only open other docs if the active phase explicitly references them.
 
-Lies:
-- `CLAUDE.md`
-- `docs/16-ui-bugfix-v6-exact-requirements.md`
+## Critical Rule
 
-Zusätzlich die angehängten Screenshots:
-- `desktop-aktuell.png`
-- `mobil-aktuell.png`
+The frontend design is approved.
 
-Die Screenshots sind der aktuelle Fehlerstand. Die Anforderungen in `docs/16-ui-bugfix-v6-exact-requirements.md` sind verbindlich.
+Do not redesign the frontend.
+Do not change visual layout unless the active phase explicitly requires a bug fix.
 
-## Muss-Fixes
+## Current Goal
 
-1. Desktop Hero:
-   - Bild links nicht vom schwarzen Hintergrund überdecken.
-   - Bild vollständig sichtbar machen.
-   - Header-Signatur auf Desktop ca. 5 mm nach unten und 2 cm nach links verschieben.
+Prepare the finished website architecture so all current static content and GitHub assets can later be replaced through Supabase/Admin content.
 
-2. Mobile Hero:
-   - Header-Bild vollständig sichtbar machen; linker Teil darf nicht abgeschnitten sein.
-   - Signatur deutlich weiter nach unten, so dass sie unten gerade aus dem Bild herausragt.
-   - Signatur etwas nach links verschieben.
+Booking is the first important production function.
 
-3. Mobile Menü:
-   - Wenn Burger-Menü offen ist, darf die Hero-/Typhoon-Signatur dahinter nicht sichtbar sein.
-   - Menü braucht eigenen deckenden Hintergrund.
-   - Im Menü-Header darf kein Teil der Website im Hintergrund sichtbar sein.
+## This Phase Must Implement
 
-4. Legal Navigation:
-   - Header-Links müssen auch von Impressum/Datenschutz/Cookies zurück zur Home-Onepager-Section führen.
-   - Links auf Legal Pages müssen `/${locale}#section` verwenden und nicht nur `#section`.
+- production-ready Booking foundation
+- Supabase-first/static-fallback content provider
+- Resend-ready booking email flow
+- Supabase booking insert if configured
+- no hard crash when env vars are missing
+- documentation for Vercel/Supabase/Resend setup
 
-5. Cookie Banner:
-   - Cookie Banner mit Bestätigung umsetzen.
-   - Keine Analytics/Embeds aktivieren.
-   - Consent lokal speichern.
-   - Links zu Datenschutz/Cookies anbieten.
+## This Phase Must Not Implement
 
-6. Sprachen:
-   - EN und TR müssen tatsächlich existieren.
-   - Header-Switch DE/EN/TR muss Inhalte in entsprechender Sprache laden.
-   - Legal Pages brauchen mindestens saubere EN/TR-Fassung oder strukturierte Übersetzung.
+- full Admin CRUD
+- shop
+- payment
+- analytics
+- external embeds
+- frontend redesign
 
-7. Demo-Player:
-   - Vor/Zurück, Lautstärke und Drei-Punkte Buttons müssen Funktion bekommen.
-   - Header-Player-Waveform muss über die ganze freie Breite bis zur Zeitangabe rendern.
-   - Andere Demo-Player-Waveforms müssen breiter und optisch angepasst werden.
-   - Kein Overflow, kein Download-Button.
-
-8. Media:
-   - Gallery/Media-Items dürfen nicht in neuem Tab öffnen.
-   - Klick öffnet eigenen Overlay-Viewer mit Vor/Zurück Buttons, Schließen und Tastatursteuerung.
-
-9. Booking Mobile:
-   - Kontaktformular-Bild rechts ist mobil falsch zugeschnitten.
-   - Auf Mobile muss das Bild sichtbar und sinnvoll positioniert sein, nicht links/rechts abgeschnitten.
-   - Button auf Bild muss vollständig sichtbar und korrekt ausgerichtet sein.
-
-## Vor Abschluss
+## Finish Criteria
 
 Run:
+
 ```bash
 npm run lint
 npm run build
 ```
 
-Fehler fixen.
+Push this phase as its own commit/branch.
 
-## Abschlussbericht
-
-Berichte:
-- Hero Desktop/Mobile Fixes
-- Mobile Menü Fix
-- Legal Navigation Fix
-- Cookie Banner
-- EN/TR Umsetzung
-- Player-Control-Funktionen
-- Waveform-Breiten
-- Media Overlay Viewer
-- Booking-Mobile Bildfix
-- geänderte Dateien
-- lint/build Ergebnis
+Then stop and summarize:
+- changed files
+- Booking status
+- Supabase content provider status
+- fallback behavior
+- env vars needed
+- lint/build result
+- next recommended phase
