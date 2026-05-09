@@ -9,17 +9,26 @@ import {
   useState,
 } from "react";
 
+export type PlaylistEntry = { id: string; src: string };
+
 type AudioState = {
   currentId: string | null;
   isPlaying: boolean;
   progress: number;
   duration: number;
   position: number;
+  volume: number; // 0..1
+  muted: boolean;
 };
 
 type AudioContextValue = AudioState & {
   toggle: (id: string, src: string | null | undefined) => void;
   seek: (id: string, ratio: number) => void;
+  setVolume: (v: number) => void;
+  toggleMute: () => void;
+  setPlaylist: (list: PlaylistEntry[]) => void;
+  next: () => void;
+  previous: () => void;
   getAnalyser: () => AnalyserNode | null;
 };
 
@@ -31,6 +40,8 @@ const initialState: AudioState = {
   progress: 0,
   duration: 0,
   position: 0,
+  volume: 1,
+  muted: false,
 };
 
 const FFT_SIZE = 256;
@@ -40,6 +51,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const playlistRef = useRef<PlaylistEntry[]>([]);
   const [state, setState] = useState<AudioState>(initialState);
 
   const ensureAudio = useCallback(() => {
@@ -98,11 +110,29 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     };
     el.onplay = () => setState((s) => ({ ...s, currentId: id, isPlaying: true }));
     el.onpause = () => setState((s) => ({ ...s, isPlaying: false }));
-    el.onended = () => setState({ ...initialState });
+    el.onended = () => {
+      // Auto-advance to the next track in the playlist if registered.
+      const list = playlistRef.current;
+      const idx = list.findIndex((p) => p.id === id);
+      const nextEntry = idx >= 0 ? list[idx + 1] : null;
+      if (nextEntry) {
+        const next = nextEntry;
+        const a = audioRef.current;
+        if (!a) return;
+        a.src = next.src;
+        attachListeners(next.id, a);
+        setState((s) => ({ ...s, currentId: next.id, position: 0, progress: 0 }));
+        a.play().catch(() => setState({ ...initialState }));
+      } else {
+        setState((s) => ({ ...s, isPlaying: false, position: 0, progress: 0 }));
+      }
+    };
     el.onerror = () => setState({ ...initialState });
     el.onloadedmetadata = () => {
       setState((s) => ({ ...s, currentId: id, duration: el.duration || 0 }));
     };
+    el.onvolumechange = () =>
+      setState((s) => ({ ...s, volume: el.volume, muted: el.muted }));
   }, []);
 
   const toggle = useCallback(
@@ -121,7 +151,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         } catch {}
         el.src = src;
         attachListeners(id, el);
-        setState({ ...initialState, currentId: id });
+        setState({ ...initialState, currentId: id, volume: el.volume, muted: el.muted });
       }
       ensureAnalyser();
       const playPromise = el.play();
@@ -146,11 +176,73 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     [state.currentId],
   );
 
+  const setVolume = useCallback((v: number) => {
+    const el = audioRef.current ?? ensureAudio();
+    if (!el) return;
+    const clamped = Math.max(0, Math.min(1, v));
+    el.volume = clamped;
+    if (clamped > 0 && el.muted) el.muted = false;
+    setState((s) => ({ ...s, volume: clamped, muted: el.muted }));
+  }, [ensureAudio]);
+
+  const toggleMute = useCallback(() => {
+    const el = audioRef.current ?? ensureAudio();
+    if (!el) return;
+    el.muted = !el.muted;
+    setState((s) => ({ ...s, muted: el.muted }));
+  }, [ensureAudio]);
+
+  const setPlaylist = useCallback((list: PlaylistEntry[]) => {
+    playlistRef.current = list;
+  }, []);
+
+  const skipBy = useCallback(
+    (delta: number) => {
+      const list = playlistRef.current;
+      if (list.length === 0) return;
+      const id = state.currentId;
+      const idx = id ? list.findIndex((p) => p.id === id) : -1;
+      // No current track → start at first/last.
+      const nextIdx =
+        idx === -1
+          ? delta > 0
+            ? 0
+            : list.length - 1
+          : (idx + delta + list.length) % list.length;
+      const target = list[nextIdx];
+      if (!target) return;
+      toggle(target.id, target.src);
+    },
+    [state.currentId, toggle],
+  );
+
+  const next = useCallback(() => skipBy(1), [skipBy]);
+  const previous = useCallback(() => {
+    // Match common audio-player UX: if more than 3s into the track, restart it
+    // first; otherwise jump to the previous track.
+    const el = audioRef.current;
+    if (el && el.currentTime > 3) {
+      el.currentTime = 0;
+      return;
+    }
+    skipBy(-1);
+  }, [skipBy]);
+
   const getAnalyser = useCallback(() => analyserRef.current, []);
 
   const value = useMemo<AudioContextValue>(
-    () => ({ ...state, toggle, seek, getAnalyser }),
-    [state, toggle, seek, getAnalyser],
+    () => ({
+      ...state,
+      toggle,
+      seek,
+      setVolume,
+      toggleMute,
+      setPlaylist,
+      next,
+      previous,
+      getAnalyser,
+    }),
+    [state, toggle, seek, setVolume, toggleMute, setPlaylist, next, previous, getAnalyser],
   );
 
   return <AudioCtx.Provider value={value}>{children}</AudioCtx.Provider>;
