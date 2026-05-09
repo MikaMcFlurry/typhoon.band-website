@@ -33,17 +33,16 @@ export function Hero() {
         }}
       >
         {/* ── Block 2: IMAGE — desktop ─────────────────────────────────
-             Container expanded so the band collage's left edge is no
-             longer chopped off (was w-[62%] right-aligned). */}
+             `object-contain` so the full band collage is visible (no
+             right-edge crop), anchored to the right side of its block. */}
         <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] hidden w-[68%] overflow-hidden md:block">
           <Image
             alt="Typhoon — Band Live Collage"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain object-right"
             height={1500}
             priority
             src="/assets/hero/hero-collage.jpeg"
             style={{
-              objectPosition: "left top",
               filter:
                 "sepia(0.4) saturate(0.85) contrast(1.08) brightness(0.78)",
             }}
@@ -65,17 +64,18 @@ export function Hero() {
           />
         </div>
 
-        {/* ── Block 2: IMAGE — mobile (full-width backdrop) ────────────── */}
+        {/* ── Block 2: IMAGE — mobile (full-width backdrop) ──────────────
+             `object-contain` so the entire band collage stays visible,
+             anchored to the right edge so the left text gutter remains. */}
         <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden md:hidden">
           <Image
             alt="Typhoon — Band Live Collage"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain object-right"
             height={1500}
             priority
             sizes="100vw"
             src="/assets/hero/hero-collage.jpeg"
             style={{
-              objectPosition: "55% 28%",
               filter:
                 "sepia(0.38) saturate(0.85) contrast(1.06) brightness(0.72)",
             }}

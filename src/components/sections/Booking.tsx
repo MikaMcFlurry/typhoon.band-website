@@ -112,15 +112,14 @@ export function Booking() {
           </p>
         </form>
 
-        <aside className="relative flex min-h-[220px] min-w-0 flex-col items-stretch justify-end overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-3 md:min-h-full md:p-[18px]">
+        <aside className="relative flex aspect-square min-w-0 flex-col items-stretch justify-end overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-3 md:aspect-auto md:min-h-full md:p-[18px]">
           <Image
             alt="Typhoon — Band mit Signatur"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain object-center md:object-cover"
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
             src="/assets/gallery/gallery-3.jpg"
             style={{
-              objectPosition: "center 65%",
               filter: "saturate(0.95) contrast(1.05) brightness(0.92)",
             }}
           />

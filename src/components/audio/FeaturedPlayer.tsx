@@ -110,7 +110,7 @@ export function FeaturedPlayer({ song, cover, artist = "Typhoon" }: Props) {
         </div>
 
         {/* ── Desktop controls (waveform fills all free width) ────────── */}
-        <div className="hidden grid-cols-[44px_36px_36px_minmax(0,1fr)_auto_auto_auto_auto] items-center gap-4 border-t border-[color:var(--line)] pt-4 md:grid">
+        <div className="hidden grid-cols-[44px_36px_36px_minmax(0,1fr)_auto_auto] items-center gap-4 border-t border-[color:var(--line)] pt-4 md:grid">
           <button
             aria-label={playing ? dict.player.pause : dict.player.play}
             className="btn-icon"
@@ -165,38 +165,9 @@ export function FeaturedPlayer({ song, cover, artist = "Typhoon" }: Props) {
               value={muted ? 0 : volume}
             />
           </div>
-          <MoreMenu />
         </div>
       </div>
     </div>
-  );
-}
-
-function MoreMenu() {
-  const { dict } = useDict();
-  return (
-    <details className="relative">
-      <summary
-        aria-label={dict.player.more}
-        className="btn-ghost-icon cursor-pointer list-none [&::-webkit-details-marker]:hidden"
-        title={dict.player.more}
-      >
-        <MoreIcon size={16} />
-      </summary>
-      <div
-        className="absolute right-0 top-full z-30 mt-2 w-44 rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.96)] p-2 text-xs text-[color:var(--muted-cream)] shadow-[0_18px_36px_rgba(0,0,0,0.6)] backdrop-blur-md"
-      >
-        <a className="block rounded px-2 py-1.5 hover:bg-[rgba(232,201,130,0.06)]" href="#booking">
-          {dict.about.ctaBook}
-        </a>
-        <a className="block rounded px-2 py-1.5 hover:bg-[rgba(232,201,130,0.06)]" href="#music">
-          {dict.demos.kicker}
-        </a>
-        <a className="block rounded px-2 py-1.5 hover:bg-[rgba(232,201,130,0.06)]" href="#contact">
-          {dict.nav.contact}
-        </a>
-      </div>
-    </details>
   );
 }
 
@@ -241,15 +212,6 @@ function VolumeMutedIcon({ size = 16 }: { size?: number }) {
     <svg aria-hidden fill="none" height={size} stroke="currentColor" strokeWidth={1.6} viewBox="0 0 24 24" width={size}>
       <polygon fill="currentColor" points="11 5 6 9 2 9 2 15 6 15 11 19" />
       <path d="M16 9l5 6M21 9l-5 6" />
-    </svg>
-  );
-}
-function MoreIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg aria-hidden fill="currentColor" height={size} viewBox="0 0 24 24" width={size}>
-      <circle cx={5} cy={12} r={1.6} />
-      <circle cx={12} cy={12} r={1.6} />
-      <circle cx={19} cy={12} r={1.6} />
     </svg>
   );
 }
