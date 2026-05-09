@@ -65,12 +65,13 @@ export function Hero() {
         </div>
 
         {/* ── Block 2: IMAGE — mobile (full-width backdrop) ──────────────
-             `object-contain` so the entire band collage stays visible,
-             anchored to the right edge so the left text gutter remains. */}
+             `object-cover object-left` so there is no horizontal letterbox
+             (= no hard bottom edge) AND the left side of the band collage
+             is visible. The right side gets the trade-off crop. */}
         <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden md:hidden">
           <Image
             alt="Typhoon — Band Live Collage"
-            className="h-full w-full object-contain object-right"
+            className="h-full w-full object-cover object-left"
             height={1500}
             priority
             sizes="100vw"
