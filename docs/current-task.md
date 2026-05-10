@@ -1,11 +1,11 @@
-# Current Task – Phase 02 Supabase Schema, RLS and Storage
+# Current Task – Phase 03 Admin Auth + Dashboard
 
 ## Current Phase
 
 Active phase:
 
 ```text
-docs/phases/02-supabase-schema-rls-storage.md
+docs/phases/03-admin-auth-dashboard.md
 ```
 
 ## Working Rule
@@ -22,44 +22,41 @@ Only open other docs if the active phase explicitly references them.
 
 ## Critical Rule
 
-The frontend design is approved.
+The public frontend design is approved.
 
-Do not redesign the frontend.
-Do not change visual layout.
+Do not redesign the public website.
+Do not change the public layout.
 
 ## Current Goal
 
-Finalize the Supabase backend foundation so later Admin phases can safely manage:
-- texts
-- images
-- audio demos
-- members
-- shows
-- legal pages
-- SEO
-- platform links
-- booking requests
+Build the secure Admin foundation:
+- Supabase Auth login
+- protected Admin route group
+- active admin profile guard
+- role helpers
+- logout
+- dashboard overview
+- Booking requests list/read-only view
 
 ## This Phase Must Implement
 
-- install/configure `@supabase/supabase-js`
-- replace REST-only Supabase booking writer with a safe server-side Supabase client implementation
-- finalize SQL migrations for schema and RLS
-- prepare Supabase Storage buckets and policies
-- make content provider capable of real Supabase reads for public published/visible content
-- keep static fallback behavior
-- update README/.env/docs
+- secure Admin login/logout flow
+- `/[locale]/admin` protected by server-side checks
+- active admin profile lookup from `admin_profiles`
+- owner/admin/editor role helper foundation
+- Admin dashboard cards
+- read-only Booking requests overview using Supabase
+- clear setup instructions for creating the first owner admin
 
 ## This Phase Must Not Implement
 
-- full Admin CRUD
-- Admin UI pages beyond existing shell
-- upload UI
+- full content CRUD
+- media/audio upload UI
 - shop
 - payment
 - analytics
 - external embeds
-- frontend redesign
+- public frontend redesign
 
 ## Finish Criteria
 
@@ -74,11 +71,11 @@ Push this phase as its own commit/branch.
 
 Then stop and summarize:
 - changed files
-- Supabase SDK/client setup
-- schema/migration changes
-- RLS/storage policy changes
-- content provider read status
-- booking storage status
+- auth/login behavior
+- admin protection
+- dashboard modules
+- booking requests view
+- first owner setup steps
 - env vars needed
 - lint/build result
 - next recommended phase
