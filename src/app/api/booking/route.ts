@@ -12,6 +12,11 @@
 //      "fallback" response so the public site stays online.
 
 import { NextResponse } from "next/server";
+import {
+  buildBookingEmailHtml,
+  buildBookingEmailText,
+  getBookingEmailSubject,
+} from "@/lib/email/booking-email";
 import { isResendConfigured, readServerEnv } from "@/lib/env";
 import { sendEmail } from "@/lib/resend/client";
 import { storeBookingRequest } from "@/lib/supabase/booking";
@@ -21,8 +26,6 @@ import {
 } from "@/lib/validation/booking";
 
 export const runtime = "nodejs";
-
-const SUBJECT = "Neue Booking-Anfrage über typhoon.band";
 
 const MESSAGES = {
   ok: "Danke für deine Anfrage. Wir melden uns so schnell wie möglich.",
@@ -107,25 +110,15 @@ async function deliverEmail(to: string, data: BookingData): Promise<Outcome> {
   if (!isResendConfigured()) {
     return { attempted: false, ok: false, reason: "resend missing" };
   }
-  const text = [
-    `Name: ${data.name}`,
-    `E-Mail: ${data.email}`,
-    data.phone ? `Telefon: ${data.phone}` : null,
-    data.event_date ? `Datum: ${data.event_date}` : null,
-    `Ort: ${data.event_location}`,
-    `Art: ${data.event_type}`,
-    `Sprache: ${data.locale}`,
-    "",
-    "Nachricht:",
-    data.message,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const receivedAt = new Date();
+  const text = buildBookingEmailText({ ...data, receivedAt });
+  const html = buildBookingEmailHtml({ ...data, receivedAt });
 
   const res = await sendEmail({
     to,
-    subject: SUBJECT,
+    subject: getBookingEmailSubject(),
     text,
+    html,
     replyTo: data.email,
   });
   return { attempted: true, ok: res.ok, reason: res.reason };
