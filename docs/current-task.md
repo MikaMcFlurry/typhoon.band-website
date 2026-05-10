@@ -1,11 +1,11 @@
-# Current Task – Phase 04 Booking Workflow + Shows Admin
+# Current Task – Phase 05 Admin Media + Audio Uploads
 
 ## Current Phase
 
 Active phase:
 
 ```text
-docs/phases/04-booking-shows-workflow.md
+docs/phases/05-admin-media-audio-uploads.md
 ```
 
 ## Working Rule
@@ -25,34 +25,38 @@ Only open other docs if the active phase explicitly references them.
 The public frontend design is approved.
 
 Do not redesign the public website.
-Do not change public layout unless required to display real Supabase shows correctly.
+Do not change public layout except minimal data wiring needed to use uploaded Supabase assets.
 
 ## Current Goal
 
-Extend the Admin so bookings can be managed and converted into public shows.
+Extend the existing Admin workflow so admins can safely upload and manage website assets:
 
-This phase connects the current Booking admin area with the Shows system.
+- Gallery images
+- Demo song MP3 files
+- Demo song cover images
+- Member photos
+- Hero/Bandinfo images through site settings
+- Asset replacement without breaking static fallback
 
 ## This Phase Must Implement
 
-- correct admin setup documentation order:
-  1. create Supabase Auth user manually
-  2. then run SQL to create/link admin_profiles row
-- Booking detail view
-- Booking delete/archive action
-- Booking status handling
-- Convert booking to show flow
-- Shows admin list/create/edit/delete
-- Supabase schema support for booking/show linking
-- public Shows section reads visible Supabase shows and keeps fallback if empty
+- secure server-side upload flow
+- file validation for images and MP3s
+- Supabase Storage upload through admin-gated server actions/routes
+- DB record update/create after upload
+- gallery media management
+- demo song audio/cover management
+- member photo management
+- hero/bandinfo image setting management
+- public site uses uploaded Supabase asset URLs when records exist
+- static GitHub assets remain fallback
 
 ## This Phase Must Not Implement
 
-- full website content CRUD
-- member CRUD
-- gallery/media uploads
-- audio uploads
-- shop checkout/payment
+- full text CRUD for every website section
+- rich text editor
+- shop
+- payment
 - analytics
 - external embeds
 - public frontend redesign
@@ -70,13 +74,11 @@ Push this phase as its own branch/commit.
 
 Then stop and summarize:
 - changed files
-- booking workflow changes
-- booking delete/archive behavior
-- convert-to-show behavior
-- shows admin CRUD
-- public shows behavior
-- migration/RLS changes
-- setup docs correction
+- upload/storage behavior
+- validation rules
+- admin media pages
+- public asset fallback behavior
+- security notes
 - manual test steps
 - lint/build result
 - next recommended phase
