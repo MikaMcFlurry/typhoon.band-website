@@ -1,11 +1,11 @@
-# Current Task – Phase 01b Booking Email Design
+# Current Task – Phase 02 Supabase Schema, RLS and Storage
 
 ## Current Phase
 
 Active phase:
 
 ```text
-docs/phases/01b-booking-email-design.md
+docs/phases/02-supabase-schema-rls-storage.md
 ```
 
 ## Working Rule
@@ -22,32 +22,44 @@ Only open other docs if the active phase explicitly references them.
 
 ## Critical Rule
 
-Booking is already functional.
+The frontend design is approved.
 
-This phase must only improve the visual quality and clarity of the booking email that is sent to:
+Do not redesign the frontend.
+Do not change visual layout.
 
-```text
-booking@typhoon.band
-```
+## Current Goal
+
+Finalize the Supabase backend foundation so later Admin phases can safely manage:
+- texts
+- images
+- audio demos
+- members
+- shows
+- legal pages
+- SEO
+- platform links
+- booking requests
 
 ## This Phase Must Implement
 
-- visually polished HTML email template
-- readable plain-text fallback
-- clean booking data formatting
-- Reply-To remains sender email
-- no frontend design changes
-- no new backend feature creep
+- install/configure `@supabase/supabase-js`
+- replace REST-only Supabase booking writer with a safe server-side Supabase client implementation
+- finalize SQL migrations for schema and RLS
+- prepare Supabase Storage buckets and policies
+- make content provider capable of real Supabase reads for public published/visible content
+- keep static fallback behavior
+- update README/.env/docs
 
 ## This Phase Must Not Implement
 
 - full Admin CRUD
+- Admin UI pages beyond existing shell
+- upload UI
 - shop
 - payment
 - analytics
 - external embeds
 - frontend redesign
-- Supabase schema phase work
 
 ## Finish Criteria
 
@@ -62,8 +74,11 @@ Push this phase as its own commit/branch.
 
 Then stop and summarize:
 - changed files
-- email template changes
-- booking behavior preserved
+- Supabase SDK/client setup
+- schema/migration changes
+- RLS/storage policy changes
+- content provider read status
+- booking storage status
 - env vars needed
 - lint/build result
 - next recommended phase
