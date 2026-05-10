@@ -9,19 +9,7 @@ import {
   upsertAssetSetting,
   type SiteAssetKey,
 } from "@/lib/admin/site-settings";
-import {
-  deleteStorageObject,
-  uploadAssetToStorage,
-} from "@/lib/storage/upload";
-
-function isFile(value: unknown): value is File {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as File).size === "number" &&
-    typeof (value as File).name === "string"
-  );
-}
+import { parseSupabasePublicUrl } from "@/lib/storage/upload";
 
 function asAssetKey(value: unknown): SiteAssetKey | null {
   if (typeof value !== "string") return null;
@@ -43,30 +31,26 @@ function flashRedirect(
   redirect(`/${locale}/admin/settings/assets${qs}`);
 }
 
-export async function uploadSiteAssetAction(formData: FormData) {
+export async function saveSiteAssetAction(formData: FormData) {
   const locale = resolveLocale(String(formData.get("locale") ?? ""));
   await requireAdminWithPasswordOk(locale);
 
   const key = asAssetKey(formData.get("key"));
   if (!key) flashRedirect(locale, "error", "Unbekannter Asset-Schlüssel.");
 
-  const file = formData.get("file");
-  if (!isFile(file) || file.size === 0) {
-    flashRedirect(locale, "error", "Bitte eine Datei auswählen.");
+  const url = String(formData.get("file_url") ?? "").trim();
+  if (!url) {
+    flashRedirect(locale, "error", "Bitte zuerst eine Datei hochladen.");
+  }
+  const parsed = parseSupabasePublicUrl(url);
+  if (!parsed.ok) flashRedirect(locale, "error", parsed.message);
+  if (parsed.bucket !== "public-media") {
+    flashRedirect(locale, "error", "Falscher Storage-Bucket.");
   }
 
-  const upload = await uploadAssetToStorage({
-    bucket: "public-media",
-    prefix: `site/${key}`,
-    kind: "image",
-    file,
-  });
-  if (!upload.ok) flashRedirect(locale, "error", upload.message);
-
-  const result = await upsertAssetSetting(key, upload.publicUrl);
+  const result = await upsertAssetSetting(key, parsed.publicUrl);
   if (!result.ok) {
-    await deleteStorageObject(upload.bucket, upload.path);
-    flashRedirect(locale, "error", result.reason);
+    flashRedirect(locale, "error", `Speichern fehlgeschlagen: ${result.reason}`);
   }
 
   revalidatePath(`/${locale}/admin/settings/assets`);

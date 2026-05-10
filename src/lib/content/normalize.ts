@@ -113,25 +113,63 @@ export type MemberRow = {
   } | null;
 };
 
+// Merge strategy:
+//   - The static fallback list (8 musicians) is the canonical base.
+//   - For each fallback slug, overlay matching Supabase data (photo /
+//     translation / sort_order). If `is_visible === false`, drop only
+//     that one member.
+//   - Any Supabase rows whose slug is NOT in the fallback list are
+//     appended at the end so an Admin can add a 9th musician without
+//     editing the repo.
+//
+// This is the core fix for the "one Supabase row hides the other 7"
+// regression — the public site is always at least as complete as the
+// fallback list, never strictly less.
 export function normaliseMembers(
   rows: MemberRow[],
   fallbacks: Member[],
 ): Member[] {
-  return rows
-    .filter((r) => r.is_visible !== false)
-    .map((row) => {
-      const fallback = fallbacks.find((m) => m.id === row.slug);
-      return {
-        id: row.slug,
-        name: pickString(row.translation?.name, fallback?.name ?? row.slug),
-        role: pickString(row.translation?.role, fallback?.role ?? ""),
-        bio: pickString(row.translation?.bio_md, fallback?.bio ?? ""),
-        photoUrl: pickString(row.photo_url, fallback?.photoUrl ?? ""),
-        isPlaceholder: fallback?.isPlaceholder ?? false,
-        sortOrder: row.sort_order ?? fallback?.sortOrder ?? 999,
-      };
-    })
-    .sort((a, b) => a.sortOrder - b.sortOrder);
+  const rowsBySlug = new Map<string, MemberRow>();
+  for (const r of rows) rowsBySlug.set(r.slug, r);
+
+  const result: Member[] = [];
+  const usedSlugs = new Set<string>();
+
+  for (const fb of fallbacks) {
+    const sb = rowsBySlug.get(fb.id);
+    if (!sb) {
+      // No Supabase row for this slug — keep the static fallback as-is.
+      result.push(fb);
+      continue;
+    }
+    usedSlugs.add(fb.id);
+    if (sb.is_visible === false) continue; // explicit hide → drop only this one
+    result.push({
+      id: fb.id,
+      name: pickString(sb.translation?.name, fb.name),
+      role: pickString(sb.translation?.role, fb.role),
+      bio: pickString(sb.translation?.bio_md, fb.bio),
+      photoUrl: pickString(sb.photo_url, fb.photoUrl),
+      isPlaceholder: fb.isPlaceholder,
+      sortOrder: sb.sort_order ?? fb.sortOrder,
+    });
+  }
+
+  for (const sb of rows) {
+    if (usedSlugs.has(sb.slug)) continue;
+    if (sb.is_visible === false) continue;
+    result.push({
+      id: sb.slug,
+      name: pickString(sb.translation?.name, sb.slug),
+      role: pickString(sb.translation?.role, ""),
+      bio: pickString(sb.translation?.bio_md, ""),
+      photoUrl: pickString(sb.photo_url, ""),
+      isPlaceholder: false,
+      sortOrder: sb.sort_order ?? 999,
+    });
+  }
+
+  return result.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
 export type SongRow = {

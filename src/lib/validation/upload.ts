@@ -173,3 +173,119 @@ function uuidV4(): string {
   const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
+
+// Metadata-only validator used by the direct-to-Storage upload prepare
+// step. The browser describes the file (name/size/mime), the server
+// confirms the descriptor matches the policy before issuing a signed
+// upload URL. No buffering of the file body happens here.
+export type UploadMeta = {
+  filename: string;
+  size: number;
+  mime: string;
+};
+
+export type UploadMetaValidation =
+  | {
+      ok: true;
+      kind: UploadKind;
+      mime: string;
+      extension: string;
+      size: number;
+      filename: string;
+    }
+  | { ok: false; message: string };
+
+export function validateUploadMeta(
+  meta: UploadMeta,
+  kind: UploadKind,
+): UploadMetaValidation {
+  if (typeof meta.filename !== "string" || meta.filename.length === 0) {
+    return { ok: false, message: "Dateiname fehlt." };
+  }
+  if (typeof meta.size !== "number" || !Number.isFinite(meta.size)) {
+    return { ok: false, message: "Dateigröße fehlt." };
+  }
+  if (meta.size <= 0) {
+    return { ok: false, message: "Datei ist leer." };
+  }
+  const max = kind === "image" ? IMAGE_MAX_BYTES : AUDIO_MAX_BYTES;
+  if (meta.size > max) {
+    const mb = (max / (1024 * 1024)).toFixed(0);
+    return { ok: false, message: `Datei zu groß (max. ${mb} MB).` };
+  }
+
+  const mime = (meta.mime || "").toLowerCase();
+  const ext = getExtension(meta.filename);
+
+  if (kind === "image") {
+    const mimeOk = (IMAGE_MIME as readonly string[]).includes(mime);
+    const extOk = (IMAGE_EXT as readonly string[]).includes(ext);
+    if (!mimeOk || !extOk) {
+      return {
+        ok: false,
+        message:
+          "Format nicht erlaubt. Erlaubt: JPG, PNG, WebP. SVG, GIF und HEIC werden nicht akzeptiert.",
+      };
+    }
+    return {
+      ok: true,
+      kind,
+      mime,
+      extension: MIME_TO_EXT[mime] ?? ext,
+      size: meta.size,
+      filename: meta.filename,
+    };
+  }
+
+  const mimeOk = (AUDIO_MIME as readonly string[]).includes(mime);
+  const extOk = (AUDIO_EXT as readonly string[]).includes(ext);
+  if (!mimeOk || !extOk) {
+    return {
+      ok: false,
+      message:
+        "Format nicht erlaubt. Nur MP3 ist erlaubt (kein WAV, FLAC, AIFF, M4A).",
+    };
+  }
+  return {
+    ok: true,
+    kind,
+    mime,
+    extension: MIME_TO_EXT[mime] ?? ".mp3",
+    size: meta.size,
+    filename: meta.filename,
+  };
+}
+
+// Browser-side counterpart: cheap structural check before we ever
+// reach the network. Same rules, but operates on the File object that
+// the user just picked. Errors render inline next to the file input.
+export function clientValidateFile(
+  file: File,
+  kind: UploadKind,
+): { ok: true } | { ok: false; message: string } {
+  return validateUploadMeta(
+    { filename: file.name, size: file.size, mime: file.type ?? "" },
+    kind,
+  ).ok
+    ? { ok: true }
+    : (validateUploadMeta(
+        { filename: file.name, size: file.size, mime: file.type ?? "" },
+        kind,
+      ) as { ok: false; message: string });
+}
+
+// Convenience max-size labels for the Admin form hints.
+export function maxSizeLabel(kind: UploadKind): string {
+  const bytes = kind === "image" ? IMAGE_MAX_BYTES : AUDIO_MAX_BYTES;
+  return `${(bytes / (1024 * 1024)).toFixed(0)} MB`;
+}
+
+export function allowedFormatLabel(kind: UploadKind): string {
+  return kind === "image" ? "JPG / PNG / WebP" : "MP3";
+}
+
+export function acceptAttr(kind: UploadKind): string {
+  return kind === "image"
+    ? "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+    : "audio/mpeg,audio/mp3,.mp3";
+}

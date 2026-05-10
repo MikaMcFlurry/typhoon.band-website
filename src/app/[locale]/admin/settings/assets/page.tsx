@@ -6,21 +6,20 @@ import {
   listAssetSettings,
   type SiteAssetKey,
 } from "@/lib/admin/site-settings";
-import { IMAGE_MAX_BYTES } from "@/lib/validation/upload";
 
 import { AdminShell } from "../../_components/AdminShell";
+
+import { clearSiteAssetAction } from "./actions";
 import {
-  clearSiteAssetAction,
-  uploadSiteAssetAction,
-} from "./actions";
+  SiteAssetSlotForm,
+  type AssetSlotKey,
+} from "./SiteAssetSlotForm";
 
 export const metadata = { title: "Admin · Site-Assets" };
 export const dynamic = "force-dynamic";
 
-const IMAGE_MAX_MB = (IMAGE_MAX_BYTES / (1024 * 1024)).toFixed(0);
-
 type Slot = {
-  key: SiteAssetKey;
+  key: SiteAssetKey & AssetSlotKey;
   label: string;
   description: string;
   fallbackUrl: string;
@@ -87,8 +86,8 @@ export default async function AdminAssetsPage({
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[color:var(--muted-cream)]">
           Diese Seite ersetzt nur einzelne Site-Asset-URLs (Hero, Bandinfo,
           optional Signature). Solange kein Wert gespeichert ist, zeigt das
-          öffentliche Frontend die statischen Repo-Bilder. Erlaubt: JPG / PNG /
-          WebP, max. {IMAGE_MAX_MB} MB. SVG wird abgewiesen.
+          öffentliche Frontend die statischen Repo-Bilder. Uploads laufen
+          direkt vom Browser in Supabase Storage.
         </p>
       </header>
 
@@ -145,26 +144,7 @@ export default async function AdminAssetsPage({
                       width={320}
                     />
                   </div>
-                  <form
-                    action={uploadSiteAssetAction}
-                    className="grid gap-2"
-                    encType="multipart/form-data"
-                  >
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="key" value={slot.key} />
-                    <Field
-                      label="Datei"
-                      name="file"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      required
-                    />
-                    <div>
-                      <button type="submit" className="btn btn-secondary">
-                        Hochladen &amp; speichern
-                      </button>
-                    </div>
-                  </form>
+                  <SiteAssetSlotForm locale={locale} slotKey={slot.key} />
                 </div>
 
                 {fromSupabase ? (
@@ -188,35 +168,5 @@ export default async function AdminAssetsPage({
         </ul>
       )}
     </AdminShell>
-  );
-}
-
-function Field({
-  label,
-  name,
-  type = "text",
-  defaultValue,
-  accept,
-  required,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  defaultValue?: string;
-  accept?: string;
-  required?: boolean;
-}) {
-  return (
-    <label className="grid gap-1 text-xs text-[color:var(--muted-cream)]">
-      <span className="kicker">{label}</span>
-      <input
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        accept={accept}
-        required={required}
-        className="rounded-md border border-[color:var(--line)] bg-transparent px-3 py-2 text-sm text-[color:var(--cream)] focus:border-[color:var(--gold-soft)] focus:outline-none"
-      />
-    </label>
   );
 }

@@ -110,7 +110,10 @@ export async function getBandInfo(locale: Locale): Promise<BandInfo> {
 export async function getMembers(locale: Locale): Promise<Member[]> {
   const fallback = buildMembersFallback(locale);
   const rows = await safe(() => fetchMembers(locale));
-  if (!rows || rows.length === 0) return fallback;
+  // `null` means Supabase isn't configured / threw — fall back entirely.
+  // An empty array still triggers the merge so the fallback list stays
+  // visible while individual Supabase rows can override per slug.
+  if (!rows) return fallback;
   return normaliseMembers(rows, fallback);
 }
 

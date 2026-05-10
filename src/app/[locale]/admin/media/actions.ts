@@ -9,10 +9,7 @@ import {
   deleteMediaItem,
   updateMediaItem,
 } from "@/lib/admin/media";
-import {
-  deleteStorageObject,
-  uploadAssetToStorage,
-} from "@/lib/storage/upload";
+import { parseSupabasePublicUrl } from "@/lib/storage/upload";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,6 +30,11 @@ function asInt(value: FormDataEntryValue | null, fallback = 0): number {
   return fallback;
 }
 
+function readCheckbox(formData: FormData, name: string): boolean {
+  const values = formData.getAll(name);
+  return values.some((v) => v === "on" || v === "true" || v === "1");
+}
+
 function flashRedirect(
   locale: string,
   status: "uploaded" | "updated" | "deleted" | "error",
@@ -49,12 +51,12 @@ export async function uploadGalleryImageAction(formData: FormData) {
   const locale = resolveLocale(String(formData.get("locale") ?? ""));
   await requireAdminWithPasswordOk(locale);
 
-  const upload = await uploadAssetToStorage({
-    bucket: "gallery",
-    kind: "image",
-    file: formData.get("file"),
-  });
-  if (!upload.ok) flashRedirect(locale, "error", upload.message);
+  const url = String(formData.get("file_url") ?? "");
+  const parsed = parseSupabasePublicUrl(url);
+  if (!parsed.ok) flashRedirect(locale, "error", parsed.message);
+  if (parsed.bucket !== "gallery") {
+    flashRedirect(locale, "error", "Falscher Storage-Bucket für die Galerie.");
+  }
 
   const title = trim(formData.get("title"), 160);
   const altText = trim(formData.get("alt_text"), 240);
@@ -62,7 +64,7 @@ export async function uploadGalleryImageAction(formData: FormData) {
 
   const result = await createMediaItem({
     type: "image",
-    file_url: upload.publicUrl,
+    file_url: parsed.publicUrl,
     title: title || null,
     alt_text: altText || title || null,
     category: "gallery",
@@ -71,9 +73,7 @@ export async function uploadGalleryImageAction(formData: FormData) {
   });
 
   if (!result.ok) {
-    await deleteStorageObject(upload.bucket, upload.path);
-    flashRedirect(locale, "error", result.reason);
-    return;
+    flashRedirect(locale, "error", `Speichern fehlgeschlagen: ${result.reason}`);
   }
 
   revalidatePath(`/${locale}/admin/media`);
@@ -91,35 +91,22 @@ export async function updateGalleryItemAction(formData: FormData) {
   const title = trim(formData.get("title"), 160);
   const altText = trim(formData.get("alt_text"), 240);
   const sortOrder = asInt(formData.get("sort_order"), 0);
+  const isVisible = readCheckbox(formData, "is_visible");
 
   const result = await updateMediaItem(id, {
     title: title || null,
     alt_text: altText || title || null,
     sort_order: sortOrder,
+    is_visible: isVisible,
   });
 
-  if (!result.ok) flashRedirect(locale, "error", result.reason);
+  if (!result.ok) {
+    flashRedirect(locale, "error", `Speichern fehlgeschlagen: ${result.reason}`);
+  }
 
   revalidatePath(`/${locale}/admin/media`);
   revalidatePath(`/${locale}`);
   flashRedirect(locale, "updated");
-}
-
-export async function toggleGalleryVisibilityAction(formData: FormData) {
-  const locale = resolveLocale(String(formData.get("locale") ?? ""));
-  await requireAdminWithPasswordOk(locale);
-
-  const id = String(formData.get("id") ?? "");
-  if (!isUuid(id)) flashRedirect(locale, "error", "Ungültige ID.");
-
-  const next = String(formData.get("next") ?? "");
-  const value = next === "1";
-
-  const result = await updateMediaItem(id, { is_visible: value });
-  if (!result.ok) flashRedirect(locale, "error", result.reason);
-
-  revalidatePath(`/${locale}/admin/media`);
-  revalidatePath(`/${locale}`);
 }
 
 export async function deleteGalleryItemAction(formData: FormData) {

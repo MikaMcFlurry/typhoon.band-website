@@ -327,9 +327,11 @@ are documented in [`docs/admin-setup.md`](docs/admin-setup.md).
 ## Admin media + audio uploads
 
 Phase 05 wires the prepared Storage buckets to admin-gated upload flows.
-Every flow runs `requireAdminWithPasswordOk()`, validates the file
-server-side, uploads through the service-role client, and writes a DB
-record that the public site reads.
+Files travel **directly from the browser to Supabase Storage** via a
+one-shot signed URL the server issues after admin + format/size checks.
+The Server Action only ever receives metadata and the resulting public
+URL, so Vercel's serverless request body limit never sees real demo
+MP3s or member photos.
 
 | Bucket          | Use                                          |
 | --------------- | -------------------------------------------- |
@@ -348,8 +350,16 @@ Validation lives in `src/lib/validation/upload.ts`:
 - Filenames are sanitized (lower-case ASCII slug + ISO date + UUID +
   original extension); originals are never written to Storage as-is.
 
-Storage uploads go through `src/lib/storage/upload.ts`. Failures during
-the DB write trigger a best-effort cleanup of the orphan Storage object.
+Allowed formats and max sizes are surfaced inline next to every file
+input. Errors stay inside the Admin UI in German (Format nicht erlaubt
+/ Datei zu groß / Upload fehlgeschlagen / Speichern fehlgeschlagen).
+The service-role key never reaches the browser — only the signed upload
+URL bound to the exact `(bucket, path)` the server picked.
+
+See [`docs/admin-media-audio-uploads.md`](docs/admin-media-audio-uploads.md)
+for the detailed flow diagram and the
+[`docs/phase-05-upload-member-fixes.md`](docs/phase-05-upload-member-fixes.md)
+fix log for the regression it solves.
 
 ### Public fallback rule
 
@@ -361,25 +371,44 @@ record for an asset:
 - Gallery: visible rows in `media_items` (category `gallery`).
 - Demos: visible + streamable rows in `songs`. The featured flag chooses
   the song shown above the demo list.
-- Member photos: `band_members.photo_url` keyed by member slug.
+- Members: **per-slug merge**. The 8 fallback musicians always render
+  unless a matching Supabase row sets `is_visible = false`. A row that
+  carries a photo, sort or translation overrides only that one member;
+  the other 7 stay visible. Apply
+  `supabase/policies/0006_phase05_member_full_read.sql` so the public
+  client can see hidden member rows (without it, hidden members would
+  silently fall back to the repo and render again).
 
 If any of these are empty/missing, the page renders with the repo asset
 in `public/assets/*` (no design change).
+
+### Member text editing
+
+`/[locale]/admin/members` edits per slug: name, instrument/role, short
+bio (DE required; EN/TR fall back to the dictionary when empty),
+`sort_order`, `is_visible`, photo. The `is_visible` checkbox uses a
+hidden-input pattern so unchecking persists `false` instead of snapping
+back to `true`. Photo uploads use the same direct-to-Storage flow as
+media/music.
 
 ### Manual smoke test
 
 1. Sign in as Admin and rotate the initial password.
 2. `/[locale]/admin/media` — upload a JPG, set title/alt/sort, save.
    Public homepage gallery shows the new image first.
-3. Hide the image — public gallery falls back to the repo set.
-4. `/[locale]/admin/music` — create a song, attach an MP3 + cover,
-   mark as featured. Featured player swaps to the new song; static
-   featured returns when the row is hidden.
-5. `/[locale]/admin/members` — upload a photo for `mika`. The Members
-   grid reads the new URL; the Repo fallback returns after "Foto
-   entfernen".
+3. Untick "Auf der Website anzeigen", save — that image disappears
+   from the public gallery, others stay.
+4. `/[locale]/admin/music` — create a song, attach a real (10–50 MB)
+   MP3 + cover, mark as featured. Featured player swaps to the new
+   song; static featured returns when the row is hidden.
+5. `/[locale]/admin/members` — edit Mika's DE name/role/bio and upload
+   a photo. Only the Mika card changes on the public site; the other
+   7 musicians keep their fallback. Untick visibility → only Mika
+   disappears. Re-tick → returns.
 6. `/[locale]/admin/settings/assets` — replace hero/bandinfo image.
    Confirm Hero and Bandinfo modules render the new URLs.
+7. Try a `.svg`, a `.wav`, a 12 MB JPG → inline German error, no
+   upload attempt, no client crash.
 
 ### Image optimisation
 

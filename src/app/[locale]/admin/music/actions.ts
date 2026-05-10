@@ -10,10 +10,7 @@ import {
   setFeaturedSong,
   updateSong,
 } from "@/lib/admin/songs";
-import {
-  deleteStorageObject,
-  uploadAssetToStorage,
-} from "@/lib/storage/upload";
+import { parseSupabasePublicUrl } from "@/lib/storage/upload";
 import { sanitizeBaseName } from "@/lib/validation/upload";
 
 const UUID_RE =
@@ -27,11 +24,6 @@ function trim(value: FormDataEntryValue | null, max = 200): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
-function asBool(value: FormDataEntryValue | null, fallback = false): boolean {
-  if (typeof value !== "string") return fallback;
-  return value === "on" || value === "true" || value === "1";
-}
-
 function asInt(value: FormDataEntryValue | null, fallback = 0): number {
   if (typeof value === "string") {
     const n = Number.parseInt(value, 10);
@@ -40,13 +32,9 @@ function asInt(value: FormDataEntryValue | null, fallback = 0): number {
   return fallback;
 }
 
-function isFile(value: unknown): value is File {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as File).size === "number" &&
-    typeof (value as File).name === "string"
-  );
+function readCheckbox(formData: FormData, name: string): boolean {
+  const values = formData.getAll(name);
+  return values.some((v) => v === "on" || v === "true" || v === "1");
 }
 
 function flashRedirect(
@@ -61,6 +49,24 @@ function flashRedirect(
   redirect(`/${locale}/admin/music${qs}`);
 }
 
+function readUploadedUrl(
+  formData: FormData,
+  base: string,
+  expectedBucket: string | null,
+): { ok: true; url: string } | { ok: false; message: string } | { ok: "empty" } {
+  const raw = trim(formData.get(`${base}_url`), 800);
+  if (!raw) return { ok: "empty" };
+  const parsed = parseSupabasePublicUrl(raw);
+  if (!parsed.ok) return { ok: false, message: parsed.message };
+  if (expectedBucket && parsed.bucket !== expectedBucket) {
+    return {
+      ok: false,
+      message: `URL gehört zum falschen Bucket (erwartet: ${expectedBucket}).`,
+    };
+  }
+  return { ok: true, url: parsed.publicUrl };
+}
+
 export async function createSongAction(formData: FormData) {
   const locale = resolveLocale(String(formData.get("locale") ?? ""));
   await requireAdminWithPasswordOk(locale);
@@ -72,44 +78,26 @@ export async function createSongAction(formData: FormData) {
   const slug = (slugRaw || sanitizeBaseName(title)).slice(0, 80);
   if (!slug) flashRedirect(locale, "error", "Slug konnte nicht abgeleitet werden.");
 
-  const audioFile = formData.get("audio_file");
-  if (!isFile(audioFile) || audioFile.size === 0) {
-    flashRedirect(locale, "error", "MP3-Datei ist Pflicht.");
+  const audio = readUploadedUrl(formData, "audio", "audio-demos");
+  if (audio.ok === "empty") {
+    flashRedirect(locale, "error", "Audio-Upload ist Pflicht.");
   }
+  if (audio.ok === false) flashRedirect(locale, "error", audio.message);
+  const audioUrl = (audio as { ok: true; url: string }).url;
 
-  const upload = await uploadAssetToStorage({
-    bucket: "audio-demos",
-    kind: "audio",
-    file: audioFile,
-  });
-  if (!upload.ok) flashRedirect(locale, "error", upload.message);
+  const cover = readUploadedUrl(formData, "cover", "public-media");
+  if (cover.ok === false) flashRedirect(locale, "error", cover.message);
+  const coverUrl =
+    cover.ok === true ? (cover as { ok: true; url: string }).url : null;
 
-  let coverUrl: string | null = null;
-  let coverPath: string | null = null;
-  const coverFile = formData.get("cover_file");
-  if (isFile(coverFile) && coverFile.size > 0) {
-    const coverUpload = await uploadAssetToStorage({
-      bucket: "public-media",
-      prefix: "covers",
-      kind: "image",
-      file: coverFile,
-    });
-    if (!coverUpload.ok) {
-      await deleteStorageObject(upload.bucket, upload.path);
-      flashRedirect(locale, "error", coverUpload.message);
-    }
-    coverUrl = coverUpload.publicUrl;
-    coverPath = coverUpload.path;
-  }
-
-  const isVisible = asBool(formData.get("is_visible"), true);
-  const isFeatured = asBool(formData.get("is_featured"), false);
+  const isVisible = readCheckbox(formData, "is_visible");
+  const isFeatured = readCheckbox(formData, "is_featured");
   const sortOrder = asInt(formData.get("sort_order"), 0);
 
   const result = await createSong({
     title,
     slug,
-    audio_url: upload.publicUrl,
+    audio_url: audioUrl,
     cover_image_url: coverUrl,
     is_visible: isVisible,
     is_featured: isFeatured,
@@ -117,9 +105,7 @@ export async function createSongAction(formData: FormData) {
   });
 
   if (!result.ok) {
-    await deleteStorageObject(upload.bucket, upload.path);
-    if (coverPath) await deleteStorageObject("public-media", coverPath);
-    flashRedirect(locale, "error", result.reason);
+    flashRedirect(locale, "error", `Speichern fehlgeschlagen: ${result.reason}`);
   }
 
   if (isFeatured) {
@@ -141,8 +127,8 @@ export async function updateSongAction(formData: FormData) {
   const title = trim(formData.get("title"), 160);
   const slugRaw = trim(formData.get("slug"), 80);
   const slug = slugRaw || sanitizeBaseName(title);
-  const isVisible = asBool(formData.get("is_visible"), true);
-  const isFeatured = asBool(formData.get("is_featured"), false);
+  const isVisible = readCheckbox(formData, "is_visible");
+  const isFeatured = readCheckbox(formData, "is_featured");
   const sortOrder = asInt(formData.get("sort_order"), 0);
 
   const patch: Parameters<typeof updateSong>[1] = {
@@ -153,33 +139,24 @@ export async function updateSongAction(formData: FormData) {
     sort_order: sortOrder,
   };
 
-  const audioFile = formData.get("audio_file");
-  if (isFile(audioFile) && audioFile.size > 0) {
-    const upload = await uploadAssetToStorage({
-      bucket: "audio-demos",
-      kind: "audio",
-      file: audioFile,
-    });
-    if (!upload.ok) flashRedirect(locale, "error", upload.message);
-    patch.audio_url = upload.publicUrl;
+  const audio = readUploadedUrl(formData, "audio", "audio-demos");
+  if (audio.ok === false) flashRedirect(locale, "error", audio.message);
+  if (audio.ok === true) {
+    patch.audio_url = (audio as { ok: true; url: string }).url;
   }
 
-  const coverFile = formData.get("cover_file");
-  if (isFile(coverFile) && coverFile.size > 0) {
-    const upload = await uploadAssetToStorage({
-      bucket: "public-media",
-      prefix: "covers",
-      kind: "image",
-      file: coverFile,
-    });
-    if (!upload.ok) flashRedirect(locale, "error", upload.message);
-    patch.cover_image_url = upload.publicUrl;
-  } else if (asBool(formData.get("clear_cover"), false)) {
+  const cover = readUploadedUrl(formData, "cover", "public-media");
+  if (cover.ok === false) flashRedirect(locale, "error", cover.message);
+  if (cover.ok === true) {
+    patch.cover_image_url = (cover as { ok: true; url: string }).url;
+  } else if (readCheckbox(formData, "clear_cover")) {
     patch.cover_image_url = null;
   }
 
   const result = await updateSong(id, patch);
-  if (!result.ok) flashRedirect(locale, "error", result.reason);
+  if (!result.ok) {
+    flashRedirect(locale, "error", `Speichern fehlgeschlagen: ${result.reason}`);
+  }
 
   if (isFeatured) {
     await setFeaturedSong(id);

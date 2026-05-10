@@ -4,27 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { resolveLocale, requireAdminWithPasswordOk } from "@/lib/admin/auth";
-import { upsertMemberBySlug } from "@/lib/admin/members";
-import {
-  deleteStorageObject,
-  uploadAssetToStorage,
-} from "@/lib/storage/upload";
-import { sanitizeBaseName } from "@/lib/validation/upload";
+import { saveMember } from "@/lib/admin/members";
+import { parseSupabasePublicUrl } from "@/lib/storage/upload";
 
 const SLUG_RE = /^[a-z0-9-]{1,40}$/;
 
-function isFile(value: unknown): value is File {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as File).size === "number" &&
-    typeof (value as File).name === "string"
-  );
-}
-
-function asBool(value: FormDataEntryValue | null, fallback = false): boolean {
-  if (typeof value !== "string") return fallback;
-  return value === "on" || value === "true" || value === "1";
+function trim(value: FormDataEntryValue | null, max = 600): string {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
 function asInt(value: FormDataEntryValue | null, fallback = 0): number {
@@ -33,6 +19,11 @@ function asInt(value: FormDataEntryValue | null, fallback = 0): number {
     if (Number.isFinite(n)) return n;
   }
   return fallback;
+}
+
+function readCheckbox(formData: FormData, name: string): boolean {
+  const values = formData.getAll(name);
+  return values.some((v) => v === "on" || v === "true" || v === "1");
 }
 
 function flashRedirect(
@@ -47,58 +38,9 @@ function flashRedirect(
   redirect(`/${locale}/admin/members${qs}`);
 }
 
-export async function uploadMemberPhotoAction(formData: FormData) {
-  const locale = resolveLocale(String(formData.get("locale") ?? ""));
-  await requireAdminWithPasswordOk(locale);
+const SUPPORTED_LOCALES = ["de", "en", "tr"] as const;
 
-  const slugRaw = String(formData.get("slug") ?? "");
-  const slug = slugRaw.toLowerCase().trim();
-  if (!SLUG_RE.test(slug)) flashRedirect(locale, "error", "Ungültiger Slug.");
-
-  const isVisible = asBool(formData.get("is_visible"), true);
-  const sortOrder = asInt(formData.get("sort_order"), 0);
-
-  const file = formData.get("photo_file");
-  let photoUrl: string | null | undefined = undefined;
-  let uploadedPath: string | null = null;
-
-  if (isFile(file) && file.size > 0) {
-    const renamedFile =
-      typeof File !== "undefined"
-        ? new File([file], `${sanitizeBaseName(slug)}-${file.name}`, {
-            type: file.type,
-          })
-        : file;
-    const upload = await uploadAssetToStorage({
-      bucket: "member-images",
-      kind: "image",
-      file: renamedFile,
-    });
-    if (!upload.ok) flashRedirect(locale, "error", upload.message);
-    photoUrl = upload.publicUrl;
-    uploadedPath = upload.path;
-  }
-
-  const result = await upsertMemberBySlug({
-    slug,
-    photo_url: photoUrl,
-    is_visible: isVisible,
-    sort_order: sortOrder,
-  });
-
-  if (!result.ok) {
-    if (uploadedPath) {
-      await deleteStorageObject("member-images", uploadedPath);
-    }
-    flashRedirect(locale, "error", result.reason);
-  }
-
-  revalidatePath(`/${locale}/admin/members`);
-  revalidatePath(`/${locale}`);
-  flashRedirect(locale, "saved");
-}
-
-export async function clearMemberPhotoAction(formData: FormData) {
+export async function saveMemberAction(formData: FormData) {
   const locale = resolveLocale(String(formData.get("locale") ?? ""));
   await requireAdminWithPasswordOk(locale);
 
@@ -107,10 +49,45 @@ export async function clearMemberPhotoAction(formData: FormData) {
     .trim();
   if (!SLUG_RE.test(slug)) flashRedirect(locale, "error", "Ungültiger Slug.");
 
-  const result = await upsertMemberBySlug({ slug, photo_url: null });
-  if (!result.ok) flashRedirect(locale, "error", result.reason);
+  const isVisible = readCheckbox(formData, "is_visible");
+  const sortOrder = asInt(formData.get("sort_order"), 0);
+
+  // Photo handling: a fresh upload sets `photo_url` (the hidden input from
+  // DirectUploadField). An explicit "clear" checkbox wipes the value. If
+  // neither is set we keep the current photo on the row.
+  const rawUrl = String(formData.get("photo_file_url") ?? "").trim();
+  const clearPhoto = readCheckbox(formData, "clear_photo");
+
+  let photoUrl: string | null | undefined = undefined;
+  if (rawUrl) {
+    const parsed = parseSupabasePublicUrl(rawUrl);
+    if (!parsed.ok) flashRedirect(locale, "error", parsed.message);
+    if (parsed.bucket !== "member-images") {
+      flashRedirect(locale, "error", "Falscher Storage-Bucket für Member-Fotos.");
+    }
+    photoUrl = parsed.publicUrl;
+  }
+
+  const translations = SUPPORTED_LOCALES.map((loc) => ({
+    locale: loc,
+    name: trim(formData.get(`name_${loc}`), 160),
+    role: trim(formData.get(`role_${loc}`), 160),
+    bioMd: trim(formData.get(`bio_${loc}`), 800),
+  }));
+
+  const result = await saveMember({
+    slug,
+    photoUrl,
+    clearPhoto,
+    sortOrder,
+    isVisible,
+    translations,
+  });
+  if (!result.ok) {
+    flashRedirect(locale, "error", `Speichern fehlgeschlagen: ${result.reason}`);
+  }
 
   revalidatePath(`/${locale}/admin/members`);
   revalidatePath(`/${locale}`);
-  flashRedirect(locale, "cleared");
+  flashRedirect(locale, "saved");
 }
