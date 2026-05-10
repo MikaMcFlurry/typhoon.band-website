@@ -57,13 +57,19 @@ Open **SQL Editor** and run (replace the placeholders):
 
 ```sql
 insert into public.admin_profiles
-  (user_id, display_name, email, role, is_active)
+  (user_id, display_name, email, role, is_active,
+   must_change_password, initial_password_issued_at)
 values
-  ('AUTH_USER_UUID', 'Mika Hertler', 'YOUR_LOGIN_EMAIL', 'owner', true);
+  ('AUTH_USER_UUID', 'Mika Hertler', 'YOUR_LOGIN_EMAIL', 'owner', true,
+   true, now());
 ```
 
 `role` accepts `owner`, `admin`, or `editor`. Only the first account should
-be `owner`.
+be `owner`. The migration default for `must_change_password` is `false`, so
+you **must** set it to `true` explicitly when provisioning a new admin —
+that is what forces the account through the rotation flow on first login
+(see step 5). `initial_password_issued_at = now()` records when the
+out-of-band password was handed out so you can audit the rotation later.
 
 The matching `admin_profiles` row is what lets `requireAdmin()` allow the
 session through — without it, even an authenticated Supabase user is
@@ -74,8 +80,10 @@ rejected (and signed out) by the login action.
 1. Run `npm run dev` (or hit production).
 2. Visit `/de/admin` → you should be redirected to `/de/admin/login`.
 3. Log in with the email + password from step 3a.
-4. You should land on the dashboard with the owner role chip and a
-   "Booking" tile linking to the read-only requests view.
+4. Because the insert in step 3b set `must_change_password = true`, the
+   login redirects to `/de/admin/change-password` (see section 5). After
+   setting a new password you'll land on the dashboard with the owner role
+   chip and a "Booking" tile linking to the read-only requests view.
 
 If something goes wrong:
 
@@ -84,21 +92,62 @@ If something goes wrong:
   matching `admin_profiles` row, or `is_active = false`. Re-run step 3b
   or flip the boolean.
 
-## 5. Add another admin
+## 5. First-login password rotation
+
+Every freshly provisioned admin row is inserted with
+`must_change_password = true` (see section 3b — the column itself defaults
+to `false`, so the insert must set it explicitly). The Admin shell
+honours that flag:
+
+- After login, the user is redirected to `/[locale]/admin/change-password`.
+- `requireAdminWithPasswordOk()` blocks `/admin` and `/admin/booking`
+  until the rotation succeeds, so there is no path to the dashboard while
+  the initial password is still active.
+- The password form requires a minimum length of 12 characters and a
+  matching confirmation. Supabase's password policy (configured in the
+  Auth settings) is also applied.
+- On success the action runs `supabase.auth.updateUser({ password })` for
+  the signed-in user, then sets `must_change_password = false` and
+  `password_changed_at = now()` on the matching `admin_profiles` row via
+  the service-role client (the row has no self-update RLS policy by
+  design).
+- The user is then redirected to the dashboard.
+
+If you want to force another rotation later (e.g. after a leak, or for a
+new owner taking over an existing account):
+
+```sql
+update public.admin_profiles
+set must_change_password = true,
+    initial_password_issued_at = now(),
+    updated_at = now()
+where email = 'login@example.com';
+```
+
+Their next request to any protected admin route will redirect them to
+`/[locale]/admin/change-password` until they set a new password.
+
+## 6. Add another admin
 
 Repeat step 3 with a different email and pick the right role:
 
 ```sql
 insert into public.admin_profiles
-  (user_id, display_name, email, role, is_active)
+  (user_id, display_name, email, role, is_active,
+   must_change_password, initial_password_issued_at)
 values
-  ('NEW_USER_UUID', 'Display Name', 'login@example.com', 'admin', true);
+  ('NEW_USER_UUID', 'Display Name', 'login@example.com', 'admin', true,
+   true, now());
 ```
 
 For now, all three roles (`owner` / `admin` / `editor`) get the same
-dashboard access. Owner-only mutations land in later phases.
+dashboard access. Owner-only mutations land in later phases. The new
+account will be forced through the password rotation on first login,
+just like the owner — provided the insert sets `must_change_password =
+true` and stamps `initial_password_issued_at = now()` (the column default
+is `false`).
 
-## 6. Deactivate / re-activate an admin
+## 7. Deactivate / re-activate an admin
 
 No user is deleted — flip the `is_active` flag. The next request will fail
 the `canAccessAdmin()` check and the session is forced out.
@@ -111,7 +160,7 @@ where email = 'login@example.com';
 
 To re-enable, set it back to `true`.
 
-## 7. Test inactive denial (recommended)
+## 8. Test inactive denial (recommended)
 
 After deactivating yourself in a separate Supabase tab:
 
@@ -121,13 +170,15 @@ After deactivating yourself in a separate Supabase tab:
    "kein aktiver Admin-Zugang" message — proving inactive admins cannot
    reach the dashboard even with valid Supabase credentials.
 
-## 8. Logout
+## 9. Logout
 
 The dashboard header has a Logout button that POSTs to
 `/api/admin/auth/logout?locale=<locale>`. The server clears the Supabase
-session cookies and redirects back to the login page.
+session cookies and redirects back to the login page. The
+change-password page exposes the same logout, so an admin who is stuck
+on a forced rotation can always sign out.
 
-## 9. Next phase
+## 10. Next phase
 
 Phase 04 will introduce the first real Admin CRUD (members, songs, shows,
 gallery, legal). Until then, all content edits happen through the SQL

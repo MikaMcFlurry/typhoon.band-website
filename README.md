@@ -47,6 +47,7 @@ src/
         layout.tsx              # forwards children — auth gating happens per-route
         page.tsx                # dashboard cards
         login/                  # email + password form (server action)
+        change-password/        # forced first-login password rotation
         booking/                # read-only booking requests view
         _components/AdminShell.tsx
     api/booking/route.ts        # POST handler (validation, honeypot, Supabase insert, Resend email)
@@ -70,6 +71,7 @@ supabase/
     0002_supabase_foundation.sql  # additive: site_settings.locale/is_public, booking_requests.locale,
                                   #            shows.is_tba + nullable starts_at, media_items.alt_text/title
     0003_storage_buckets.sql    # public asset buckets + admin-only write policies
+    0004_admin_password_flow.sql  # additive: admin_profiles.must_change_password + password_changed_at + initial_password_issued_at
   policies/
     0001_rls.sql                # base RLS per docs/06
     0002_rls_foundation.sql     # additive: public read on is_public site_settings; assert no public read on booking/admin
@@ -199,6 +201,7 @@ WEBSITE_FROM_EMAIL                # must be a Resend-verified domain
    psql -f supabase/migrations/0002_supabase_foundation.sql
    psql -f supabase/policies/0002_rls_foundation.sql
    psql -f supabase/migrations/0003_storage_buckets.sql
+   psql -f supabase/migrations/0004_admin_password_flow.sql
    ```
    The same SQL can be pasted into the Supabase SQL editor. Every
    statement is idempotent so reruns are safe.
@@ -263,18 +266,33 @@ The Admin shell is reachable at `/[locale]/admin` and protected by Supabase
 Auth + an active row in `admin_profiles`.
 
 - Login route: `/[locale]/admin/login` (email + password, German copy).
+- Initial password rotation: `/[locale]/admin/change-password`. New admin
+  rows are inserted with `must_change_password = true` (the column itself
+  defaults to `false`, so the provisioning SQL sets it explicitly together
+  with `initial_password_issued_at = now()` — see
+  [`docs/admin-setup.md`](docs/admin-setup.md)). The very first login is
+  funnelled here before the dashboard becomes reachable.
 - Dashboard route: `/[locale]/admin` (placeholder cards for upcoming
   modules; Booking is the only live tile in this phase).
 - Booking view: `/[locale]/admin/booking` (read-only list, latest 50).
 - Logout: `POST /api/admin/auth/logout?locale=<locale>` from the shell
-  header.
+  header (or from the change-password page).
 
 Server-side guarding lives in `src/lib/admin/auth.ts`:
 
 ```ts
-getCurrentAdmin()   // → CurrentAdmin | null
-requireAdmin(locale)// → CurrentAdmin (redirects to login otherwise)
+getCurrentAdmin()              // → CurrentAdmin | null
+requireAdmin(locale)           // → CurrentAdmin (redirects to login otherwise)
+requireAdminWithPasswordOk(locale)
+                                // → CurrentAdmin (also redirects to
+                                //   /admin/change-password while
+                                //   must_change_password is true)
 ```
+
+`/admin` and `/admin/booking` use `requireAdminWithPasswordOk()`, so an
+admin can never reach the dashboard while their initial password is still
+in place. The change-password page itself uses plain `requireAdmin()`
+to break the redirect loop.
 
 Role helpers are in `src/lib/admin/roles.ts` (`isOwner`, `isAdminLike`,
 `isEditor`, `canAccessAdmin`). All three roles (`owner`, `admin`, `editor`)

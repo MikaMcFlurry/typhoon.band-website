@@ -22,9 +22,14 @@ export default async function AdminLoginPage({
   const fromRaw = sp.from;
   const from = typeof fromRaw === "string" ? fromRaw : undefined;
 
-  // Already a valid admin? Skip the form.
+  // Already a valid admin? Skip the form. If the rotation flag is still
+  // set, jump straight into the change-password page so we don't bounce
+  // through the dashboard guard.
   const current = await getCurrentAdmin();
   if (current) {
+    if (current.mustChangePassword) {
+      redirect(`/${locale}/admin/change-password`);
+    }
     const target =
       from && from.startsWith(`/${locale}/admin`) ? from : `/${locale}/admin`;
     redirect(target);

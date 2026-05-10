@@ -1,5 +1,5 @@
 import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
-import { requireAdmin } from "@/lib/admin/auth";
+import { requireAdminWithPasswordOk } from "@/lib/admin/auth";
 import {
   getRecentBookingRequests,
   type RecentBookingRequest,
@@ -53,7 +53,7 @@ export default async function AdminBookingPage({
 }) {
   const { locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const current = await requireAdmin(locale, {
+  const current = await requireAdminWithPasswordOk(locale, {
     from: `/${locale}/admin/booking`,
   });
   const recent = await getRecentBookingRequests(50);
