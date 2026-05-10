@@ -68,6 +68,7 @@ export type Dict = {
     backendNotice: string;
     submitFallback: string;
     submitOk: string;
+    submitError: string;
   };
   footer: {
     contact: string;
@@ -239,17 +240,22 @@ const de: Dict = {
     emailLabel: "E-Mail *",
     phoneLabel: "Telefon (optional)",
     dateLabel: "Veranstaltungsdatum",
-    locationLabel: "Ort",
-    typeLabel: "Art der Veranstaltung",
+    locationLabel: "Ort *",
+    typeLabel: "Art der Veranstaltung *",
     messageLabel: "Nachricht *",
     submit: "Booking anfragen",
     submitting: "Wird gesendet…",
     requiredErr: "Bitte fülle alle Pflichtfelder aus.",
-    networkErr: "Netzwerkfehler. Bitte später erneut versuchen.",
-    backendNotice: "Booking-Versand wird im nächsten Batch angebunden.",
+    networkErr:
+      "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+    backendNotice:
+      "Anfragen gehen direkt an booking@typhoon.band. Antwort innerhalb von 48 Stunden.",
     submitFallback:
-      "Anfrage erhalten — wir melden uns. (Hinweis: Backend-Versand wird im nächsten Batch angebunden.)",
-    submitOk: "Danke! Wir melden uns innerhalb 48 Stunden.",
+      "Booking ist vorbereitet, aber der Versand ist noch nicht vollständig angebunden.",
+    submitOk:
+      "Danke für deine Anfrage. Wir melden uns so schnell wie möglich.",
+    submitError:
+      "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
   },
   footer: {
     contact: "Kontakt",
@@ -355,17 +361,21 @@ const en: Dict = {
     emailLabel: "Email *",
     phoneLabel: "Phone (optional)",
     dateLabel: "Event date",
-    locationLabel: "Location",
-    typeLabel: "Type of event",
+    locationLabel: "Location *",
+    typeLabel: "Type of event *",
     messageLabel: "Message *",
     submit: "Send booking request",
     submitting: "Sending…",
     requiredErr: "Please fill in all required fields.",
-    networkErr: "Network error. Please try again later.",
-    backendNotice: "Booking delivery is wired up in the next batch.",
+    networkErr:
+      "We couldn't send your request. Please try again in a moment.",
+    backendNotice:
+      "Requests go straight to booking@typhoon.band. Reply within 48 hours.",
     submitFallback:
-      "Request received — we'll get back to you. (Note: backend delivery ships in the next batch.)",
-    submitOk: "Thanks! We'll reply within 48 hours.",
+      "Booking is ready, but delivery is not fully wired up yet.",
+    submitOk: "Thanks for your request. We'll get back to you as soon as possible.",
+    submitError:
+      "We couldn't send your request. Please try again in a moment.",
   },
   footer: {
     contact: "Contact",
@@ -471,17 +481,22 @@ const tr: Dict = {
     emailLabel: "E-posta *",
     phoneLabel: "Telefon (isteğe bağlı)",
     dateLabel: "Etkinlik tarihi",
-    locationLabel: "Yer",
-    typeLabel: "Etkinlik türü",
+    locationLabel: "Yer *",
+    typeLabel: "Etkinlik türü *",
     messageLabel: "Mesaj *",
     submit: "Booking talebi gönder",
     submitting: "Gönderiliyor…",
     requiredErr: "Lütfen tüm zorunlu alanları doldurun.",
-    networkErr: "Ağ hatası. Lütfen daha sonra tekrar deneyin.",
-    backendNotice: "Booking gönderimi bir sonraki batch'te bağlanacak.",
+    networkErr:
+      "Talep gönderilemedi. Lütfen biraz sonra tekrar deneyin.",
+    backendNotice:
+      "Talepler doğrudan booking@typhoon.band adresine ulaşır. Yanıt 48 saat içinde.",
     submitFallback:
-      "Talep alındı — size geri döneceğiz. (Not: backend gönderimi bir sonraki batch'te eklenecek.)",
-    submitOk: "Teşekkürler! 48 saat içinde dönüş yapacağız.",
+      "Booking hazır, ancak gönderim henüz tamamen bağlanmadı.",
+    submitOk:
+      "Talebiniz için teşekkürler. En kısa sürede size dönüş yapacağız.",
+    submitError:
+      "Talep gönderilemedi. Lütfen biraz sonra tekrar deneyin.",
   },
   footer: {
     contact: "İletişim",

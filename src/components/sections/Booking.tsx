@@ -10,21 +10,41 @@ type Status =
   | { kind: "idle" }
   | { kind: "submitting" }
   | { kind: "success"; message: string }
+  | { kind: "fallback"; message: string }
   | { kind: "error"; message: string };
+
+type ApiResponse =
+  | { ok: true; status: "sent" | "fallback"; message: string }
+  | {
+      ok: false;
+      status: "validation" | "error";
+      message: string;
+      field?: string;
+    };
 
 // Layout matches handoff `.booking-grid`. On mobile we stack form-on-top,
 // signature-image-below so the band photo and submit button always render
 // at full width and intentional crop instead of fighting a 130px column.
 export function Booking() {
-  const { dict } = useDict();
+  const { dict, locale } = useDict();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries()) as Record<
+      string,
+      string
+    >;
     if (data.hp_field) return;
-    if (!data.name || !data.email || !data.message) {
+    if (
+      !data.name ||
+      !data.email ||
+      !data.event_location ||
+      !data.event_type ||
+      !data.message
+    ) {
       setStatus({ kind: "error", message: dict.booking.requiredErr });
       return;
     }
@@ -33,20 +53,31 @@ export function Booking() {
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, locale }),
       });
-      const body = (await res.json()) as { ok: boolean; message?: string };
-      if (!res.ok || !body.ok) {
+      const body = (await res.json().catch(() => null)) as ApiResponse | null;
+      if (!body) {
+        setStatus({ kind: "error", message: dict.booking.networkErr });
+        return;
+      }
+      if (!body.ok) {
         setStatus({
           kind: "error",
-          message: body.message ?? dict.booking.requiredErr,
+          message: body.message || dict.booking.submitError,
         });
         return;
       }
-      setStatus({
-        kind: "success",
-        message: body.message ?? dict.booking.submitOk,
-      });
+      if (body.status === "fallback") {
+        setStatus({
+          kind: "fallback",
+          message: body.message || dict.booking.submitFallback,
+        });
+      } else {
+        setStatus({
+          kind: "success",
+          message: body.message || dict.booking.submitOk,
+        });
+      }
       form.reset();
     } catch {
       setStatus({ kind: "error", message: dict.booking.networkErr });
@@ -55,6 +86,14 @@ export function Booking() {
 
   const submitLabel =
     status.kind === "submitting" ? dict.booking.submitting : dict.booking.submit;
+
+  const noticeKind = status.kind;
+  const noticeText =
+    status.kind === "success" ||
+    status.kind === "fallback" ||
+    status.kind === "error"
+      ? status.message
+      : null;
 
   return (
     <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="booking">
@@ -87,24 +126,37 @@ export function Booking() {
             <input name="event_date" placeholder={dict.booking.dateLabel} type="date" />
           </div>
           <div className="field min-w-0 md:col-span-1">
-            <input name="event_location" placeholder={dict.booking.locationLabel} type="text" />
+            <input
+              name="event_location"
+              placeholder={dict.booking.locationLabel}
+              required
+              type="text"
+            />
           </div>
           <div className="field min-w-0 md:col-span-2">
-            <input name="event_type" placeholder={dict.booking.typeLabel} type="text" />
+            <input
+              name="event_type"
+              placeholder={dict.booking.typeLabel}
+              required
+              type="text"
+            />
           </div>
           <div className="field min-w-0 md:col-span-2">
             <textarea name="message" placeholder={dict.booking.messageLabel} required />
           </div>
-          {status.kind === "success" || status.kind === "error" ? (
+          {noticeText ? (
             <div
               aria-live="polite"
               className={`rounded border px-3 py-2 text-[11px] md:col-span-2 md:text-xs ${
-                status.kind === "success"
+                noticeKind === "success"
                   ? "border-[rgba(232,201,130,0.45)] bg-[rgba(199,154,75,0.14)] text-[color:var(--gold-soft)]"
-                  : "border-[rgba(220,120,90,0.4)] bg-[rgba(180,70,50,0.18)] text-[#f4c8b3]"
+                  : noticeKind === "fallback"
+                    ? "border-[rgba(232,201,130,0.30)] bg-[rgba(11,8,5,0.85)] text-[color:var(--muted-cream)]"
+                    : "border-[rgba(220,120,90,0.4)] bg-[rgba(180,70,50,0.18)] text-[#f4c8b3]"
               }`}
+              role={noticeKind === "error" ? "alert" : "status"}
             >
-              {status.message}
+              {noticeText}
             </div>
           ) : null}
           <p className="text-[9px] uppercase tracking-[0.16em] text-[color:var(--muted)] md:col-span-2 md:text-[10px]">
