@@ -1,15 +1,148 @@
-export const metadata = { title: "Admin" };
+import Link from "next/link";
 
-export default function AdminHomePage() {
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
+import { requireAdminWithPasswordOk } from "@/lib/admin/auth";
+
+import { AdminShell } from "./_components/AdminShell";
+
+export const metadata = { title: "Admin" };
+export const dynamic = "force-dynamic";
+
+type CardStatus = "live" | "soon";
+
+type DashboardCard = {
+  key: string;
+  label: string;
+  description: string;
+  status: CardStatus;
+  href?: string;
+};
+
+const CARDS: DashboardCard[] = [
+  {
+    key: "booking",
+    label: "Booking",
+    description: "Eingegangene Booking-Anfragen ansehen.",
+    status: "live",
+  },
+  {
+    key: "shows",
+    label: "Shows",
+    description: "Termine veröffentlichen, TBA markieren, sortieren.",
+    status: "soon",
+  },
+  {
+    key: "music",
+    label: "Music",
+    description: "Demos und Releases pflegen, Cover & Audio verlinken.",
+    status: "soon",
+  },
+  {
+    key: "gallery",
+    label: "Gallery",
+    description: "Bilder/Videos hochladen, sortieren, verbergen.",
+    status: "soon",
+  },
+  {
+    key: "members",
+    label: "Members",
+    description: "Bandmitglieder, Rollen und Bios pflegen.",
+    status: "soon",
+  },
+  {
+    key: "legal",
+    label: "Legal",
+    description: "Impressum, Datenschutz und Cookies bearbeiten.",
+    status: "soon",
+  },
+  {
+    key: "seo",
+    label: "SEO",
+    description: "Title, Description und OG-Bilder pro Seite.",
+    status: "soon",
+  },
+  {
+    key: "platform",
+    label: "Platform Links",
+    description: "Spotify, YouTube, Instagram & Co. verwalten.",
+    status: "soon",
+  },
+  {
+    key: "settings",
+    label: "Settings",
+    description: "Site-Einstellungen, Kontaktdaten, Sichtbarkeit.",
+    status: "soon",
+  },
+];
+
+export default async function AdminHomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const current = await requireAdminWithPasswordOk(locale, {
+    from: `/${locale}/admin`,
+  });
+
   return (
-    <div>
-      <h1 className="font-display text-3xl font-bold tracking-[-0.02em] md:text-4xl">
-        Admin
-      </h1>
-      <p className="mt-4 text-sm text-[color:var(--muted-cream)]">
-        Vollständiges Admin-CRUD wird im nächsten Batch implementiert. Diese
-        Route stellt nur den geschützten Server-Shell bereit.
-      </p>
-    </div>
+    <AdminShell locale={locale} current={current} active="dashboard">
+      <header>
+        <p className="kicker">Übersicht</p>
+        <h2 className="mt-2 font-display text-xl font-semibold tracking-[-0.01em] md:text-2xl">
+          Admin Dashboard
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[color:var(--muted-cream)]">
+          Diese Phase liefert nur die Auth-Hülle und einen schreibgeschützten
+          Booking-Überblick. Alle weiteren Module folgen schrittweise.
+        </p>
+      </header>
+
+      <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {CARDS.map((card) => {
+          const target =
+            card.key === "booking" ? `/${locale}/admin/booking` : null;
+          const inner = (
+            <>
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-display text-base font-semibold tracking-[-0.01em] md:text-lg">
+                  {card.label}
+                </span>
+                <span
+                  className={
+                    "rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-[0.22em] " +
+                    (card.status === "live"
+                      ? "border-[color:var(--gold-soft)] text-[color:var(--gold-soft)]"
+                      : "border-[color:var(--line)] text-[color:var(--muted-cream)]")
+                  }
+                >
+                  {card.status === "live" ? "Aktiv" : "Coming next"}
+                </span>
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-[color:var(--muted-cream)]">
+                {card.description}
+              </p>
+            </>
+          );
+          return (
+            <li key={card.key}>
+              {target ? (
+                <Link
+                  href={target}
+                  className="panel block h-full p-4 transition hover:border-[color:var(--line-strong)]"
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <div className="panel block h-full p-4 opacity-90">
+                  {inner}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </AdminShell>
   );
 }

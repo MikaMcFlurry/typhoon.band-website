@@ -1,7 +1,9 @@
 // Manually maintained Database type for the public schema. Mirrors
 // `supabase/migrations/0001_init.sql` plus the additive
-// `0002_supabase_foundation.sql` changes (TBA shows, media alt/title,
-// site_settings.locale/is_public, booking_requests.locale).
+// `0002_supabase_foundation.sql` and `0004_admin_password_flow.sql`
+// changes (TBA shows, media alt/title, site_settings.locale/is_public,
+// booking_requests.locale, admin_profiles.must_change_password +
+// password_changed_at + initial_password_issued_at).
 //
 // `Relationships: []` is intentionally empty: nested PostgREST joins are
 // avoided in favour of explicit two-step queries. A future Admin phase
@@ -31,6 +33,9 @@ export type Database = {
           email: string | null;
           role: AdminRole;
           is_active: boolean;
+          must_change_password: boolean;
+          password_changed_at: string | null;
+          initial_password_issued_at: string | null;
           last_login_at: string | null;
           created_at: string;
           updated_at: string;
@@ -42,6 +47,9 @@ export type Database = {
           email?: string | null;
           role?: AdminRole;
           is_active?: boolean;
+          must_change_password?: boolean;
+          password_changed_at?: string | null;
+          initial_password_issued_at?: string | null;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -53,6 +61,9 @@ export type Database = {
           email?: string | null;
           role?: AdminRole;
           is_active?: boolean;
+          must_change_password?: boolean;
+          password_changed_at?: string | null;
+          initial_password_issued_at?: string | null;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;

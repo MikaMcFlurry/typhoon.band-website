@@ -1,11 +1,11 @@
-# Current Task – Phase 03 Admin Auth + Dashboard
+# Current Task – Phase 03b Initial Admin Password Flow
 
 ## Current Phase
 
 Active phase:
 
 ```text
-docs/phases/03-admin-auth-dashboard.md
+docs/phases/03b-initial-admin-password-flow.md
 ```
 
 ## Working Rule
@@ -22,36 +22,37 @@ Only open other docs if the active phase explicitly references them.
 
 ## Critical Rule
 
-The public frontend design is approved.
+This phase builds directly on Phase 03 Admin Auth.
 
 Do not redesign the public website.
-Do not change the public layout.
+Do not build Admin content CRUD.
+Do not build uploads.
 
 ## Current Goal
 
-Build the secure Admin foundation:
-- Supabase Auth login
-- protected Admin route group
-- active admin profile guard
-- role helpers
-- logout
-- dashboard overview
-- Booking requests list/read-only view
+Adjust the Admin login flow to support:
+
+1. Admin user with e-mail + initial password.
+2. Active `admin_profiles` row.
+3. Forced one-time password change after first login.
+4. No access to Admin dashboard until password was changed.
+5. Clear documentation for first owner setup.
 
 ## This Phase Must Implement
 
-- secure Admin login/logout flow
-- `/[locale]/admin` protected by server-side checks
-- active admin profile lookup from `admin_profiles`
-- owner/admin/editor role helper foundation
-- Admin dashboard cards
-- read-only Booking requests overview using Supabase
-- clear setup instructions for creating the first owner admin
+- additive migration for password-change state
+- `must_change_password` guard
+- `/[locale]/admin/change-password`
+- redirect after first login if password change is required
+- secure password update through Supabase Auth
+- update `admin_profiles` after successful password change
+- admin setup documentation
 
 ## This Phase Must Not Implement
 
-- full content CRUD
-- media/audio upload UI
+- full Admin CRUD
+- Admin user management UI
+- media/audio uploads
 - shop
 - payment
 - analytics
@@ -67,15 +68,14 @@ npm run lint
 npm run build
 ```
 
-Push this phase as its own commit/branch.
+Push this phase as its own branch/commit.
 
 Then stop and summarize:
 - changed files
-- auth/login behavior
-- admin protection
-- dashboard modules
-- booking requests view
-- first owner setup steps
-- env vars needed
+- database/migration changes
+- initial admin setup flow
+- forced password-change behavior
+- security notes
+- manual test steps
 - lint/build result
 - next recommended phase
