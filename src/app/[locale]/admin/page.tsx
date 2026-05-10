@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
-import { requireAdmin } from "@/lib/admin/auth";
+import { requireAdminWithPasswordOk } from "@/lib/admin/auth";
 
 import { AdminShell } from "./_components/AdminShell";
 
@@ -82,7 +82,9 @@ export default async function AdminHomePage({
 }) {
   const { locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const current = await requireAdmin(locale, { from: `/${locale}/admin` });
+  const current = await requireAdminWithPasswordOk(locale, {
+    from: `/${locale}/admin`,
+  });
 
   return (
     <AdminShell locale={locale} current={current} active="dashboard">

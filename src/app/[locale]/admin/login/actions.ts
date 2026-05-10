@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { resolveLocale } from "@/lib/admin/auth";
 import { canAccessAdmin } from "@/lib/admin/roles";
+import { getAdminSupabase } from "@/lib/supabase/admin";
 import { getSupabaseServerAuthClient } from "@/lib/supabase/server-auth";
 
 export type LoginActionState = {
@@ -16,6 +17,9 @@ const ADMIN_PATH = (locale: string, from?: string | null) => {
   if (from && from.startsWith(`/${locale}/admin`)) return from;
   return `/${locale}/admin`;
 };
+
+const CHANGE_PASSWORD_PATH = (locale: string) =>
+  `/${locale}/admin/change-password`;
 
 function trimmedString(value: FormDataEntryValue | null): string {
   return typeof value === "string" ? value.trim() : "";
@@ -69,7 +73,7 @@ export async function loginWithPasswordAction(
 
   const { data: profile } = await supabase
     .from("admin_profiles")
-    .select("role, is_active")
+    .select("role, is_active, must_change_password")
     .eq("user_id", data.user.id)
     .maybeSingle();
 
@@ -83,10 +87,22 @@ export async function loginWithPasswordAction(
     };
   }
 
-  await supabase
-    .from("admin_profiles")
-    .update({ last_login_at: new Date().toISOString() })
-    .eq("user_id", data.user.id);
+  // last_login_at lives on admin_profiles, which has no self-update RLS
+  // policy by design — so we go through the privileged service-role
+  // client for this housekeeping write. It never bypasses the auth
+  // checks above; we only get here once the user is a confirmed active
+  // admin.
+  const adminClient = getAdminSupabase();
+  if (adminClient) {
+    await adminClient
+      .from("admin_profiles")
+      .update({ last_login_at: new Date().toISOString() })
+      .eq("user_id", data.user.id);
+  }
+
+  if (profile?.must_change_password === true) {
+    redirect(CHANGE_PASSWORD_PATH(locale));
+  }
 
   redirect(ADMIN_PATH(locale, fromRaw || null));
 }
