@@ -2,166 +2,288 @@
 
 ## Goal
 
-Make sure no admin keeps using the temporary password their owner set in
-the Supabase Dashboard. Phase 03 wired up Auth + the admin shell; this
-phase plugs the obvious gap: every newly provisioned admin must rotate
-their password before reaching the dashboard.
+Phase 03 created the Admin Auth + Dashboard foundation.
+
+This phase corrects the intended first-admin workflow:
+
+The admin should be able to log in with an admin e-mail and an initial password. After the first login, the admin must be forced to change the password before accessing the Admin dashboard.
+
+## Important context
+
+Current Phase 03 behavior:
+- `/[locale]/admin/login` uses Supabase e-mail + password login.
+- Admin access requires a matching `admin_profiles` row.
+- `admin_profiles.is_active` must be true.
+- Roles `owner`, `admin`, `editor` exist.
+- Dashboard and read-only booking requests already exist.
+
+Required new behavior:
+- first login with initial password
+- forced one-time password change
+- no dashboard access until password was changed
 
 ## Absolute scope
 
 Allowed:
-- additive migration adding `must_change_password` and
-  `password_changed_at` to `public.admin_profiles`
-- a `requireAdminWithPasswordOk()` guard that re-uses the existing
-  `requireAdmin()` and additionally redirects to the change-password
-  page when the rotation flag is still set
-- `/[locale]/admin/change-password` route (server page + client form +
-  server action)
-- Supabase Auth password update for the signed-in user
-- mark the rotation as done by flipping
-  `must_change_password = false` and writing `password_changed_at = now()`
-  via the service-role client
-- docs updates (`docs/admin-setup.md`, `README.md`)
+- additive DB migration
+- admin auth guard improvement
+- change-password page
+- server/client auth helper adjustments
+- docs update
 
 Not allowed:
-- full content CRUD
-- Admin user management UI
 - public frontend redesign
-- shop / payment / analytics / external embeds
-- media/audio uploads
+- full Admin CRUD
+- admin user management UI
+- uploads
+- shop/payment
+- analytics
+- external embeds
 
 ## Existing files to inspect first
 
 ```text
+src/app/[locale]/admin/layout.tsx
 src/app/[locale]/admin/page.tsx
-src/app/[locale]/admin/booking/page.tsx
-src/app/[locale]/admin/login/actions.ts
 src/app/[locale]/admin/login/page.tsx
+src/app/[locale]/admin/login/LoginForm.tsx
+src/app/[locale]/admin/login/actions.ts
+src/app/api/admin/auth/logout/route.ts
 src/lib/admin/auth.ts
 src/lib/admin/roles.ts
 src/lib/supabase/server-auth.ts
+src/lib/supabase/browser-auth.ts
 src/lib/supabase/admin.ts
 src/lib/supabase/types.ts
-supabase/migrations/0001_init.sql
-supabase/policies/0001_rls.sql
+docs/admin-setup.md
+README.md
+supabase/migrations/
+```
+
+## Database migration
+
+Create an additive migration:
+
+```text
+supabase/migrations/0004_admin_password_flow.sql
+```
+
+Add fields to `public.admin_profiles`:
+
+```sql
+alter table public.admin_profiles
+  add column if not exists must_change_password boolean not null default false,
+  add column if not exists password_changed_at timestamptz,
+  add column if not exists initial_password_issued_at timestamptz;
+```
+
+Optional but useful:
+
+```sql
+comment on column public.admin_profiles.must_change_password is
+  'If true, admin must change password before accessing dashboard.';
+```
+
+Update manual `Database` TypeScript type accordingly.
+
+Do not create a public policy for these fields.
+
+## First owner setup flow
+
+Because there is no Admin user management UI yet, setup remains manual.
+
+Required documented flow:
+
+1. Supabase Dashboard → Authentication → Users → Add user.
+2. Create user with:
+   - admin e-mail
+   - temporary initial password
+   - Auto-confirm enabled
+3. Copy User UID.
+4. Supabase SQL Editor:
+
+```sql
+insert into public.admin_profiles
+  (user_id, display_name, email, role, is_active, must_change_password, initial_password_issued_at)
+values
+  ('AUTH_USER_UUID', 'Mika Hertler', 'ADMIN_LOGIN_EMAIL', 'owner', true, true, now());
+```
+
+5. Admin logs in at:
+
+```text
+/de/admin/login
+```
+
+6. Admin is redirected to:
+
+```text
+/de/admin/change-password
+```
+
+7. Admin sets a new password.
+8. After success:
+   - `must_change_password = false`
+   - `password_changed_at = now()`
+   - redirect to `/de/admin`
+
+Important:
+- Do not store the initial password in GitHub.
+- Do not put initial password into `.env`.
+- Do not hard-code admin email or password.
+- The initial password must be communicated out-of-band and changed immediately.
+
+## Forced change-password guard
+
+Update admin guard behavior:
+
+If user is not authenticated:
+- redirect to `/[locale]/admin/login`
+
+If user is authenticated but has no active admin profile:
+- sign out or deny
+- redirect to login with clear error if existing behavior supports it
+
+If user is active admin and `must_change_password = true`:
+- allow access only to:
+  - `/[locale]/admin/change-password`
+  - logout route
+- redirect all other admin pages to:
+  - `/[locale]/admin/change-password`
+
+If user is active admin and `must_change_password = false`:
+- allow normal dashboard/admin access
+
+## Change password page
+
+Create route:
+
+```text
+/[locale]/admin/change-password
+```
+
+Requirements:
+- protected route: authenticated active admin only
+- dark/gold Typhoon Admin style
+- no public frontend redesign
+- fields:
+  - new password
+  - confirm new password
+- optional field:
+  - current/initial password, only if needed
+- submit button
+- clear success/error states
+
+Password rules:
+- minimum 12 characters
+- new password and confirmation must match
+- show clear error if too short/mismatch
+- after successful change, redirect to `/[locale]/admin`
+
+Use Supabase Auth password update:
+- use the current authenticated session
+- do not use service role to set user password in the browser
+- no password logged
+- no password stored in DB
+
+## Updating admin profile after password change
+
+After Supabase Auth password update succeeds, update admin profile:
+
+```text
+must_change_password = false
+password_changed_at = now()
+```
+
+This update must be server-side or through an authenticated/admin-safe path.
+
+Do not expose service role to the browser.
+
+Acceptable implementation patterns:
+- server action using server-auth session plus RLS/admin policy
+- route handler with server-auth and admin validation
+- server-only admin helper gated by current authenticated admin
+
+The simplest safe route is acceptable.
+
+## Login behavior
+
+After successful login:
+- load admin profile
+- if `must_change_password = true`, redirect to `/[locale]/admin/change-password`
+- otherwise redirect to the original admin `from` path or dashboard
+
+Do not allow `from` to bypass the password-change requirement.
+
+## Dashboard behavior
+
+Dashboard must not render when `must_change_password = true`.
+
+Booking requests page must not render when `must_change_password = true`.
+
+## Logout
+
+Logout must remain possible from the change-password page.
+
+## Documentation updates
+
+Update:
+
+```text
 docs/admin-setup.md
 README.md
 ```
 
-## Required schema changes
+Include:
+- first owner setup with initial password
+- SQL insert with `must_change_password = true`
+- expected forced password-change flow
+- how to reset the flag manually if needed
+- how to deactivate an admin
+- how to test unauthorized / inactive / change-required states
 
-Additive only — new columns, no rewrites:
+Manual reset examples:
 
 ```sql
-alter table public.admin_profiles
-  add column if not exists must_change_password boolean not null default true,
-  add column if not exists password_changed_at  timestamptz;
+update public.admin_profiles
+set must_change_password = true,
+    initial_password_issued_at = now()
+where email = 'ADMIN_LOGIN_EMAIL';
 ```
 
-Existing rows pick up `true` from the default, which means every admin
-provisioned before this migration will be funnelled through the new
-flow on their next login.
+Deactivate:
 
-## Required access model
-
-All three roles (`owner` / `admin` / `editor`) must rotate the initial
-password the same way. The flow:
-
-```text
-auth user exists (Supabase)
-AND admin_profiles row exists for auth.users.id
-AND admin_profiles.is_active = true
-AND admin_profiles.must_change_password = false   -- enforced for /admin and /admin/booking
+```sql
+update public.admin_profiles
+set is_active = false
+where email = 'ADMIN_LOGIN_EMAIL';
 ```
-
-`/admin/change-password` itself only requires the first three (otherwise
-the user can never satisfy the flag), but redirects back to `/admin`
-when `must_change_password` is already false.
-
-## Important
-
-- Do not rely on client-side checks. The redirect must happen server-side
-  inside the protected layout/page or its data loader.
-- Admins must be able to log out from the change-password page in case
-  they were enrolled with a wrong account.
-- Do not loosen RLS on `admin_profiles`. The rotation flags are written
-  through the service-role client, the same pattern Phase 03 uses for
-  `last_login_at`.
-
-## Pages / actions to build
-
-### /[locale]/admin/change-password
-
-Server page:
-- `requireAdmin(locale, { from })` to ensure an authenticated active
-  admin is on the page (no rotation check, otherwise we'd loop).
-- Redirect to `/[locale]/admin` when `mustChangePassword` is already
-  false (e.g. user navigated here manually after the rotation).
-
-Client form:
-- New password + confirmation.
-- Minimum length 12.
-- German primary copy. EN/TR can stay simple.
-
-Server action:
-- Validate non-empty + length + match.
-- Re-fetch the current admin server-side.
-- `supabase.auth.updateUser({ password })`.
-- On success, service-role update on `admin_profiles`:
-  `must_change_password = false`, `password_changed_at = now()`,
-  `updated_at = now()`.
-- Redirect to `/[locale]/admin`.
-
-### Login action
-
-After a successful sign-in + active-admin check, read
-`must_change_password` and redirect to
-`/[locale]/admin/change-password` instead of the dashboard if the flag
-is still true.
-
-### Login page
-
-If a user is already signed in as an active admin who still needs to
-rotate their password, redirect them straight to
-`/[locale]/admin/change-password`.
-
-### Dashboard + booking
-
-Switch their data loaders from `requireAdmin()` to
-`requireAdminWithPasswordOk()`.
 
 ## Security requirements
 
-- No service-role key in client components.
-- The change-password action must require an authenticated session.
-- The action must update only the signed-in user's own
-  `admin_profiles` row (filter by `user_id = current.userId`).
-- Passwords must never be logged. Errors surface as user-facing text
-  only.
-- Inactive admins must still be denied — `requireAdmin()` already
-  enforces this.
-- No public access to `/admin/change-password`.
-
-## Documentation updates
-
-- `docs/admin-setup.md` — describe the rotation flow, how to force a
-  rotation manually (`update admin_profiles set must_change_password =
-  true …`), and the logout escape hatch.
-- `README.md` — note the new route, the new helper, and the new
-  migration in the Supabase apply list.
+- no initial password in GitHub
+- no password in `.env`
+- no service role in client components
+- no dashboard access before password change
+- no booking data exposed before password change
+- no public access to admin pages
+- inactive admins denied
+- session checked server-side
+- no weakening of RLS
 
 ## Acceptance checklist
 
-- new admin row is created with `must_change_password = true`
-- `/de/admin/login` → after correct credentials, redirect to
-  `/de/admin/change-password`
-- `/de/admin` and `/de/admin/booking` redirect to
-  `/de/admin/change-password` while the flag is still true
-- after a successful password change:
-  - `must_change_password = false` and `password_changed_at` populated
-  - user lands on `/de/admin`
-  - `/de/admin/change-password` redirects back to `/de/admin`
-- inactive admin is still denied (no regression)
-- no service-role key reaches the browser
+- migration adds password-flow fields
+- TypeScript DB type updated
+- first owner setup docs updated
+- admin with `must_change_password=true` is redirected to change-password
+- admin cannot open dashboard/booking before password change
+- password change validates length and confirmation
+- successful password change updates Supabase Auth password
+- successful password change sets `must_change_password=false`
+- successful password change sets `password_changed_at`
+- admin can access dashboard after password change
+- logout works from change-password page
+- public frontend unchanged
 - `npm run lint` passes
 - `npm run build` passes

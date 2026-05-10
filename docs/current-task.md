@@ -22,41 +22,41 @@ Only open other docs if the active phase explicitly references them.
 
 ## Critical Rule
 
-The public frontend design is approved.
+This phase builds directly on Phase 03 Admin Auth.
 
 Do not redesign the public website.
-Do not change the public layout.
+Do not build Admin content CRUD.
+Do not build uploads.
 
 ## Current Goal
 
-Force every freshly provisioned admin to set their own password before
-they can use any other Admin route:
-- additive migration for `admin_profiles` password-change fields
-- guard that redirects active admins with `must_change_password = true`
-  to a dedicated change-password page
-- /[locale]/admin/change-password page with Supabase Auth password update
-- mark `must_change_password = false` and stamp `password_changed_at`
-  after a successful change
-- block dashboard and booking access until password is changed
+Adjust the Admin login flow to support:
+
+1. Admin user with e-mail + initial password.
+2. Active `admin_profiles` row.
+3. Forced one-time password change after first login.
+4. No access to Admin dashboard until password was changed.
+5. Clear documentation for first owner setup.
 
 ## This Phase Must Implement
 
-- additive SQL migration adding `must_change_password` and
-  `password_changed_at` to `admin_profiles`
-- typed helpers (`requireAdminWithPasswordOk`) that route
-  `must_change_password = true` admins to the change-password page
-- a server-protected `/[locale]/admin/change-password` page with a
-  client form (new password + confirmation, min length, German copy)
-- server action that calls `supabase.auth.updateUser({ password })`,
-  then sets `must_change_password = false` and `password_changed_at = now()`
-- updated `docs/admin-setup.md` and `README.md` describing the flow
+- additive migration for password-change state
+- `must_change_password` guard
+- `/[locale]/admin/change-password`
+- redirect after first login if password change is required
+- secure password update through Supabase Auth
+- update `admin_profiles` after successful password change
+- admin setup documentation
 
 ## This Phase Must Not Implement
 
-- full content CRUD
+- full Admin CRUD
 - Admin user management UI
-- media/audio upload UI
-- shop / payment / analytics / external embeds
+- media/audio uploads
+- shop
+- payment
+- analytics
+- external embeds
 - public frontend redesign
 
 ## Finish Criteria
@@ -68,12 +68,14 @@ npm run lint
 npm run build
 ```
 
-Push this phase as its own commit/branch.
+Push this phase as its own branch/commit.
 
 Then stop and summarize:
 - changed files
-- password-flow behavior
-- admin protection
-- env vars needed
+- database/migration changes
+- initial admin setup flow
+- forced password-change behavior
+- security notes
+- manual test steps
 - lint/build result
 - next recommended phase
