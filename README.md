@@ -202,6 +202,8 @@ WEBSITE_FROM_EMAIL                # must be a Resend-verified domain
    psql -f supabase/policies/0002_rls_foundation.sql
    psql -f supabase/migrations/0003_storage_buckets.sql
    psql -f supabase/migrations/0004_admin_password_flow.sql
+   psql -f supabase/migrations/0005_booking_show_workflow.sql
+   psql -f supabase/policies/0005_booking_show_workflow.sql
    ```
    The same SQL can be pasted into the Supabase SQL editor. Every
    statement is idempotent so reruns are safe.
@@ -241,7 +243,7 @@ The Supabase reader (`src/lib/content/supabase-content.ts`) covers:
 - `band_members` + `band_member_translations` → `getMembers(locale)`
 - `songs` (visible + streamable) → `getSongs(locale)`
 - `media_items` (visible) → `getGalleryItems(locale)`
-- `shows` (visible, supports `is_tba`) → `getShows(locale)`
+- `shows` (visible AND published, supports `is_tba`) → `getShows(locale)`
 - `legal_pages` + `legal_page_translations` (published) → `getLegalPage`
 - `platform_links` (active) → `getPlatformLinks()`
 - `seo_entries` → `getSeoEntry(path, locale)`
@@ -274,9 +276,18 @@ Auth + an active row in `admin_profiles`.
   funnelled here before the dashboard becomes reachable.
 - Dashboard route: `/[locale]/admin` (placeholder cards for upcoming
   modules; Booking is the only live tile in this phase).
-- Booking view: `/[locale]/admin/booking` (read-only list, latest 50).
+- Booking inbox: `/[locale]/admin/booking` (latest 50, status chips,
+  archive filter).
+- Booking detail: `/[locale]/admin/booking/<id>` (status update, soft
+  delete / restore, convert-to-show form prefilled from the request).
+- Shows admin: `/[locale]/admin/shows` (list, `+ Neue Show`, edit,
+  visibility toggle, delete).
 - Logout: `POST /api/admin/auth/logout?locale=<locale>` from the shell
   header (or from the change-password page).
+
+The Booking → Shows workflow (statuses, soft-delete behaviour, public
+visibility rule) is documented in detail in
+[`docs/admin-booking-shows-workflow.md`](docs/admin-booking-shows-workflow.md).
 
 Server-side guarding lives in `src/lib/admin/auth.ts`:
 
@@ -307,8 +318,9 @@ are documented in [`docs/admin-setup.md`](docs/admin-setup.md).
 
 ## Deferred / next batches
 
-- **Phase 04:** Admin CRUD for content tables (members, songs, gallery,
-  shows, legal, SEO, platform links, site settings).
+- **Phase 05+:** Admin CRUD for the remaining content tables (members,
+  songs, gallery, legal, SEO, platform links, site settings). Phase 04
+  ships the booking workflow + Shows admin only.
 - Admin media/audio uploads through the prepared Storage buckets.
 - Hero/about content tables to replace dictionary fallback.
 - Owner-only mutations (admin-profile management UI, legal page deletes).

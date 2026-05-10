@@ -16,12 +16,13 @@ export function AdminShell({
 }: {
   locale: string;
   current: CurrentAdmin;
-  active: "dashboard" | "booking";
+  active: "dashboard" | "booking" | "shows";
   children: React.ReactNode;
 }) {
   const navItems: { href: string; label: string; key: typeof active }[] = [
     { href: `/${locale}/admin`, label: "Dashboard", key: "dashboard" },
     { href: `/${locale}/admin/booking`, label: "Booking", key: "booking" },
+    { href: `/${locale}/admin/shows`, label: "Shows", key: "shows" },
   ];
 
   const displayName =
