@@ -1,11 +1,11 @@
-# Current Task – Phase 01 Booking + Content Foundation
+# Current Task – Phase 01b Booking Email Design
 
 ## Current Phase
 
 Active phase:
 
 ```text
-docs/phases/01-booking-content-foundation.md
+docs/phases/01b-booking-email-design.md
 ```
 
 ## Working Rule
@@ -22,25 +22,22 @@ Only open other docs if the active phase explicitly references them.
 
 ## Critical Rule
 
-The frontend design is approved.
+Booking is already functional.
 
-Do not redesign the frontend.
-Do not change visual layout unless the active phase explicitly requires a bug fix.
+This phase must only improve the visual quality and clarity of the booking email that is sent to:
 
-## Current Goal
-
-Prepare the finished website architecture so all current static content and GitHub assets can later be replaced through Supabase/Admin content.
-
-Booking is the first important production function.
+```text
+booking@typhoon.band
+```
 
 ## This Phase Must Implement
 
-- production-ready Booking foundation
-- Supabase-first/static-fallback content provider
-- Resend-ready booking email flow
-- Supabase booking insert if configured
-- no hard crash when env vars are missing
-- documentation for Vercel/Supabase/Resend setup
+- visually polished HTML email template
+- readable plain-text fallback
+- clean booking data formatting
+- Reply-To remains sender email
+- no frontend design changes
+- no new backend feature creep
 
 ## This Phase Must Not Implement
 
@@ -50,6 +47,7 @@ Booking is the first important production function.
 - analytics
 - external embeds
 - frontend redesign
+- Supabase schema phase work
 
 ## Finish Criteria
 
@@ -64,9 +62,8 @@ Push this phase as its own commit/branch.
 
 Then stop and summarize:
 - changed files
-- Booking status
-- Supabase content provider status
-- fallback behavior
+- email template changes
+- booking behavior preserved
 - env vars needed
 - lint/build result
 - next recommended phase
