@@ -1,11 +1,11 @@
-# Current Task – Phase 03b Initial Admin Password Flow
+# Current Task – Phase 04 Booking Workflow + Shows Admin
 
 ## Current Phase
 
 Active phase:
 
 ```text
-docs/phases/03b-initial-admin-password-flow.md
+docs/phases/04-booking-shows-workflow.md
 ```
 
 ## Working Rule
@@ -22,39 +22,37 @@ Only open other docs if the active phase explicitly references them.
 
 ## Critical Rule
 
-This phase builds directly on Phase 03 Admin Auth.
+The public frontend design is approved.
 
 Do not redesign the public website.
-Do not build Admin content CRUD.
-Do not build uploads.
+Do not change public layout unless required to display real Supabase shows correctly.
 
 ## Current Goal
 
-Adjust the Admin login flow to support:
+Extend the Admin so bookings can be managed and converted into public shows.
 
-1. Admin user with e-mail + initial password.
-2. Active `admin_profiles` row.
-3. Forced one-time password change after first login.
-4. No access to Admin dashboard until password was changed.
-5. Clear documentation for first owner setup.
+This phase connects the current Booking admin area with the Shows system.
 
 ## This Phase Must Implement
 
-- additive migration for password-change state
-- `must_change_password` guard
-- `/[locale]/admin/change-password`
-- redirect after first login if password change is required
-- secure password update through Supabase Auth
-- update `admin_profiles` after successful password change
-- admin setup documentation
+- correct admin setup documentation order:
+  1. create Supabase Auth user manually
+  2. then run SQL to create/link admin_profiles row
+- Booking detail view
+- Booking delete/archive action
+- Booking status handling
+- Convert booking to show flow
+- Shows admin list/create/edit/delete
+- Supabase schema support for booking/show linking
+- public Shows section reads visible Supabase shows and keeps fallback if empty
 
 ## This Phase Must Not Implement
 
-- full Admin CRUD
-- Admin user management UI
-- media/audio uploads
-- shop
-- payment
+- full website content CRUD
+- member CRUD
+- gallery/media uploads
+- audio uploads
+- shop checkout/payment
 - analytics
 - external embeds
 - public frontend redesign
@@ -72,10 +70,13 @@ Push this phase as its own branch/commit.
 
 Then stop and summarize:
 - changed files
-- database/migration changes
-- initial admin setup flow
-- forced password-change behavior
-- security notes
+- booking workflow changes
+- booking delete/archive behavior
+- convert-to-show behavior
+- shows admin CRUD
+- public shows behavior
+- migration/RLS changes
+- setup docs correction
 - manual test steps
 - lint/build result
 - next recommended phase
