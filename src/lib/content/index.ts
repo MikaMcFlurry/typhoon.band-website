@@ -12,6 +12,7 @@
 // directly — it always goes through these loaders.
 
 import type { Locale } from "@/i18n/locales";
+import { fetchPublicAssetSettings } from "@/lib/admin/site-settings";
 import {
   buildBandInfoFallback,
   buildGalleryFallback,
@@ -82,15 +83,28 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 export async function getHeroContent(locale: Locale): Promise<HeroContent> {
   const fallback = buildHeroFallback(locale);
   const row = await safe(() => fetchHero(locale));
-  if (!row) return fallback;
-  return normaliseHero(row, fallback);
+  const base = row ? normaliseHero(row, fallback) : fallback;
+  // Phase 05: hero/signature image URLs may be overridden via site_settings
+  // asset keys (uploaded through the Admin). Text stays dictionary-driven.
+  const assets = await safe(() => fetchPublicAssetSettings());
+  if (!assets) return base;
+  return {
+    ...base,
+    imageUrl: assets.hero_image.url ?? base.imageUrl,
+    signatureUrl: assets.hero_signature.url ?? base.signatureUrl,
+  };
 }
 
 export async function getBandInfo(locale: Locale): Promise<BandInfo> {
   const fallback = buildBandInfoFallback(locale);
   const row = await safe(() => fetchBandInfo(locale));
-  if (!row) return fallback;
-  return normaliseBandInfo(row, fallback);
+  const base = row ? normaliseBandInfo(row, fallback) : fallback;
+  const assets = await safe(() => fetchPublicAssetSettings());
+  if (!assets) return base;
+  return {
+    ...base,
+    imageUrl: assets.bandinfo_image.url ?? base.imageUrl,
+  };
 }
 
 export async function getMembers(locale: Locale): Promise<Member[]> {

@@ -5,9 +5,17 @@ import { useState } from "react";
 import { useDict } from "@/components/i18n/DictProvider";
 import { MediaLightbox } from "@/components/media/MediaLightbox";
 import { SectionHeader } from "@/components/sections/SectionHeader";
-import { gallery } from "@/data/gallery";
 
-export function Gallery() {
+// The server passes the active gallery list (Supabase first, repo
+// fallback second) so the Admin can publish/hide images via
+// `media_items` without touching the design.
+export type GalleryCard = {
+  id: string;
+  src: string;
+  alt: string;
+};
+
+export function Gallery({ items }: { items: GalleryCard[] }) {
   const { dict } = useDict();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -15,7 +23,7 @@ export function Gallery() {
     <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="media">
       <SectionHeader kicker={dict.media.kicker} />
       <div className="grid grid-cols-4 gap-1.5 md:grid-cols-8 md:gap-2">
-        {gallery.map((g, i) => (
+        {items.map((g, i) => (
           <button
             aria-label={`${dict.media.open}: ${g.alt}`}
             className="relative block aspect-square overflow-hidden rounded-md border border-[color:var(--line)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--gold-soft)]"
@@ -35,7 +43,7 @@ export function Gallery() {
       </div>
       <MediaLightbox
         index={openIndex}
-        items={gallery}
+        items={items}
         onClose={() => setOpenIndex(null)}
         onIndexChange={setOpenIndex}
       />

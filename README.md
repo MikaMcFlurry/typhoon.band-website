@@ -282,6 +282,14 @@ Auth + an active row in `admin_profiles`.
   delete / restore, convert-to-show form prefilled from the request).
 - Shows admin: `/[locale]/admin/shows` (list, `+ Neue Show`, edit,
   visibility toggle, delete).
+- Media (gallery): `/[locale]/admin/media` (upload JPG/PNG/WebP, edit
+  title/alt/sort, hide, delete).
+- Music (demos): `/[locale]/admin/music` (upload/replace MP3 + cover,
+  visibility, featured flag, sort).
+- Members (photos): `/[locale]/admin/members` (upload/replace photo by
+  slug, sort, visibility — names/roles/bios stay dictionary-driven).
+- Site assets: `/[locale]/admin/settings/assets` (replace hero image,
+  hero signature, bandinfo image; clearing falls back to repo asset).
 - Logout: `POST /api/admin/auth/logout?locale=<locale>` from the shell
   header (or from the change-password page).
 
@@ -316,13 +324,74 @@ so `booking_requests` keeps its zero-public-read RLS contract intact.
 First owner setup, environment variables, and inactive-admin denial tests
 are documented in [`docs/admin-setup.md`](docs/admin-setup.md).
 
+## Admin media + audio uploads
+
+Phase 05 wires the prepared Storage buckets to admin-gated upload flows.
+Every flow runs `requireAdminWithPasswordOk()`, validates the file
+server-side, uploads through the service-role client, and writes a DB
+record that the public site reads.
+
+| Bucket          | Use                                          |
+| --------------- | -------------------------------------------- |
+| `gallery`       | Gallery images (`media_items.file_url`)      |
+| `audio-demos`   | Demo MP3s (`songs.audio_url`)                |
+| `public-media`  | Song covers + hero/bandinfo settings         |
+| `member-images` | Band member photos (`band_members.photo_url`)|
+| `legal-assets`  | Reserved for later phases                    |
+
+Validation lives in `src/lib/validation/upload.ts`:
+
+- Images: `image/jpeg`, `image/png`, `image/webp`, max **10 MB**.
+  SVG, GIF, HEIC/HEIF, executables and unknown MIME are rejected.
+- Audio: `audio/mpeg` / `audio/mp3` only, max **50 MB**. WAV/AIFF/FLAC/M4A
+  are rejected.
+- Filenames are sanitized (lower-case ASCII slug + ISO date + UUID +
+  original extension); originals are never written to Storage as-is.
+
+Storage uploads go through `src/lib/storage/upload.ts`. Failures during
+the DB write trigger a best-effort cleanup of the orphan Storage object.
+
+### Public fallback rule
+
+The public site keeps using the static repo assets when Supabase has no
+record for an asset:
+
+- Hero / bandinfo / signature images: `site_settings` keys
+  `hero_image`, `hero_signature`, `bandinfo_image` (JSON `{ "url": "…" }`).
+- Gallery: visible rows in `media_items` (category `gallery`).
+- Demos: visible + streamable rows in `songs`. The featured flag chooses
+  the song shown above the demo list.
+- Member photos: `band_members.photo_url` keyed by member slug.
+
+If any of these are empty/missing, the page renders with the repo asset
+in `public/assets/*` (no design change).
+
+### Manual smoke test
+
+1. Sign in as Admin and rotate the initial password.
+2. `/[locale]/admin/media` — upload a JPG, set title/alt/sort, save.
+   Public homepage gallery shows the new image first.
+3. Hide the image — public gallery falls back to the repo set.
+4. `/[locale]/admin/music` — create a song, attach an MP3 + cover,
+   mark as featured. Featured player swaps to the new song; static
+   featured returns when the row is hidden.
+5. `/[locale]/admin/members` — upload a photo for `mika`. The Members
+   grid reads the new URL; the Repo fallback returns after "Foto
+   entfernen".
+6. `/[locale]/admin/settings/assets` — replace hero/bandinfo image.
+   Confirm Hero and Bandinfo modules render the new URLs.
+
+### Image optimisation
+
+`next/image` requires explicit `images.remotePatterns` for Supabase
+Storage URLs. `next.config.mjs` adds the pattern automatically when
+`NEXT_PUBLIC_SUPABASE_URL` is set; without it, the site renders the
+repo assets and never reaches Storage.
+
 ## Deferred / next batches
 
-- **Phase 05+:** Admin CRUD for the remaining content tables (members,
-  songs, gallery, legal, SEO, platform links, site settings). Phase 04
-  ships the booking workflow + Shows admin only.
-- Admin media/audio uploads through the prepared Storage buckets.
-- Hero/about content tables to replace dictionary fallback.
+- Per-locale text CRUD (members, hero, about) and rich-text editor.
+- Legal page editor + SEO entries admin.
 - Owner-only mutations (admin-profile management UI, legal page deletes).
 - Shop/tickets phase.
 - Launch hardening (rate limit, monitoring, generated Supabase types).

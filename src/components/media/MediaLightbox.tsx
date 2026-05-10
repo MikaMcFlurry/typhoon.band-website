@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useDict } from "@/components/i18n/DictProvider";
-import type { GalleryItem } from "@/data/gallery";
+
+type GalleryItem = { id: string; src: string; alt: string };
 
 type Props = {
   items: GalleryItem[];
