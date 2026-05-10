@@ -11,7 +11,7 @@ fallback).
 - TypeScript
 - Tailwind CSS
 - Vercel
-- Supabase (Auth/Postgres/Storage) — `@supabase/supabase-js` v2 with typed `Database` schema
+- Supabase (Auth/Postgres/Storage) — `@supabase/supabase-js` v2 with typed `Database` schema; cookie-aware SSR session via `@supabase/ssr`
 - Resend — wired through a server-only fetch helper
 
 ## Quick start
@@ -43,7 +43,14 @@ src/
       legal/imprint/page.tsx
       legal/privacy/page.tsx
       legal/cookies/page.tsx
+      admin/                    # protected Admin shell (login, dashboard, booking)
+        layout.tsx              # forwards children — auth gating happens per-route
+        page.tsx                # dashboard cards
+        login/                  # email + password form (server action)
+        booking/                # read-only booking requests view
+        _components/AdminShell.tsx
     api/booking/route.ts        # POST handler (validation, honeypot, Supabase insert, Resend email)
+    api/admin/auth/logout/      # POST handler — clears Supabase session cookies
   components/
     audio/                      # AudioPlayerProvider, Waveform, FeaturedPlayer, DemoRow
     layout/                     # Header (with mobile drawer), Footer, CookieConsent
@@ -51,9 +58,10 @@ src/
   data/                         # static seed data (members, songs, gallery, shows, site)
   i18n/                         # locale registry + dictionaries (de/en/tr)
   lib/
+    admin/                      # admin-only helpers (auth guard, role helpers, booking reader)
     content/                    # Supabase-first / static-fallback content provider
     env.ts                      # central env access + helper booleans
-    supabase/                   # client/server/admin typed Supabase clients + booking writer
+    supabase/                   # client/server/admin typed Supabase clients + cookie-aware SSR helpers + booking writer
     resend/                     # server-only mail helper
     validation/                 # booking input validation
 supabase/
@@ -249,13 +257,42 @@ introduced in the Admin phase.
   Supabase is connected.
 - No download button for demo audio; no external embeds without consent.
 
+## Admin
+
+The Admin shell is reachable at `/[locale]/admin` and protected by Supabase
+Auth + an active row in `admin_profiles`.
+
+- Login route: `/[locale]/admin/login` (email + password, German copy).
+- Dashboard route: `/[locale]/admin` (placeholder cards for upcoming
+  modules; Booking is the only live tile in this phase).
+- Booking view: `/[locale]/admin/booking` (read-only list, latest 50).
+- Logout: `POST /api/admin/auth/logout?locale=<locale>` from the shell
+  header.
+
+Server-side guarding lives in `src/lib/admin/auth.ts`:
+
+```ts
+getCurrentAdmin()   // → CurrentAdmin | null
+requireAdmin(locale)// → CurrentAdmin (redirects to login otherwise)
+```
+
+Role helpers are in `src/lib/admin/roles.ts` (`isOwner`, `isAdminLike`,
+`isEditor`, `canAccessAdmin`). All three roles (`owner`, `admin`, `editor`)
+get the same dashboard access today; owner-only mutations land in later
+phases.
+
+The booking reader uses the service-role client (`src/lib/admin/bookings.ts`),
+so `booking_requests` keeps its zero-public-read RLS contract intact.
+
+First owner setup, environment variables, and inactive-admin denial tests
+are documented in [`docs/admin-setup.md`](docs/admin-setup.md).
+
 ## Deferred / next batches
 
-- **Phase 03:** Admin Auth shell — Supabase email + magic-link sign-in,
-  active-admin guard for `/admin/*` routes, base dashboard layout.
-- Admin CRUD for content tables (members, songs, gallery, shows, legal,
-  SEO, platform links, site settings).
+- **Phase 04:** Admin CRUD for content tables (members, songs, gallery,
+  shows, legal, SEO, platform links, site settings).
 - Admin media/audio uploads through the prepared Storage buckets.
 - Hero/about content tables to replace dictionary fallback.
+- Owner-only mutations (admin-profile management UI, legal page deletes).
 - Shop/tickets phase.
 - Launch hardening (rate limit, monitoring, generated Supabase types).
