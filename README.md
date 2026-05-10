@@ -11,7 +11,7 @@ fallback).
 - TypeScript
 - Tailwind CSS
 - Vercel
-- Supabase (Auth/Postgres/Storage) — connected via REST in this phase, SDK ships next
+- Supabase (Auth/Postgres/Storage) — `@supabase/supabase-js` v2 with typed `Database` schema
 - Resend — wired through a server-only fetch helper
 
 ## Quick start
@@ -53,12 +53,18 @@ src/
   lib/
     content/                    # Supabase-first / static-fallback content provider
     env.ts                      # central env access + helper booleans
-    supabase/                   # client/server typed wrappers + booking writer (REST)
+    supabase/                   # client/server/admin typed Supabase clients + booking writer
     resend/                     # server-only mail helper
     validation/                 # booking input validation
 supabase/
-  migrations/0001_init.sql      # schema for all tables in docs/05
-  policies/0001_rls.sql         # RLS policies per docs/06
+  migrations/
+    0001_init.sql               # schema for all tables in docs/05
+    0002_supabase_foundation.sql  # additive: site_settings.locale/is_public, booking_requests.locale,
+                                  #            shows.is_tba + nullable starts_at, media_items.alt_text/title
+    0003_storage_buckets.sql    # public asset buckets + admin-only write policies
+  policies/
+    0001_rls.sql                # base RLS per docs/06
+    0002_rls_foundation.sql     # additive: public read on is_public site_settings; assert no public read on booking/admin
 public/assets/                  # hero, branding, members, band-cards, gallery, audio/demos
 handoff/                        # ← Claude Design source of truth (read-only reference)
 ```
@@ -73,8 +79,9 @@ The booking flow is the first production-grade backend function.
 - Validation: `src/lib/validation/booking.ts` — server-side, honeypot, ISO date
   check, length caps, required fields (`name`, `email`, `event_location`,
   `event_type`, `message`).
-- Persistence: `src/lib/supabase/booking.ts` posts to
-  `booking_requests` via Supabase REST using `SUPABASE_SERVICE_ROLE_KEY`.
+- Persistence: `src/lib/supabase/booking.ts` inserts into `booking_requests`
+  via the typed service-role client (`src/lib/supabase/admin.ts`). Service-role
+  bypasses RLS — no public insert policy exists on the table.
 - Mail: `src/lib/resend/client.ts` — Resend REST, server-only key, Reply-To
   set to the sender's address. Subject:
   `Neue Booking-Anfrage über typhoon.band`.
@@ -170,17 +177,67 @@ WEBSITE_FROM_EMAIL                # must be a Resend-verified domain
 
 ### Supabase setup checklist
 
-1. Create the project, run the migration:
+1. Create the project (Supabase Dashboard → New Project).
+2. **Project Settings → API** gives you:
+   - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
+   - `anon public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (server-only,
+     do **not** prefix with `NEXT_PUBLIC_`).
+3. Apply the SQL — order matters because later files reference helpers
+   from earlier ones:
    ```bash
    psql -f supabase/migrations/0001_init.sql
    psql -f supabase/policies/0001_rls.sql
+   psql -f supabase/migrations/0002_supabase_foundation.sql
+   psql -f supabase/policies/0002_rls_foundation.sql
+   psql -f supabase/migrations/0003_storage_buckets.sql
    ```
-2. Verify Row Level Security is **enabled** on every table.
-3. Confirm `booking_requests` has **no** public select/insert policy —
-   inserts must come through the server route (service-role bypasses RLS).
-4. Copy `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`,
-   `anon` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-   `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (server-only).
+   The same SQL can be pasted into the Supabase SQL editor. Every
+   statement is idempotent so reruns are safe.
+4. Verify Row Level Security is **enabled** on every public table and
+   that no `select`/`insert` policy is exposed for `booking_requests` or
+   `admin_profiles`. The bundled policies enforce this; do not loosen
+   them.
+5. Storage: `0003_storage_buckets.sql` creates the public asset buckets
+   `public-media`, `audio-demos`, `member-images`, `gallery`, and
+   `legal-assets`. Public read is enabled because the frontend only ever
+   renders files referenced by a published DB record. Writes are
+   restricted to authenticated active admins or the server (service
+   role). The future Admin upload UI will write into these buckets.
+
+### Test the booking writer
+
+With env vars configured locally (`.env.local`):
+
+```bash
+curl -sX POST http://localhost:3000/api/booking \
+  -H 'content-type: application/json' \
+  -d '{
+    "name":"Test","email":"test@example.com",
+    "event_location":"Bayreuth","event_type":"Hochzeit",
+    "message":"Test booking, bitte ignorieren.",
+    "locale":"de"
+  }' | jq
+```
+
+A successful run returns `{ ok: true, status: "sent", … }` and creates a
+`booking_requests` row visible in the Supabase Table editor.
+
+### Public content provider
+
+The Supabase reader (`src/lib/content/supabase-content.ts`) covers:
+
+- `band_members` + `band_member_translations` → `getMembers(locale)`
+- `songs` (visible + streamable) → `getSongs(locale)`
+- `media_items` (visible) → `getGalleryItems(locale)`
+- `shows` (visible, supports `is_tba`) → `getShows(locale)`
+- `legal_pages` + `legal_page_translations` (published) → `getLegalPage`
+- `platform_links` (active) → `getPlatformLinks()`
+- `seo_entries` → `getSeoEntry(path, locale)`
+- `site_settings` (`is_public = true`) → `getSiteSettings()`
+
+Hero / about copy is still served from dictionaries — those tables are
+introduced in the Admin phase.
 
 ## Security non-negotiables
 
@@ -194,11 +251,11 @@ WEBSITE_FROM_EMAIL                # must be a Resend-verified domain
 
 ## Deferred / next batches
 
-- **Phase 02:** ship `@supabase/supabase-js`, finalise schema & RLS, type
-  generation. Replace REST writer with SDK + idempotent migration runner.
-- Admin auth shell + protected routes.
-- Admin CRUD for content tables.
-- Admin media/audio uploads.
-- Legal/SEO/consent + platform links from Admin.
+- **Phase 03:** Admin Auth shell — Supabase email + magic-link sign-in,
+  active-admin guard for `/admin/*` routes, base dashboard layout.
+- Admin CRUD for content tables (members, songs, gallery, shows, legal,
+  SEO, platform links, site settings).
+- Admin media/audio uploads through the prepared Storage buckets.
+- Hero/about content tables to replace dictionary fallback.
 - Shop/tickets phase.
-- Launch hardening (rate limit, monitoring).
+- Launch hardening (rate limit, monitoring, generated Supabase types).

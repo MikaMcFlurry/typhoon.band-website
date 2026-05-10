@@ -1,11 +1,11 @@
-// Server-only booking writer. Uses the Supabase REST API directly with
-// the SERVICE_ROLE_KEY so we don't need the @supabase/supabase-js SDK
-// installed yet. The service role bypasses RLS, which is mandatory here
-// because `booking_requests` has NO public insert policy.
+// Server-only booking writer. Uses the service-role Supabase client so
+// the insert bypasses RLS — `booking_requests` deliberately exposes no
+// public insert policy, only the server route may write to it.
 
 import "server-only";
 
-import { isSupabaseAdminConfigured } from "@/lib/env";
+import { getAdminSupabase } from "@/lib/supabase/admin";
+import type { BookingRequestInsert } from "@/lib/supabase/types";
 import type { BookingData } from "@/lib/validation/booking";
 
 export type StoreOutcome = {
@@ -15,33 +15,16 @@ export type StoreOutcome = {
   id?: string;
 };
 
-type BookingRow = {
-  name: string;
-  email: string;
-  phone: string | null;
-  event_date: string | null;
-  event_location: string | null;
-  event_type: string | null;
-  message: string;
-  status: "new";
-  user_agent: string | null;
-};
-
 export async function storeBookingRequest(
   data: BookingData,
-  meta: { userAgent?: string },
+  meta: { userAgent?: string; ipHash?: string | null },
 ): Promise<StoreOutcome> {
-  if (!isSupabaseAdminConfigured()) {
+  const supabase = getAdminSupabase();
+  if (!supabase) {
     return { attempted: false, ok: false, reason: "supabase missing" };
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
-  if (!url || !key) {
-    return { attempted: false, ok: false, reason: "supabase missing" };
-  }
-
-  const body: BookingRow = {
+  const row: BookingRequestInsert = {
     name: data.name,
     email: data.email,
     phone: data.phone || null,
@@ -50,27 +33,21 @@ export async function storeBookingRequest(
     event_type: data.event_type || null,
     message: data.message,
     status: "new",
+    locale: data.locale,
     user_agent: meta.userAgent ?? null,
+    ip_hash: meta.ipHash ?? null,
   };
 
   try {
-    const res = await fetch(`${url}/rest/v1/booking_requests`, {
-      method: "POST",
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-        Prefer: "return=representation",
-      },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      return { attempted: true, ok: false, reason: `supabase ${res.status}` };
+    const { data: inserted, error } = await supabase
+      .from("booking_requests")
+      .insert(row)
+      .select("id")
+      .single();
+    if (error) {
+      return { attempted: true, ok: false, reason: error.message };
     }
-    const rows = (await res.json().catch(() => null)) as
-      | Array<{ id?: string }>
-      | null;
-    return { attempted: true, ok: true, id: rows?.[0]?.id };
+    return { attempted: true, ok: true, id: inserted?.id };
   } catch (err) {
     return {
       attempted: true,
