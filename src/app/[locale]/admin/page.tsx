@@ -22,14 +22,15 @@ const CARDS: DashboardCard[] = [
   {
     key: "booking",
     label: "Booking",
-    description: "Eingegangene Booking-Anfragen ansehen.",
+    description:
+      "Booking-Anfragen ansehen, beantworten, archivieren oder in eine Show umwandeln.",
     status: "live",
   },
   {
     key: "shows",
     label: "Shows",
     description: "Termine veröffentlichen, TBA markieren, sortieren.",
-    status: "soon",
+    status: "live",
   },
   {
     key: "music",
@@ -102,7 +103,11 @@ export default async function AdminHomePage({
       <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CARDS.map((card) => {
           const target =
-            card.key === "booking" ? `/${locale}/admin/booking` : null;
+            card.key === "booking"
+              ? `/${locale}/admin/booking`
+              : card.key === "shows"
+                ? `/${locale}/admin/shows`
+                : null;
           const inner = (
             <>
               <div className="flex items-center justify-between gap-3">

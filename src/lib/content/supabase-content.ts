@@ -171,12 +171,18 @@ export async function fetchShows(): Promise<Maybe<ShowRow[]>> {
   const supabase = getServerSupabase();
   if (!supabase) return null;
   return safeQuery(async () => {
+    // Public anon reader: RLS already restricts this to
+    // is_visible AND is_published, but we filter explicitly so a
+    // future RLS regression cannot leak unpublished rows. We sort by
+    // starts_at for the public homepage; sort_order acts as a tiebreaker.
     const { data, error } = await supabase
       .from("shows")
       .select(
-        "id, starts_at, venue, city, country, ticket_url, is_visible, sort_order",
+        "id, starts_at, is_tba, venue, city, country, ticket_url, event_type, is_visible, is_published, sort_order",
       )
       .eq("is_visible", true)
+      .eq("is_published", true)
+      .order("starts_at", { ascending: true, nullsFirst: false })
       .order("sort_order", { ascending: true });
     if (error || !data) return null;
     // The normaliser still expects `starts_at` as a string; substitute

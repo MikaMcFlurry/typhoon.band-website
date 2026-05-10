@@ -1,9 +1,10 @@
 // Manually maintained Database type for the public schema. Mirrors
 // `supabase/migrations/0001_init.sql` plus the additive
-// `0002_supabase_foundation.sql` and `0004_admin_password_flow.sql`
-// changes (TBA shows, media alt/title, site_settings.locale/is_public,
-// booking_requests.locale, admin_profiles.must_change_password +
-// password_changed_at + initial_password_issued_at).
+// `0002_supabase_foundation.sql`, `0004_admin_password_flow.sql` and
+// `0005_booking_show_workflow.sql` changes (TBA shows, media alt/title,
+// site_settings.locale/is_public, booking_requests.locale,
+// admin_profiles.must_change_password + password_changed_at +
+// initial_password_issued_at, booking workflow + shows admin link).
 //
 // `Relationships: []` is intentionally empty: nested PostgREST joins are
 // avoided in favour of explicit two-step queries. A future Admin phase
@@ -19,7 +20,15 @@ export type Json =
 
 type AdminRole = "owner" | "admin" | "editor";
 type SongStatus = "demo" | "single" | "album_track" | "unreleased";
-type BookingStatus = "new" | "read" | "answered" | "done" | "spam";
+export type BookingStatus =
+  | "new"
+  | "read"
+  | "answered"
+  | "accepted"
+  | "converted"
+  | "rejected"
+  | "archived"
+  | "spam";
 type MediaType = "image" | "video";
 
 export type Database = {
@@ -286,7 +295,10 @@ export type Database = {
           city: string | null;
           country: string | null;
           ticket_url: string | null;
+          event_type: string | null;
+          source_booking_request_id: string | null;
           is_visible: boolean;
+          is_published: boolean;
           sort_order: number;
           created_at: string;
           updated_at: string;
@@ -299,7 +311,10 @@ export type Database = {
           city?: string | null;
           country?: string | null;
           ticket_url?: string | null;
+          event_type?: string | null;
+          source_booking_request_id?: string | null;
           is_visible?: boolean;
+          is_published?: boolean;
           sort_order?: number;
           created_at?: string;
           updated_at?: string;
@@ -312,7 +327,10 @@ export type Database = {
           city?: string | null;
           country?: string | null;
           ticket_url?: string | null;
+          event_type?: string | null;
+          source_booking_request_id?: string | null;
           is_visible?: boolean;
+          is_published?: boolean;
           sort_order?: number;
           created_at?: string;
           updated_at?: string;
@@ -354,6 +372,9 @@ export type Database = {
           locale: string | null;
           ip_hash: string | null;
           user_agent: string | null;
+          converted_show_id: string | null;
+          converted_at: string | null;
+          deleted_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -370,6 +391,9 @@ export type Database = {
           locale?: string | null;
           ip_hash?: string | null;
           user_agent?: string | null;
+          converted_show_id?: string | null;
+          converted_at?: string | null;
+          deleted_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -386,6 +410,9 @@ export type Database = {
           locale?: string | null;
           ip_hash?: string | null;
           user_agent?: string | null;
+          converted_show_id?: string | null;
+          converted_at?: string | null;
+          deleted_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

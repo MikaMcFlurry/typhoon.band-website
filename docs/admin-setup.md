@@ -38,22 +38,32 @@ only login path.
 
 ## 3. Create the first owner account
 
-Two manual steps — both happen in the Supabase Dashboard / SQL editor.
+Two manual steps — **strict order matters**:
 
-### 3a. Create the auth user
+1. **First**: create the Supabase Auth user in the Dashboard.
+2. **Then**: run SQL to insert/link the matching `admin_profiles` row.
+
+The SQL step does **not** create the Auth user — it only links an
+existing one. If you run the SQL before the Auth user exists, the
+`user_id` foreign key cannot resolve and the insert will fail.
+
+### 3a. Create the auth user (first)
 
 In the Dashboard → **Authentication → Users → Add user → "Create new user"**:
 
 - Email: your login address (for example `mika@typhoon.band`).
-- Password: pick a strong password, store in your password manager.
+- Password: pick a strong password, store in your password manager. This
+  is the *temporary* initial password — the change-password flow forces
+  rotation on first login.
 - "Auto Confirm User" → **on**.
 
 Copy the new user's UUID from the user detail page — you need it for the
 admin profile insert below.
 
-### 3b. Insert the matching admin profile
+### 3b. Insert the matching admin profile (second)
 
-Open **SQL Editor** and run (replace the placeholders):
+Now that the Auth user exists, open **SQL Editor** and run (replace the
+placeholders):
 
 ```sql
 insert into public.admin_profiles
@@ -178,9 +188,29 @@ session cookies and redirects back to the login page. The
 change-password page exposes the same logout, so an admin who is stuck
 on a forced rotation can always sign out.
 
-## 10. Next phase
+## 10. Booking workflow + Shows admin (Phase 04)
 
-Phase 04 will introduce the first real Admin CRUD (members, songs, shows,
-gallery, legal). Until then, all content edits happen through the SQL
-editor — see `supabase/migrations/*.sql` and `supabase/policies/*.sql`
-for the schema/RLS contract.
+Phase 04 wires the booking inbox into the public Shows section. See
+`docs/admin-booking-shows-workflow.md` for the day-to-day workflow.
+
+Highlights:
+
+- Booking list shows a status chip and an "↳ Show" badge when a request
+  has been converted into a public show.
+- The Booking detail page (`/<locale>/admin/booking/<id>`) supports:
+  - status updates (`new`, `read`, `answered`, `accepted`, `converted`,
+    `rejected`, `archived`, `spam`),
+  - soft-delete / archive (sets `deleted_at` and hides from the active
+    list — the row is never physically removed so any linked show stays
+    intact),
+  - a one-shot "In Show umwandeln" form that creates a `shows` row and
+    cross-links it via `source_booking_request_id` /
+    `converted_show_id`.
+- The Shows admin (`/<locale>/admin/shows`) supports list, create, edit,
+  visibility toggle, and hard-delete.
+- Public `Shows` section reads visible+published Supabase rows when
+  available and falls back to the dictionary TBA copy otherwise.
+
+Full content CRUD for members, songs, gallery, legal etc. ships in a
+later phase. Until then those continue to come from the static
+fallback / SQL editor.
