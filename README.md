@@ -71,7 +71,7 @@ supabase/
     0002_supabase_foundation.sql  # additive: site_settings.locale/is_public, booking_requests.locale,
                                   #            shows.is_tba + nullable starts_at, media_items.alt_text/title
     0003_storage_buckets.sql    # public asset buckets + admin-only write policies
-    0004_admin_password_flow.sql  # additive: admin_profiles.must_change_password + password_changed_at
+    0004_admin_password_flow.sql  # additive: admin_profiles.must_change_password + password_changed_at + initial_password_issued_at
   policies/
     0001_rls.sql                # base RLS per docs/06
     0002_rls_foundation.sql     # additive: public read on is_public site_settings; assert no public read on booking/admin
@@ -267,8 +267,11 @@ Auth + an active row in `admin_profiles`.
 
 - Login route: `/[locale]/admin/login` (email + password, German copy).
 - Initial password rotation: `/[locale]/admin/change-password`. New admin
-  rows ship with `must_change_password = true`, so the very first login
-  is funnelled here before the dashboard becomes reachable.
+  rows are inserted with `must_change_password = true` (the column itself
+  defaults to `false`, so the provisioning SQL sets it explicitly together
+  with `initial_password_issued_at = now()` — see
+  [`docs/admin-setup.md`](docs/admin-setup.md)). The very first login is
+  funnelled here before the dashboard becomes reachable.
 - Dashboard route: `/[locale]/admin` (placeholder cards for upcoming
   modules; Booking is the only live tile in this phase).
 - Booking view: `/[locale]/admin/booking` (read-only list, latest 50).

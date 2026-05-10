@@ -57,14 +57,19 @@ Open **SQL Editor** and run (replace the placeholders):
 
 ```sql
 insert into public.admin_profiles
-  (user_id, display_name, email, role, is_active)
+  (user_id, display_name, email, role, is_active,
+   must_change_password, initial_password_issued_at)
 values
-  ('AUTH_USER_UUID', 'Mika Hertler', 'YOUR_LOGIN_EMAIL', 'owner', true);
+  ('AUTH_USER_UUID', 'Mika Hertler', 'YOUR_LOGIN_EMAIL', 'owner', true,
+   true, now());
 ```
 
 `role` accepts `owner`, `admin`, or `editor`. Only the first account should
-be `owner`. `must_change_password` defaults to `true`, so the new account
-will be forced through the rotation flow on first login (see step 5).
+be `owner`. The migration default for `must_change_password` is `false`, so
+you **must** set it to `true` explicitly when provisioning a new admin —
+that is what forces the account through the rotation flow on first login
+(see step 5). `initial_password_issued_at = now()` records when the
+out-of-band password was handed out so you can audit the rotation later.
 
 The matching `admin_profiles` row is what lets `requireAdmin()` allow the
 session through — without it, even an authenticated Supabase user is
@@ -75,10 +80,10 @@ rejected (and signed out) by the login action.
 1. Run `npm run dev` (or hit production).
 2. Visit `/de/admin` → you should be redirected to `/de/admin/login`.
 3. Log in with the email + password from step 3a.
-4. Because `must_change_password` defaults to `true`, the login redirects
-   to `/de/admin/change-password` (see section 5). After setting a new
-   password you'll land on the dashboard with the owner role chip and a
-   "Booking" tile linking to the read-only requests view.
+4. Because the insert in step 3b set `must_change_password = true`, the
+   login redirects to `/de/admin/change-password` (see section 5). After
+   setting a new password you'll land on the dashboard with the owner role
+   chip and a "Booking" tile linking to the read-only requests view.
 
 If something goes wrong:
 
@@ -89,8 +94,10 @@ If something goes wrong:
 
 ## 5. First-login password rotation
 
-Every freshly provisioned admin row starts with `must_change_password =
-true`. The Admin shell honours that flag:
+Every freshly provisioned admin row is inserted with
+`must_change_password = true` (see section 3b — the column itself defaults
+to `false`, so the insert must set it explicitly). The Admin shell
+honours that flag:
 
 - After login, the user is redirected to `/[locale]/admin/change-password`.
 - `requireAdminWithPasswordOk()` blocks `/admin` and `/admin/booking`
@@ -111,7 +118,9 @@ new owner taking over an existing account):
 
 ```sql
 update public.admin_profiles
-set must_change_password = true, updated_at = now()
+set must_change_password = true,
+    initial_password_issued_at = now(),
+    updated_at = now()
 where email = 'login@example.com';
 ```
 
@@ -124,15 +133,19 @@ Repeat step 3 with a different email and pick the right role:
 
 ```sql
 insert into public.admin_profiles
-  (user_id, display_name, email, role, is_active)
+  (user_id, display_name, email, role, is_active,
+   must_change_password, initial_password_issued_at)
 values
-  ('NEW_USER_UUID', 'Display Name', 'login@example.com', 'admin', true);
+  ('NEW_USER_UUID', 'Display Name', 'login@example.com', 'admin', true,
+   true, now());
 ```
 
 For now, all three roles (`owner` / `admin` / `editor`) get the same
 dashboard access. Owner-only mutations land in later phases. The new
 account will be forced through the password rotation on first login,
-just like the owner.
+just like the owner — provided the insert sets `must_change_password =
+true` and stamps `initial_password_issued_at = now()` (the column default
+is `false`).
 
 ## 7. Deactivate / re-activate an admin
 

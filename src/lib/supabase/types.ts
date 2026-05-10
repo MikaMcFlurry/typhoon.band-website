@@ -3,7 +3,7 @@
 // `0002_supabase_foundation.sql` and `0004_admin_password_flow.sql`
 // changes (TBA shows, media alt/title, site_settings.locale/is_public,
 // booking_requests.locale, admin_profiles.must_change_password +
-// password_changed_at).
+// password_changed_at + initial_password_issued_at).
 //
 // `Relationships: []` is intentionally empty: nested PostgREST joins are
 // avoided in favour of explicit two-step queries. A future Admin phase
@@ -35,6 +35,7 @@ export type Database = {
           is_active: boolean;
           must_change_password: boolean;
           password_changed_at: string | null;
+          initial_password_issued_at: string | null;
           last_login_at: string | null;
           created_at: string;
           updated_at: string;
@@ -48,6 +49,7 @@ export type Database = {
           is_active?: boolean;
           must_change_password?: boolean;
           password_changed_at?: string | null;
+          initial_password_issued_at?: string | null;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -61,6 +63,7 @@ export type Database = {
           is_active?: boolean;
           must_change_password?: boolean;
           password_changed_at?: string | null;
+          initial_password_issued_at?: string | null;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;

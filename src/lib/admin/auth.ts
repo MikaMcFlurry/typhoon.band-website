@@ -42,7 +42,7 @@ export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
   const { data: profile, error } = await supabase
     .from("admin_profiles")
     .select(
-      "id, user_id, display_name, email, role, is_active, must_change_password, password_changed_at, last_login_at, created_at, updated_at",
+      "id, user_id, display_name, email, role, is_active, must_change_password, password_changed_at, initial_password_issued_at, last_login_at, created_at, updated_at",
     )
     .eq("user_id", user.id)
     .maybeSingle();
