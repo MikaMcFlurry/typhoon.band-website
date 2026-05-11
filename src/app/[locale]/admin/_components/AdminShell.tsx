@@ -15,7 +15,11 @@ export type AdminTab =
   | "media"
   | "music"
   | "members"
-  | "settings";
+  | "settings"
+  | "legal"
+  | "seo"
+  | "platform-links"
+  | "consent";
 
 export function AdminShell({
   locale,
@@ -39,6 +43,18 @@ export function AdminShell({
       href: `/${locale}/admin/settings/assets`,
       label: "Assets",
       key: "settings",
+    },
+    { href: `/${locale}/admin/legal`, label: "Legal", key: "legal" },
+    { href: `/${locale}/admin/seo`, label: "SEO", key: "seo" },
+    {
+      href: `/${locale}/admin/platform-links`,
+      label: "Platform Links",
+      key: "platform-links",
+    },
+    {
+      href: `/${locale}/admin/consent`,
+      label: "Consent",
+      key: "consent",
     },
   ];
 

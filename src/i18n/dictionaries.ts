@@ -85,8 +85,17 @@ export type Dict = {
     body: string;
     accept: string;
     decline: string;
+    acceptAll: string;
+    save: string;
+    preferences: string;
     privacyLink: string;
     cookiesLink: string;
+    categoryNecessary: string;
+    categoryNecessaryDesc: string;
+    categoryExternalMedia: string;
+    categoryExternalMediaDesc: string;
+    embedGateNotice: string;
+    embedGateAccept: string;
   };
   legal: {
     backToHome: string;
@@ -271,11 +280,23 @@ const de: Dict = {
   cookies: {
     title: "Cookies & Privatsphäre",
     body:
-      "Diese Website verwendet nur technisch notwendige Cookies. Es findet kein Tracking statt.",
+      "Diese Website verwendet nur technisch notwendige Cookies. Externe Medien (z. B. YouTube, Spotify) werden erst nach Zustimmung geladen. Kein Tracking.",
     accept: "Verstanden",
-    decline: "Nicht jetzt",
+    decline: "Nur Notwendige",
+    acceptAll: "Alle erlauben",
+    save: "Auswahl speichern",
+    preferences: "Cookie-Einstellungen",
     privacyLink: "Datenschutz",
     cookiesLink: "Cookies",
+    categoryNecessary: "Notwendig",
+    categoryNecessaryDesc:
+      "Erforderlich für sichere Verbindungen und Grundfunktionen.",
+    categoryExternalMedia: "Externe Medien",
+    categoryExternalMediaDesc:
+      "Eingebettete Inhalte externer Anbieter (z. B. YouTube, Spotify, SoundCloud, Bandcamp) laden erst nach Zustimmung.",
+    embedGateNotice:
+      "Externer Inhalt blockiert. Klicke auf Akzeptieren, um diesen einmaligen Embed zu laden – externe Verbindungen werden erst dann aufgebaut.",
+    embedGateAccept: "Externe Medien laden",
   },
   legal: {
     backToHome: "Zur Startseite",
@@ -391,11 +412,23 @@ const en: Dict = {
   cookies: {
     title: "Cookies & privacy",
     body:
-      "This site only uses technically required cookies. No tracking is in place.",
+      "This site only uses technically required cookies. External media (e.g. YouTube, Spotify) only loads after consent. No tracking.",
     accept: "Got it",
-    decline: "Not now",
+    decline: "Necessary only",
+    acceptAll: "Accept all",
+    save: "Save choice",
+    preferences: "Cookie preferences",
     privacyLink: "Privacy",
     cookiesLink: "Cookies",
+    categoryNecessary: "Necessary",
+    categoryNecessaryDesc:
+      "Required for secure connections and basic functionality.",
+    categoryExternalMedia: "External media",
+    categoryExternalMediaDesc:
+      "Embedded content from third parties (e.g. YouTube, Spotify, SoundCloud, Bandcamp) only loads after consent.",
+    embedGateNotice:
+      "External content blocked. Click accept to load this embed — external connections are only opened after consent.",
+    embedGateAccept: "Load external media",
   },
   legal: {
     backToHome: "Back to home",
@@ -512,11 +545,23 @@ const tr: Dict = {
   cookies: {
     title: "Çerezler & gizlilik",
     body:
-      "Bu site yalnızca teknik olarak gerekli çerezleri kullanır. Hiçbir izleme yapılmaz.",
+      "Bu site yalnızca teknik olarak gerekli çerezleri kullanır. Harici medya (örn. YouTube, Spotify) yalnızca onayınızdan sonra yüklenir. İzleme yapılmaz.",
     accept: "Anladım",
-    decline: "Şimdi değil",
+    decline: "Sadece gerekli",
+    acceptAll: "Hepsini kabul et",
+    save: "Seçimi kaydet",
+    preferences: "Çerez tercihleri",
     privacyLink: "Gizlilik",
     cookiesLink: "Çerezler",
+    categoryNecessary: "Gerekli",
+    categoryNecessaryDesc:
+      "Güvenli bağlantı ve temel işlevsellik için gereklidir.",
+    categoryExternalMedia: "Harici medya",
+    categoryExternalMediaDesc:
+      "Üçüncü taraf gömülü içerikleri (örn. YouTube, Spotify, SoundCloud, Bandcamp) yalnızca onayınızdan sonra yüklenir.",
+    embedGateNotice:
+      "Harici içerik engellendi. Bu gömülü içeriği yüklemek için kabul et'e tıklayın — harici bağlantılar yalnızca onaydan sonra açılır.",
+    embedGateAccept: "Harici medyayı yükle",
   },
   legal: {
     backToHome: "Ana sayfaya dön",

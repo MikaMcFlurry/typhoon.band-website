@@ -1,13 +1,54 @@
-"use client";
+import { getDict } from "@/i18n/dictionaries";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
+import { getLegalPage, getSeoEntry } from "@/lib/content";
+import { LegalBody, LegalH2, LegalShell } from "@/components/legal/LegalShell";
 
-import { useDict } from "@/components/i18n/DictProvider";
-import { LegalH2, LegalShell } from "@/components/legal/LegalShell";
+export const dynamic = "force-dynamic";
 
-export default function CookiesPage() {
-  const { dict, locale } = useDict();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const entry = await getSeoEntry("/legal/cookies", locale);
+  return {
+    title: entry.title ?? undefined,
+    description: entry.description ?? undefined,
+    openGraph: entry.ogImageUrl
+      ? { images: [{ url: entry.ogImageUrl }] }
+      : undefined,
+  };
+}
+
+export default async function CookiesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const dict = getDict(locale);
+  const page = await getLegalPage("cookies", locale);
+
+  if (page.bodyMd.trim().length > 0) {
+    return (
+      <LegalShell
+        kicker={dict.footer.legal}
+        title={page.title}
+        showDraftNote={false}
+      >
+        <LegalBody text={page.bodyMd} />
+      </LegalShell>
+    );
+  }
+
+  const body =
+    locale === "en" ? <BodyEn /> : locale === "tr" ? <BodyTr /> : <BodyDe />;
   return (
-    <LegalShell kicker={dict.footer.legal} title={dict.legal.cookiesTitle}>
-      {locale === "en" ? <BodyEn /> : locale === "tr" ? <BodyTr /> : <BodyDe />}
+    <LegalShell kicker={dict.footer.legal} title={page.title}>
+      {body}
     </LegalShell>
   );
 }

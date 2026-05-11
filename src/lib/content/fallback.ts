@@ -135,9 +135,20 @@ export function buildPlatformLinksFallback(): PlatformLink[] {
 
 export function buildSeoFallback(path: string, locale: Locale): SeoEntry {
   const dict = getDict(locale);
+  // Page-specific fallbacks so the legal routes don't pretend to be the
+  // home page in their `<title>`. The root layout applies a `· Typhoon`
+  // suffix template, so we return the bare page label here.
+  let title = `Typhoon — ${dict.brand.genreLine}`;
+  if (path === "/legal/imprint") {
+    title = dict.legal.imprintTitle;
+  } else if (path === "/legal/privacy") {
+    title = dict.legal.privacyTitle;
+  } else if (path === "/legal/cookies") {
+    title = dict.legal.cookiesTitle;
+  }
   return {
     path,
-    title: `Typhoon — ${dict.brand.genreLine}`,
+    title,
     description: dict.hero.description,
     ogImageUrl: "/assets/hero/hero-collage.jpeg",
   };
