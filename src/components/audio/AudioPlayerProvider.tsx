@@ -58,6 +58,11 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (typeof window === "undefined") return null;
     if (!audioRef.current) {
       const el = new Audio();
+      // crossOrigin must be set before any src is assigned. Cross-origin
+      // Supabase Storage MP3s are otherwise silenced once routed through
+      // a Web Audio analyser (the graph receives zero-sample data when
+      // the media is CORS-tainted).
+      el.crossOrigin = "anonymous";
       el.preload = "metadata";
       audioRef.current = el;
     }
@@ -119,6 +124,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         const next = nextEntry;
         const a = audioRef.current;
         if (!a) return;
+        a.crossOrigin = "anonymous";
         a.src = next.src;
         attachListeners(next.id, a);
         setState((s) => ({ ...s, currentId: next.id, position: 0, progress: 0 }));
@@ -149,10 +155,15 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         try {
           el.pause();
         } catch {}
+        // Re-affirm crossOrigin before each src change so a hot-reload or
+        // a future code path that recreates the element cannot strip it.
+        el.crossOrigin = "anonymous";
         el.src = src;
         attachListeners(id, el);
         setState({ ...initialState, currentId: id, volume: el.volume, muted: el.muted });
       }
+      // Analyser is best-effort: if CORS or AudioContext setup fails the
+      // playback path must continue, so we ignore the return value here.
       ensureAnalyser();
       const playPromise = el.play();
       if (playPromise && typeof playPromise.catch === "function") {
