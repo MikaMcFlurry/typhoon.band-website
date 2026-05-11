@@ -8,6 +8,15 @@ const ROLE_LABELS: Record<CurrentAdmin["profile"]["role"], string> = {
   editor: "Editor",
 };
 
+export type AdminTab =
+  | "dashboard"
+  | "booking"
+  | "shows"
+  | "media"
+  | "music"
+  | "members"
+  | "settings";
+
 export function AdminShell({
   locale,
   current,
@@ -16,13 +25,21 @@ export function AdminShell({
 }: {
   locale: string;
   current: CurrentAdmin;
-  active: "dashboard" | "booking" | "shows";
+  active: AdminTab;
   children: React.ReactNode;
 }) {
-  const navItems: { href: string; label: string; key: typeof active }[] = [
+  const navItems: { href: string; label: string; key: AdminTab }[] = [
     { href: `/${locale}/admin`, label: "Dashboard", key: "dashboard" },
     { href: `/${locale}/admin/booking`, label: "Booking", key: "booking" },
     { href: `/${locale}/admin/shows`, label: "Shows", key: "shows" },
+    { href: `/${locale}/admin/media`, label: "Media", key: "media" },
+    { href: `/${locale}/admin/music`, label: "Music", key: "music" },
+    { href: `/${locale}/admin/members`, label: "Members", key: "members" },
+    {
+      href: `/${locale}/admin/settings/assets`,
+      label: "Assets",
+      key: "settings",
+    },
   ];
 
   const displayName =

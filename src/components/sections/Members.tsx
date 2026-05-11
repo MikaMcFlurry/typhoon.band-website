@@ -3,9 +3,20 @@
 import Image from "next/image";
 import { useDict } from "@/components/i18n/DictProvider";
 import { SectionHeader } from "@/components/sections/SectionHeader";
-import { members } from "@/data/members";
 
-export function Members() {
+// Member list shape passed in from the server. The content provider
+// (`getMembers()`) merges Supabase rows with the static fallback so the
+// Admin can replace photos without touching the design here.
+export type MemberCard = {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  photoUrl: string;
+  isPlaceholder: boolean;
+};
+
+export function Members({ members }: { members: MemberCard[] }) {
   const { dict } = useDict();
   return (
     <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="band">
@@ -22,7 +33,7 @@ export function Members() {
                 className="h-full w-full object-cover sepia-img"
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"
-                src={m.photo}
+                src={m.photoUrl}
               />
               {m.isPlaceholder ? (
                 <span

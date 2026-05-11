@@ -89,10 +89,13 @@ export async function fetchMembers(
   const supabase = getServerSupabase();
   if (!supabase) return null;
   return safeQuery(async () => {
+    // Read all rows (visible AND hidden) so the public merge can decide
+    // per-slug whether to hide a single member. The is_visible filter
+    // lives in the content provider, not in the query, so an Admin
+    // toggling visibility doesn't lose the row from the fallback merge.
     const { data: members, error: membersErr } = await supabase
       .from("band_members")
       .select("id, slug, photo_url, sort_order, is_visible")
-      .eq("is_visible", true)
       .order("sort_order", { ascending: true });
     if (membersErr || !members) return null;
     if (members.length === 0) return [];

@@ -8,17 +8,27 @@ import {
 import { Waveform } from "@/components/audio/Waveform";
 import { useTrackDuration } from "@/components/audio/useTrackDuration";
 import { useDict } from "@/components/i18n/DictProvider";
-import type { Song } from "@/data/songs";
+
+// Local song shape so Demos/DemoRow no longer depend on the static
+// `data/songs.ts` definition. The home page builds this from the
+// content provider (Supabase-first, fallback static).
+export type DemoRowSong = {
+  id: string;
+  title: string;
+  src: string;
+  cover?: string | null;
+};
 
 type Props = {
   index: number;
-  song: Song;
+  song: DemoRowSong;
   cover?: string;
 };
 
 const DEFAULT_COVER = "/assets/hero/hero-collage.jpeg";
 
-export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
+export function DemoRow({ index, song, cover }: Props) {
+  const resolvedCover = cover ?? song.cover ?? DEFAULT_COVER;
   const {
     currentId,
     isPlaying,
@@ -43,7 +53,7 @@ export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
     <article className="w-full max-w-full overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.55)] px-3 py-3 transition hover:border-[color:var(--line-strong)] hover:bg-[rgba(11,8,5,0.7)] md:px-5 md:py-3.5">
       {/* ── Mobile: top meta row ────────────────────────────────────── */}
       <div className="flex items-center gap-3 md:hidden">
-        <Cover cover={cover} title={song.title} />
+        <Cover cover={resolvedCover} title={song.title} />
         <span className="font-mono text-[10px] text-[color:var(--muted)]">
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -75,7 +85,7 @@ export function DemoRow({ index, song, cover = DEFAULT_COVER }: Props) {
 
       {/* ── Desktop: single row, waveform fills remaining width ─────── */}
       <div className="hidden grid-cols-[44px_28px_44px_minmax(140px,0.9fr)_minmax(0,3fr)_auto_auto] items-center gap-4 md:grid">
-        <Cover cover={cover} title={song.title} />
+        <Cover cover={resolvedCover} title={song.title} />
         <span className="font-mono text-xs text-[color:var(--muted)]">
           {String(index + 1).padStart(2, "0")}
         </span>

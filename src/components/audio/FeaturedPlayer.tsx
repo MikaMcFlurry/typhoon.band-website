@@ -7,10 +7,18 @@ import {
 } from "@/components/audio/AudioPlayerProvider";
 import { Waveform } from "@/components/audio/Waveform";
 import { useDict } from "@/components/i18n/DictProvider";
-import type { Song } from "@/data/songs";
+
+// Player works against any song descriptor that exposes id/title/src.
+// The home page builds this from the content provider so an Admin MP3
+// uploaded to Supabase replaces the static demo automatically.
+export type FeaturedSong = {
+  id: string;
+  title: string;
+  src: string;
+};
 
 type Props = {
-  song: Song;
+  song: FeaturedSong;
   cover: string;
   artist?: string;
 };

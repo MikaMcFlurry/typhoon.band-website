@@ -7,7 +7,15 @@ import { SectionHeader } from "@/components/sections/SectionHeader";
 // Editorial Bandinfo module per docs/v5 + docs/band-info-example.png:
 //   desktop : image left  ─ text right
 //   mobile  : same logic, image stays on top, text reflows below.
-export function About() {
+//
+// Image URL is server-driven (`getBandInfo()`) so the Admin can replace
+// it via Supabase site_settings without touching the layout.
+
+type AboutProps = {
+  imageUrl: string;
+};
+
+export function About({ imageUrl }: AboutProps) {
   const { dict } = useDict();
   return (
     <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="about">
@@ -24,7 +32,7 @@ export function About() {
             className="h-full w-full object-cover"
             fill
             sizes="(max-width: 768px) 100vw, 42vw"
-            src="/assets/gallery/gallery-5.jpg"
+            src={imageUrl}
             style={{
               objectPosition: "center",
               filter: "saturate(0.92) contrast(1.05) brightness(0.92)",

@@ -33,22 +33,28 @@ const CARDS: DashboardCard[] = [
     status: "live",
   },
   {
-    key: "music",
-    label: "Music",
-    description: "Demos und Releases pflegen, Cover & Audio verlinken.",
-    status: "soon",
+    key: "media",
+    label: "Media",
+    description: "Galerie-Bilder hochladen, sortieren, ausblenden.",
+    status: "live",
   },
   {
-    key: "gallery",
-    label: "Gallery",
-    description: "Bilder/Videos hochladen, sortieren, verbergen.",
-    status: "soon",
+    key: "music",
+    label: "Music",
+    description: "Demos pflegen, MP3 und Cover hochladen, Sichtbarkeit/Featured.",
+    status: "live",
   },
   {
     key: "members",
     label: "Members",
-    description: "Bandmitglieder, Rollen und Bios pflegen.",
-    status: "soon",
+    description: "Bandmitglieder-Fotos hochladen und Sichtbarkeit pflegen.",
+    status: "live",
+  },
+  {
+    key: "settings",
+    label: "Assets",
+    description: "Hero- und Bandinfo-Bild austauschen, Site-Assets verwalten.",
+    status: "live",
   },
   {
     key: "legal",
@@ -66,12 +72,6 @@ const CARDS: DashboardCard[] = [
     key: "platform",
     label: "Platform Links",
     description: "Spotify, YouTube, Instagram & Co. verwalten.",
-    status: "soon",
-  },
-  {
-    key: "settings",
-    label: "Settings",
-    description: "Site-Einstellungen, Kontaktdaten, Sichtbarkeit.",
     status: "soon",
   },
 ];
@@ -107,7 +107,15 @@ export default async function AdminHomePage({
               ? `/${locale}/admin/booking`
               : card.key === "shows"
                 ? `/${locale}/admin/shows`
-                : null;
+                : card.key === "media"
+                  ? `/${locale}/admin/media`
+                  : card.key === "music"
+                    ? `/${locale}/admin/music`
+                    : card.key === "members"
+                      ? `/${locale}/admin/members`
+                      : card.key === "settings"
+                        ? `/${locale}/admin/settings/assets`
+                        : null;
           const inner = (
             <>
               <div className="flex items-center justify-between gap-3">

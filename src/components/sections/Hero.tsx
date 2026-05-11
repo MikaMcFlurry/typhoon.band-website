@@ -8,6 +8,10 @@ import { useDict } from "@/components/i18n/DictProvider";
 //   2. IMAGE block     — band collage (z 1)
 //   3. SIGNATURE block — oversized gold wordmark, rotated -4deg (z 50)
 //
+// Image and signature URLs are passed in by the server (`getHeroContent()`)
+// so an Admin upload via Supabase Storage can override the static repo
+// assets without touching the design.
+//
 // Desktop tweaks (Design-Fix v6):
 //   - Image block starts at ~38vw (was 38% from right edge), so the LEFT
 //     edge of the band collage is fully visible inside the hero again.
@@ -21,7 +25,13 @@ import { useDict } from "@/components/i18n/DictProvider";
 //     is visible under the hero.
 //   - The signature sits much lower and slightly LEFT, slightly bleeding
 //     out of the bottom of the image (the visual handoff intent).
-export function Hero() {
+
+type HeroProps = {
+  imageUrl: string;
+  signatureUrl: string;
+};
+
+export function Hero({ imageUrl, signatureUrl }: HeroProps) {
   const { dict } = useDict();
   return (
     <section className="relative overflow-visible" id="home">
@@ -41,7 +51,7 @@ export function Hero() {
             className="h-full w-full object-contain object-right"
             height={1500}
             priority
-            src="/assets/hero/hero-collage.jpeg"
+            src={imageUrl}
             style={{
               filter:
                 "sepia(0.4) saturate(0.85) contrast(1.08) brightness(0.78)",
@@ -75,7 +85,7 @@ export function Hero() {
             height={1500}
             priority
             sizes="100vw"
-            src="/assets/hero/hero-collage.jpeg"
+            src={imageUrl}
             style={{
               filter:
                 "sepia(0.38) saturate(0.85) contrast(1.06) brightness(0.72)",
@@ -106,7 +116,7 @@ export function Hero() {
           aria-hidden
           className="pointer-events-none absolute z-[50] hidden md:block"
           height={724}
-          src="/assets/branding/typhoon-signature-gold.png"
+          src={signatureUrl}
           style={{
             // was right: -2%, bottom: -40px → -20px shifted down + 75px left
             right: "calc(-2% + 75px)",
@@ -124,7 +134,7 @@ export function Hero() {
           aria-hidden
           className="pointer-events-none absolute z-[50] md:hidden"
           height={724}
-          src="/assets/branding/typhoon-signature-gold.png"
+          src={signatureUrl}
           style={{
             right: "-2%",
             bottom: "30px",
