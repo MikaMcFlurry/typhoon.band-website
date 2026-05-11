@@ -59,6 +59,12 @@ export function MemberForm({
   const isVisible = db?.is_visible ?? true;
   const sortOrder = db?.sort_order ?? fallback.sortOrder;
 
+  // Heading priority: current admin locale translation → German translation → static fallback.
+  const headingName =
+    findTranslation(db?.translations, locale)?.name?.trim() ||
+    findTranslation(db?.translations, "de")?.name?.trim() ||
+    fallback.name;
+
   return (
     <form action={saveMemberAction} className="grid gap-3">
       <input type="hidden" name="locale" value={locale} />
@@ -67,7 +73,7 @@ export function MemberForm({
       <header className="flex items-baseline justify-between gap-2">
         <div>
           <p className="font-display text-base font-semibold tracking-[-0.01em]">
-            {fallback.name}
+            {headingName}
           </p>
           <p className="mt-1 text-[10px] uppercase tracking-[0.22em] text-[color:var(--muted-cream)]">
             slug: {slug}
@@ -82,7 +88,7 @@ export function MemberForm({
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-[color:var(--line)] md:w-[140px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            alt={fallback.name}
+            alt={headingName}
             className="h-full w-full object-cover"
             src={photoUrl}
           />

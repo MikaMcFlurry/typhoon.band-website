@@ -29,7 +29,7 @@ export function Members({ members }: { members: MemberCard[] }) {
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-[rgba(11,8,5,0.85)]">
               <Image
-                alt={`${m.name} – ${dict.members.instrument[m.id] ?? m.role}`}
+                alt={`${m.name} – ${m.role}`}
                 className="h-full w-full object-cover sepia-img"
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"
@@ -49,10 +49,10 @@ export function Members({ members }: { members: MemberCard[] }) {
                 {m.name}
               </h3>
               <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[color:var(--gold-soft)] md:text-[10px]">
-                {dict.members.instrument[m.id] ?? m.role}
+                {m.role}
               </span>
               <p className="m-0 text-[11px] leading-[1.55] text-[color:var(--muted-cream)] md:text-[12px]">
-                {dict.members.bio[m.id] ?? m.bio}
+                {m.bio}
               </p>
             </div>
           </article>
