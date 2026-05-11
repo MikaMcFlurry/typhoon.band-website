@@ -1,11 +1,11 @@
-# Current Task – Phase 05 Admin Media + Audio Uploads
+# Current Task – Phase 06 Legal, SEO, Consent and Platform Links
 
 ## Current Phase
 
 Active phase:
 
 ```text
-docs/phases/05-admin-media-audio-uploads.md
+docs/phases/06-legal-seo-consent-platforms.md
 ```
 
 ## Working Rule
@@ -25,40 +25,39 @@ Only open other docs if the active phase explicitly references them.
 The public frontend design is approved.
 
 Do not redesign the public website.
-Do not change public layout except minimal data wiring needed to use uploaded Supabase assets.
+Only make minimal UI additions required for:
+- legal pages
+- cookie consent banner/preferences
+- platform links
+- SEO metadata
 
 ## Current Goal
 
-Extend the existing Admin workflow so admins can safely upload and manage website assets:
-
-- Gallery images
-- Demo song MP3 files
-- Demo song cover images
-- Member photos
-- Hero/Bandinfo images through site settings
-- Asset replacement without breaking static fallback
+Make the website more launch-ready by finishing:
+- editable legal pages
+- SEO/OpenGraph metadata
+- cookie/consent handling
+- platform link management
+- external media/embed safeguards
 
 ## This Phase Must Implement
 
-- secure server-side upload flow
-- file validation for images and MP3s
-- Supabase Storage upload through admin-gated server actions/routes
-- DB record update/create after upload
-- gallery media management
-- demo song audio/cover management
-- member photo management
-- hero/bandinfo image setting management
-- public site uses uploaded Supabase asset URLs when records exist
-- static GitHub assets remain fallback
+- Admin Legal page editor
+- Admin SEO editor
+- Admin Platform Links editor
+- Cookie consent banner and preferences
+- no external embeds without consent
+- public legal pages from Supabase with fallback
+- metadata from content provider / SEO entries
+- docs updates
 
 ## This Phase Must Not Implement
 
-- full text CRUD for every website section
-- rich text editor
+- analytics unless explicitly configured and consent-gated
 - shop
 - payment
-- analytics
-- external embeds
+- full rich-text CMS
+- media/audio upload changes
 - public frontend redesign
 
 ## Finish Criteria
@@ -74,11 +73,12 @@ Push this phase as its own branch/commit.
 
 Then stop and summarize:
 - changed files
-- upload/storage behavior
-- validation rules
-- admin media pages
-- public asset fallback behavior
-- security notes
+- legal editor behavior
+- SEO behavior
+- consent behavior
+- platform link behavior
+- external embed safeguards
+- migration/RLS changes if any
 - manual test steps
 - lint/build result
 - next recommended phase
