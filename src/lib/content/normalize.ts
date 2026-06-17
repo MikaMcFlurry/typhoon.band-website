@@ -144,13 +144,19 @@ export function normaliseMembers(
     }
     usedSlugs.add(fb.id);
     if (sb.is_visible === false) continue; // explicit hide → drop only this one
+    // A real photo uploaded via Admin (band_members.photo_url) always wins:
+    // once Supabase has a photo for this member, it can never be a placeholder,
+    // regardless of the static fallback flag. The fallback placeholder marker
+    // only applies when Supabase has no photo for this slug.
+    const hasSupabasePhoto =
+      typeof sb.photo_url === "string" && sb.photo_url.trim().length > 0;
     result.push({
       id: fb.id,
       name: pickString(sb.translation?.name, fb.name),
       role: pickString(sb.translation?.role, fb.role),
       bio: pickString(sb.translation?.bio_md, fb.bio),
       photoUrl: pickString(sb.photo_url, fb.photoUrl),
-      isPlaceholder: fb.isPlaceholder,
+      isPlaceholder: hasSupabasePhoto ? false : fb.isPlaceholder,
       sortOrder: sb.sort_order ?? fb.sortOrder,
     });
   }
