@@ -68,10 +68,13 @@ The old Claude branch controls only:
 
 Do not copy the old player card visual layout if it conflicts with DESIGN.md.
 
-Content rules that stay: exactly 8 members in the documented order (Typhoon,
-Mika, Schack, Hardy, Stefan, Tom, Buğra, Jürgen — never "Taifun", never
-"Daniel"), only `booking@typhoon.band` (no `info@`), never invent show dates,
-no placeholder badges, no horizontal overflow on mobile (test 320/390 px).
+Content rules that stay: the repo fallback lists 8 members in the documented
+order (Typhoon, Mika, Schack, Hardy, Stefan, Tom, Buğra, Jürgen — never
+"Taifun", never "Daniel"); Supabase admin data overrides per slot (the live
+DB currently shows "Tan – Percussion" in the `jurgen` slot — owner to
+confirm), so never hard-code member names in copy. Only `booking@typhoon.band`
+(no `info@`), never invent show dates, no placeholder badges, no horizontal
+overflow on mobile (test 320/390 px).
 
 ## Non-negotiable security rules
 

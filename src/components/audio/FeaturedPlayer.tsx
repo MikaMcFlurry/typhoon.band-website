@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
 import {
   formatTime,
   useAudioPlayer,
@@ -38,7 +39,8 @@ export function FeaturedPlayer({
     playlist,
   } = useAudioPlayer();
   const { position } = useAudioTime();
-  const metaDuration = useTrackDuration(song.src);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const metaDuration = useTrackDuration(song.src, cardRef);
   const isCurrent = currentId === song.id;
   const playing = isCurrent && isPlaying;
   const shownDuration = isCurrent && duration ? duration : metaDuration;
@@ -50,7 +52,10 @@ export function FeaturedPlayer({
       aria-labelledby="featured-title"
       className="container-x relative z-20 -mt-8 lg:-mt-16"
     >
-      <div className="rounded-md border border-line-2 bg-ink-3 p-4 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] sm:p-5 md:p-6">
+      <div
+        className="rounded-md border border-line-2 bg-ink-3 p-4 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] sm:p-5 md:p-6"
+        ref={cardRef}
+      >
         <div className="flex items-center gap-4 md:gap-5">
           <div className="relative size-16 flex-none overflow-hidden rounded-sm border border-line md:size-[88px]">
             <Image

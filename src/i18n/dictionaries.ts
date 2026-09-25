@@ -357,7 +357,7 @@ const de: Dict = {
     body:
       "Typhoon sprengt Genregrenzen, ohne die eigene Handschrift zu verlieren: markante Blues-Riffs, funkige Grooves, soulige Melodien, jazzige Finessen und türkischsprachige Texte. Eine erfahrene Band, die live sofort zündet.",
     lead:
-      "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.\n\nIm Zentrum steht ein eingespieltes Kollektiv aus acht erfahrenen Musikern mit über 30 Jahren Bühnenerfahrung: Sänger Typhoon, Posaunist Mika, Saxophonist Schack, Trompeter Hardy, Funk-Bassist Stefan, Schlagzeuger Tom sowie die Gitarristen Buğra und Jürgen.\n\nIm eigenen Kanzlei Studio in Hechingen produziert die Band ihre Arrangements mit viel Liebe zum Detail und moderner Technik. Das Ergebnis ist ein Gesamtpaket aus handwerklicher Präzision und authentischer Spielfreude.",
+      "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.\n\nIm Zentrum steht ein eingespieltes Kollektiv aus acht erfahrenen Musikern mit über 30 Jahren Bühnenerfahrung, getragen von Gesang, Bläsersatz und einer groovenden Rhythmusgruppe.\n\nIm eigenen Kanzlei Studio in Hechingen produziert die Band ihre Arrangements mit viel Liebe zum Detail und moderner Technik. Das Ergebnis ist ein Gesamtpaket aus handwerklicher Präzision und authentischer Spielfreude.",
     more: "Mehr über Typhoon",
     imageAlt: "Typhoon singt live auf der Bühne",
     cta: "Die Besetzung",
@@ -428,7 +428,7 @@ const de: Dict = {
       "Erzählt uns kurz von eurem Event. Wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
     factsTitle: "Für Veranstalter",
     facts: [
-      { label: "Besetzung", value: "{count} Musiker: Gesang, Bläsersatz, Gitarren, Bass, Schlagzeug" },
+      { label: "Besetzung", value: "{count} Musiker mit Gesang, Bläsersatz und Rhythmusgruppe" },
       { label: "Programm", value: "Eigene Songs mit türkischen Texten" },
       { label: "Stil", value: "Bluesrock, Funk, Soul, Jazz, Southern Rock" },
       { label: "Anlässe", value: "Festival, Club, Stadtfest, Firmen- und Privatevents" },
@@ -617,7 +617,7 @@ const en: Dict = {
     body:
       "Typhoon breaks genre boundaries without losing their handwriting: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
     lead:
-      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of eight experienced musicians with more than 30 years of stage experience: singer Typhoon, trombonist Mika, saxophonist Schack, trumpeter Hardy, funk bassist Stefan, drummer Tom and guitarists Buğra and Jürgen.\n\nIn their own Kanzlei Studio in Hechingen, the band works out its arrangements with great attention to detail and modern equipment. The result is a complete package of craftsmanship and genuine joy of playing.",
+      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of eight experienced musicians with more than 30 years of stage experience, built on vocals, a horn section and a grooving rhythm section.\n\nIn their own Kanzlei Studio in Hechingen, the band works out its arrangements with great attention to detail and modern equipment. The result is a complete package of craftsmanship and genuine joy of playing.",
     more: "More about Typhoon",
     imageAlt: "Typhoon singing live on stage",
     cta: "Meet the line-up",
@@ -687,7 +687,7 @@ const en: Dict = {
       "Tell us a little about your event. We'll reply personally with availability and terms.",
     factsTitle: "For promoters",
     facts: [
-      { label: "Line-up", value: "{count} musicians: vocals, horns, guitars, bass, drums" },
+      { label: "Line-up", value: "{count} musicians: vocals, horn section, rhythm section" },
       { label: "Set", value: "Original songs with Turkish lyrics" },
       { label: "Style", value: "Blues rock, funk, soul, jazz, southern rock" },
       { label: "Occasions", value: "Festivals, clubs, city festivals, corporate and private events" },
@@ -875,7 +875,7 @@ const tr: Dict = {
     body:
       "Typhoon, kendi imzasını kaybetmeden tür sınırlarını aşar: vurucu blues riff'leri, funky groove'lar, ruhlu melodiler, jazz incelikleri ve Türkçe sözler. Sahneye çıktığı an alev alan tecrübeli bir grup.",
     lead:
-      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.\n\nMerkezde, 30 yılı aşkın sahne tecrübesine sahip sekiz deneyimli müzisyenden oluşan uyumlu bir kolektif var: vokalist Typhoon, trombonist Mika, saksofoncu Schack, trompetçi Hardy, funk basçı Stefan, davulcu Tom ve gitaristler Buğra ile Jürgen.\n\nGrup, Hechingen'deki kendi Kanzlei Studio'sunda düzenlemelerini büyük bir özen ve modern teknikle hazırlar. Sonuç: ustalık ve içten çalma keyfinin bir araya geldiği eksiksiz bir paket.",
+      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.\n\nMerkezde, 30 yılı aşkın sahne tecrübesine sahip sekiz deneyimli müzisyenden oluşan uyumlu bir kolektif var; vokal, nefesli grubu ve groove dolu bir ritim grubu.\n\nGrup, Hechingen'deki kendi Kanzlei Studio'sunda düzenlemelerini büyük bir özen ve modern teknikle hazırlar. Sonuç: ustalık ve içten çalma keyfinin bir araya geldiği eksiksiz bir paket.",
     more: "Typhoon hakkında daha fazla",
     imageAlt: "Typhoon sahnede canlı söylüyor",
     cta: "Kadroyu tanıyın",
@@ -945,7 +945,7 @@ const tr: Dict = {
       "Etkinliğinizi kısaca anlatın. Uygunluk ve koşullarla size bizzat dönüş yapalım.",
     factsTitle: "Organizatörler için",
     facts: [
-      { label: "Kadro", value: "{count} müzisyen: vokal, nefesliler, gitarlar, bas, davul" },
+      { label: "Kadro", value: "{count} müzisyen: vokal, nefesli grubu, ritim grubu" },
       { label: "Program", value: "Türkçe sözlü kendi şarkıları" },
       { label: "Tarz", value: "Blues rock, funk, soul, jazz, southern rock" },
       { label: "Etkinlikler", value: "Festival, kulüp, şehir şenliği, kurumsal ve özel etkinlikler" },

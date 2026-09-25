@@ -189,6 +189,16 @@ export type SongRow = {
   sort_order: number | null;
 };
 
+/** "Gece Yine Düştün" → "geceyinedustun" — case, Turkish diacritics, spaces and dashes ignored. */
+export function songKey(title: string): string {
+  return title
+    .toLocaleLowerCase("tr")
+    .replace(/ı/g, "i")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
 export function normaliseSongs(
   rows: SongRow[],
   fallbacks: SongItem[],
@@ -196,10 +206,17 @@ export function normaliseSongs(
   return rows
     .filter((r) => r.is_visible !== false)
     .map((row) => {
-      const fallback = fallbacks.find((s) => s.id === row.slug);
+      // Match the repo demo by slug, or by title ignoring case/diacritics:
+      // the live DB has "Cilgin" / "gece yine dustun" for "Çılgın" /
+      // "Gece Yine Düştün". A title that only lost its diacritics is shown
+      // in the canonical spelling; a genuinely different title is kept.
+      const byTitle = row.title
+        ? fallbacks.find((s) => songKey(s.title) === songKey(row.title))
+        : undefined;
+      const fallback = fallbacks.find((s) => s.id === row.slug) ?? byTitle;
       return {
         id: row.slug,
-        title: pickString(row.title, fallback?.title ?? row.slug),
+        title: byTitle ? byTitle.title : pickString(row.title, fallback?.title ?? row.slug),
         audioUrl: pickString(row.audio_url, fallback?.audioUrl ?? ""),
         coverImageUrl:
           pickStringOrNull(row.cover_image_url) ??

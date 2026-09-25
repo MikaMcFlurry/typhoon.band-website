@@ -87,9 +87,7 @@ export function LoginForm({
       <SubmitButton />
 
       <p className="text-[11px] leading-relaxed text-[color:var(--muted-cream)]">
-        Zugang nur für aktive Admins. Owner richten neue Accounts über die
-        Supabase-Konsole + <code>admin_profiles</code> ein. Siehe{" "}
-        <code>docs/admin-setup.md</code>.
+        Zugang nur für Bandmitglieder mit aktivem Admin-Konto.
       </p>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
 import {
   formatTime,
   useAudioPlayer,
@@ -38,7 +39,8 @@ function TrackRow({
   const { currentId, isPlaying, isLoading, hasError, duration, toggle } =
     useAudioPlayer();
   const { position } = useAudioTime();
-  const metaDuration = useTrackDuration(track.src);
+  const rowRef = useRef<HTMLLIElement | null>(null);
+  const metaDuration = useTrackDuration(track.src, rowRef);
   const isCurrent = currentId === track.id;
   const playing = isCurrent && isPlaying;
   const shownDuration = isCurrent && duration ? duration : metaDuration;
@@ -46,6 +48,7 @@ function TrackRow({
 
   return (
     <li
+      ref={rowRef}
       className={`group relative grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-3 border-b border-line px-2 py-4 transition-colors md:px-3 md:grid-cols-[2.5rem_auto_minmax(0,14rem)_1fr_4.5rem_auto] md:gap-x-6 md:py-5 ${
         isCurrent ? "bg-ink-3/60" : "hover:bg-ink-3/40"
       } ${className}`}
