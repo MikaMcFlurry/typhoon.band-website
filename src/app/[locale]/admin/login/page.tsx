@@ -51,7 +51,7 @@ export default async function AdminLoginPage({
       {supabaseReady ? (
         <LoginForm locale={locale} from={from} />
       ) : (
-        <div className="mt-8 rounded-[10px] border border-[color:var(--line)] bg-[color:var(--panel)] p-4 text-sm text-[color:var(--muted-cream)]">
+        <div className="mt-8 rounded-[10px] border border-[color:var(--line)] bg-[color:var(--panel)] p-4 text-sm text-[color:var(--muted-cream)] [overflow-wrap:anywhere]">
           Supabase ist nicht konfiguriert. Setze
           <code className="mx-1">NEXT_PUBLIC_SUPABASE_URL</code>
           und
