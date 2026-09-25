@@ -8,15 +8,39 @@
       "kicker": "THE ROLL",
       "lineage": "Tour-Rider, Stage-Plot, Spike-Tape auf dem Bühnenboden, Setlist mit Gaffa am Monitor",
       "thesis": "Die Website ist der Abend aus Sicht der Bühne: Stage-Plot für die Besetzung, Setlist für die Songs, Rider für das Booking.",
-      "palette": ["#141312", "#EDE9DF", "#FF6A1F", "#FF3D8B", "#35D07F", "#3AA7FF"],
-      "materials": ["mattschwarzer Bühnenboden", "farbiges Spike-Tape", "weißes Gaffa mit Edding-Beschriftung", "Flightcase-Schablonenschrift"],
+      "palette": [
+        "#141312",
+        "#EDE9DF",
+        "#FF6A1F",
+        "#FF3D8B",
+        "#35D07F",
+        "#3AA7FF"
+      ],
+      "materials": [
+        "mattschwarzer Bühnenboden",
+        "farbiges Spike-Tape",
+        "weißes Gaffa mit Edding-Beschriftung",
+        "Flightcase-Schablonenschrift"
+      ],
       "viewport": "Draufsicht auf die Bühne: acht Tape-Markierungen an den echten Positionen, Sänger vorne Mitte, darüber die goldene Signatur; Song 1 der Setlist spielt mit einem Tap; Booking als orangenes Tape oben rechts.",
       "risk": "Wird Kostüm, wenn Tape nur Deko ist; jede Markierung muss eine echte Funktion tragen.",
       "raised": [
-        {"from": "challenger-algorave", "raise": "Eine gemeinsame Uhr: der laufende Song pulsiert live durch Setlist, Dock und Bühnenplan."},
-        {"from": "challenger-darkroom", "raise": "Booking zeigt vor dem Absenden die Anfrage als Karte, wie sie ankommt (Teststreifen vor dem Belichten)."},
-        {"from": "challenger-deco", "raise": "Genau eine unverwechselbare Primäraktion (Booking-Tape), alles andere tritt zurück."},
-        {"from": "challenger-cloud", "raise": "Textflächen bleiben unbunt; Farbe lebt nur auf Tape und Zuständen."}
+        {
+          "from": "challenger-algorave",
+          "raise": "Eine gemeinsame Uhr: der laufende Song pulsiert live durch Setlist, Dock und Bühnenplan."
+        },
+        {
+          "from": "challenger-darkroom",
+          "raise": "Booking zeigt vor dem Absenden die Anfrage als Karte, wie sie ankommt (Teststreifen vor dem Belichten)."
+        },
+        {
+          "from": "challenger-deco",
+          "raise": "Genau eine unverwechselbare Primäraktion (Booking-Tape), alles andere tritt zurück."
+        },
+        {
+          "from": "challenger-cloud",
+          "raise": "Textflächen bleiben unbunt; Farbe lebt nur auf Tape und Zuständen."
+        }
       ]
     },
     {
@@ -25,8 +49,18 @@
       "kicker": "IMPECCABLE’S PICK",
       "lineage": "türkische 7-Zoll-Singles der 70er (Anadolu Rock, Plak-Etiketten)",
       "thesis": "Jeder Song als türkische 45er-Single mit Etikett, Katalognummer und kräftigen Farbfeldern.",
-      "palette": ["#E8432A", "#F2B705", "#0F6E6E", "#F4EBDD", "#1A1A1A"],
-      "materials": ["Offsetdruck auf Karton", "Plattenetikett", "Rasterfoto"],
+      "palette": [
+        "#E8432A",
+        "#F2B705",
+        "#0F6E6E",
+        "#F4EBDD",
+        "#1A1A1A"
+      ],
+      "materials": [
+        "Offsetdruck auf Karton",
+        "Plattenetikett",
+        "Rasterfoto"
+      ],
       "viewport": "Eine übergroße Singlehülle mit Collage und Etikett, die Platte gleitet heraus und spielt.",
       "risk": "Retro-Plattenhülle ist ein vertrauter Band-Seiten-Zug; kann nostalgisch statt live wirken."
     },
@@ -36,8 +70,15 @@
       "verdict": "competitive",
       "lineage": "japanische Boutique-Pop-Hüllen mit Obi-Streifen",
       "thesis": "Fast leere Fläche mit der Signatur, darum ein dichter Obi-Streifen mit allen Credits.",
-      "palette": ["#F1EEE6", "#D6282E", "#111111"],
-      "materials": ["Papier-Obi", "dichter Credit-Satz"],
+      "palette": [
+        "#F1EEE6",
+        "#D6282E",
+        "#111111"
+      ],
+      "materials": [
+        "Papier-Obi",
+        "dichter Credit-Satz"
+      ],
       "viewport": "Signatur allein auf heller Fläche, ein roter Obi-Streifen mit acht Namen, Instrumenten und Songliste.",
       "case": "Verschmilzt gut: Credits sind Bookerfakten; verliert knapp bei der Identifikation mit einer Liveband.",
       "risk": "Kann kühl und zu ruhig für Funk wirken.",
@@ -48,8 +89,15 @@
       "label": "Algorave-Bühne",
       "verdict": "declined",
       "lineage": "Live-Coding-Partys",
-      "palette": ["#050505", "#39FF88", "#FF2BD6"],
-      "materials": ["Projektorschwarz", "Code-Puffer"],
+      "palette": [
+        "#050505",
+        "#39FF88",
+        "#FF2BD6"
+      ],
+      "materials": [
+        "Projektorschwarz",
+        "Code-Puffer"
+      ],
       "thesis": "Die Musik als live editierter Code.",
       "viewport": "Terminal-Puffer als Bühne.",
       "case": "Booker einer Funkband erkennen sich nicht im Code.",
@@ -61,8 +109,15 @@
       "label": "Dunkelkammer",
       "verdict": "declined",
       "lineage": "Fotolabor unter Rotlicht",
-      "palette": ["#C2561C", "#8E8E8E", "#0B0B0B"],
-      "materials": ["Safelight-Bernstein", "Silbergelatine"],
+      "palette": [
+        "#C2561C",
+        "#8E8E8E",
+        "#0B0B0B"
+      ],
+      "materials": [
+        "Safelight-Bernstein",
+        "Silbergelatine"
+      ],
       "thesis": "Bilder entstehen langsam im Entwicklerbad.",
       "viewport": "Galerie als Wässerungsleine.",
       "case": "Schön für die Galerie, trägt aber weder Sound noch Booking.",
@@ -74,8 +129,15 @@
       "label": "Art-Déco-Kino",
       "verdict": "declined",
       "lineage": "Premierenfoyer",
-      "palette": ["#0E0B08", "#C9A45C", "#8C1C24"],
-      "materials": ["Messing", "Lack"],
+      "palette": [
+        "#0E0B08",
+        "#C9A45C",
+        "#8C1C24"
+      ],
+      "materials": [
+        "Messing",
+        "Lack"
+      ],
       "thesis": "Sonnenstrahl-Marquee und Messing.",
       "viewport": "Marquee mit Stufen-Versalien.",
       "case": "Führt zurück zu Schwarz-Gold von Version A.",
@@ -87,8 +149,16 @@
       "label": "Irisierender Wolkenrand",
       "verdict": "declined",
       "lineage": "Wolkenphysik",
-      "palette": ["#FAFAFA", "#5B6570", "#9FE3C8", "#E9A3C0"],
-      "materials": ["Wolkenweiß", "Spektralsaum"],
+      "palette": [
+        "#FAFAFA",
+        "#5B6570",
+        "#9FE3C8",
+        "#E9A3C0"
+      ],
+      "materials": [
+        "Wolkenweiß",
+        "Spektralsaum"
+      ],
       "thesis": "Wörtliche Lesart von 'Typhoon'.",
       "viewport": "Weiße Wolke mit Farbsaum.",
       "case": "Nur der Name, nicht die Band.",
@@ -100,8 +170,15 @@
       "label": "Raku-Brand",
       "verdict": "declined",
       "lineage": "Keramik",
-      "palette": ["#111111", "#DADADA", "#E86A1A"],
-      "materials": ["Ruß", "Craquelé"],
+      "palette": [
+        "#111111",
+        "#DADADA",
+        "#E86A1A"
+      ],
+      "materials": [
+        "Ruß",
+        "Craquelé"
+      ],
       "thesis": "Rauch, Ruß und Glasur.",
       "viewport": "Gefäß im Rauch.",
       "case": "Keine Verbindung zu Publikum oder Produkt.",
@@ -109,16 +186,39 @@
       "kept": "Asymmetrie als Gesetz."
     }
   ],
-  "reroll": {"registers": ["safer", "bolder"]},
-  "buildPath": {"value": "code", "toggle": false},
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "buildPath": {
+    "value": "code",
+    "toggle": false
+  },
   "canon": true,
   "canonCard": {
     "label": "Standard-Bandseite",
     "thesis": "Vollflächiges Bandfoto, großer Name, Tourdaten, Listen-Button.",
-    "palette": ["#0D0D0D", "#FFFFFF", "#E0B34A"],
-    "materials": ["Vollbildfoto", "saubere Liste"],
+    "palette": [
+      "#0D0D0D",
+      "#FFFFFF",
+      "#E0B34A"
+    ],
+    "materials": [
+      "Vollbildfoto",
+      "saubere Liste"
+    ],
     "viewport": "Foto über die ganze Breite, Name und zwei Buttons darauf.",
     "risk": "Von jeder anderen Bandseite nicht zu unterscheiden."
   },
-  "steer": true
+  "steer": true,
+  "seed": {
+    "key": "f20ee826",
+    "scope": "direction",
+    "mode": "persuade",
+    "assignedIndex": 4,
+    "chosen": "assigned",
+    "note": "concept-seed roll 2026-09-25; choice ping sent with --kind assigned"
+  }
 }

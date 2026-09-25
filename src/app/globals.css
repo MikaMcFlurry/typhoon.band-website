@@ -469,9 +469,10 @@ a {
     display: block;
     min-height: 48px;
   }
+  /* color-scheme: dark already renders the picker icon light. */
   .st-field input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.92);
     cursor: pointer;
+    opacity: 0.9;
   }
   .st-field-error {
     font-size: 0.875rem;

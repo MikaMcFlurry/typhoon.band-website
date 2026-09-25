@@ -326,7 +326,10 @@ A flat, matte, square-cut strip in one colour with stage-ink text. Padding is 0.
 A chalk sheet held by two pink tape pieces, with an ink 2px header rule and numbered rows (mono index, title, mono duration, and a 44px ink play square that turns pink when playing or hovered). The current row's title gets pink tape and carries `data-live`, and a seekable waveform opens under it (`on-light`: ink bars played, 28% ink unplayed).
 
 ### Line-up cards
-One card per member from live data: a 4:5 photo, the name on gaffer tape overlapping the photo's bottom edge (alternating ±0.8° tilt), the role on green tape, and the short bio in chalk-2. **No stage positions or stage plot:** the band has no fixed placement on stage (owner, 2026-09-25), so nothing may suggest one.
+One card per member from live data: a 4:5 photo in one monochrome treatment (`grayscale` + `contrast(1.08)`, so colour snapshots and sepia crops read as one set; colour lives on the tapes), the name on gaffer tape overlapping the photo's bottom edge (alternating ±0.8° tilt), the role on green tape, and the short bio in chalk-2. **No stage positions or stage plot:** the band has no fixed placement on stage (owner, 2026-09-25), so nothing may suggest one.
+
+### Request sent / fallback
+No icon tile. The result heading sits on chalk tape; in the fallback state the orange mailto button is the one action.
 
 ### Rider (booking)
 A heading on orange tape, a facts dl under a 2px chalk rule, and contact lines in Big Shoulders. The form sits on a `deck-2` panel. A chalk **request preview** sheet (taped in orange) mirrors the draft in mono just above the submit.

@@ -1,7 +1,8 @@
 import Image from "next/image";
 import type { Member } from "@/lib/content/types";
 
-// The line-up as a row of backstage passes: photo, name on gaffer tape,
+// The line-up as a row of backstage passes: photo (one monochrome
+// treatment so colour snapshots and sepia crops read as one set), name on gaffer tape,
 // instrument on green tape, short bio. No stage positions — the band has
 // no fixed placement on stage. Names, roles, bios and photos come from the
 // live data per slot; nothing here hard-codes a name.
@@ -21,14 +22,14 @@ export function Lineup({ members }: { members: Member[] }) {
             <div className="relative aspect-[4/5] overflow-hidden bg-deck-3">
               <Image
                 alt={`${m.name}, ${m.role}`}
-                className="object-cover object-top"
+                className="object-cover object-top grayscale contrast-[1.08]"
                 fill
                 sizes="(min-width: 1024px) 300px, (min-width: 768px) 30vw, 50vw"
                 src={m.photoUrl}
               />
             </div>
             <h4 className="-mt-5 ml-2 font-stage text-[1.625rem] font-black uppercase leading-none sm:text-[2rem]">
-              <span className={`tape relative ${i % 2 ? "rotate-[0.8deg]" : "-rotate-[0.8deg]"} inline-block max-w-full [overflow-wrap:anywhere]`}>
+              <span className={`tape relative ${i % 2 ? "rotate-[0.8deg]" : "-rotate-[0.8deg]"} inline-block max-w-full [overflow-wrap:break-word]`}>
                 {m.name}
               </span>
             </h4>

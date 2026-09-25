@@ -214,11 +214,10 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
             role="status"
             tabIndex={-1}
           >
-            <span className="inline-flex size-12 items-center justify-center bg-green text-[#121110]">
-              <Icon name={status.kind === "sent" ? "check" : "mail"} size={26} />
-            </span>
-            <h3 className="mt-6 font-stage text-[2.5rem] font-black uppercase leading-[0.95]">
-              {status.kind === "sent" ? t.submitOkTitle : t.direct}
+            <h3 className="font-stage text-[2.5rem] font-black uppercase leading-[1.02]">
+              <span className="tape -rotate-[0.8deg]">
+                {status.kind === "sent" ? t.submitOkTitle : t.direct}
+              </span>
             </h3>
             <p className="copy mt-3">{status.message}</p>
             {status.kind === "fallback" ? (
