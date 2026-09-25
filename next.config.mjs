@@ -23,21 +23,34 @@ if (supabaseUrl) {
 // Conservative security headers. No third-party scripts, frames or trackers
 // are loaded, so the policy can stay tight. Supabase is needed for admin
 // uploads (direct-to-Storage) and public audio/images.
-const connectSrc = ["'self'", supabaseOrigin, supabaseOrigin.replace("https://", "wss://")]
-  .filter(Boolean)
-  .join(" ");
-const mediaSrc = ["'self'", "blob:", supabaseOrigin].filter(Boolean).join(" ");
-const imgSrc = ["'self'", "data:", "blob:", supabaseOrigin].filter(Boolean).join(" ");
+// Vercel preview deployments inject the Vercel toolbar (comments for
+// reviewers). Allow it on previews only; production stays locked down.
+const isPreview = process.env.VERCEL_ENV === "preview";
+const toolbar = isPreview
+  ? {
+      script: "https://vercel.live",
+      connect: "https://vercel.live wss://ws-us3.pusher.com",
+      img: "https://vercel.live https://vercel.com",
+      frame: "https://vercel.live",
+      style: "https://vercel.live",
+      font: "https://vercel.live https://assets.vercel.com",
+    }
+  : null;
+
+const join = (...parts) => parts.filter(Boolean).join(" ");
+const connectSrc = join("'self'", supabaseOrigin, supabaseOrigin.replace("https://", "wss://"), toolbar?.connect);
+const mediaSrc = join("'self'", "blob:", supabaseOrigin);
+const imgSrc = join("'self'", "data:", "blob:", supabaseOrigin, toolbar?.img);
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'" + (process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""),
-  "style-src 'self' 'unsafe-inline'",
+  join("script-src 'self' 'unsafe-inline'", process.env.NODE_ENV === "development" ? "'unsafe-eval'" : "", toolbar?.script),
+  join("style-src 'self' 'unsafe-inline'", toolbar?.style),
   `img-src ${imgSrc}`,
   `media-src ${mediaSrc}`,
-  "font-src 'self' data:",
+  join("font-src 'self' data:", toolbar?.font),
   `connect-src ${connectSrc}`,
-  "frame-src 'none'",
+  toolbar ? `frame-src ${toolbar.frame}` : "frame-src 'none'",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
