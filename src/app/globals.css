@@ -421,7 +421,7 @@ a {
     min-width: 0;
     background: var(--deck);
     border: 0;
-    border-bottom: 2px solid var(--rule-2);
+    border-bottom: 2px solid var(--chalk-3);
     padding: 12px 12px 10px;
     color: var(--chalk);
     font-family: inherit;
