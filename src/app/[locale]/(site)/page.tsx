@@ -8,9 +8,28 @@ import { Hero } from "@/components/sections/Hero";
 import { Members } from "@/components/sections/Members";
 import { Shows } from "@/components/sections/Shows";
 import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
-import { getPublicPageContent } from "@/lib/content";
+import { getPublicPageContent, getSeoEntry } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const entry = await getSeoEntry("/", locale);
+  return {
+    // `title.absolute` skips the "· Typhoon" template from the root
+    // layout — home-page titles already include the brand.
+    title: entry.title ? { absolute: entry.title } : undefined,
+    description: entry.description ?? undefined,
+    openGraph: entry.ogImageUrl
+      ? { images: [{ url: entry.ogImageUrl }] }
+      : undefined,
+  };
+}
 
 export default async function HomePage({
   params,

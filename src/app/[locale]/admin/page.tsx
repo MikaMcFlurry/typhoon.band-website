@@ -59,20 +59,27 @@ const CARDS: DashboardCard[] = [
   {
     key: "legal",
     label: "Legal",
-    description: "Impressum, Datenschutz und Cookies bearbeiten.",
-    status: "soon",
+    description: "Impressum, Datenschutz und Cookies pro Sprache bearbeiten.",
+    status: "live",
   },
   {
     key: "seo",
     label: "SEO",
-    description: "Title, Description und OG-Bilder pro Seite.",
-    status: "soon",
+    description: "Title, Description und OG-Bilder pro Seite/Sprache.",
+    status: "live",
   },
   {
     key: "platform",
     label: "Platform Links",
-    description: "Spotify, YouTube, Instagram & Co. verwalten.",
-    status: "soon",
+    description:
+      "Spotify, YouTube, Instagram, Facebook, SoundCloud, Bandcamp verwalten.",
+    status: "live",
+  },
+  {
+    key: "consent",
+    label: "Consent",
+    description: "Cookie-Banner-Kategorien sichten (Edit folgt).",
+    status: "live",
   },
 ];
 
@@ -115,7 +122,15 @@ export default async function AdminHomePage({
                       ? `/${locale}/admin/members`
                       : card.key === "settings"
                         ? `/${locale}/admin/settings/assets`
-                        : null;
+                        : card.key === "legal"
+                          ? `/${locale}/admin/legal`
+                          : card.key === "seo"
+                            ? `/${locale}/admin/seo`
+                            : card.key === "platform"
+                              ? `/${locale}/admin/platform-links`
+                              : card.key === "consent"
+                                ? `/${locale}/admin/consent`
+                                : null;
           const inner = (
             <>
               <div className="flex items-center justify-between gap-3">

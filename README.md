@@ -72,9 +72,14 @@ supabase/
                                   #            shows.is_tba + nullable starts_at, media_items.alt_text/title
     0003_storage_buckets.sql    # public asset buckets + admin-only write policies
     0004_admin_password_flow.sql  # additive: admin_profiles.must_change_password + password_changed_at + initial_password_issued_at
+    0005_booking_show_workflow.sql # additive: booking statuses + soft delete + converted_show_id
+    0006_legal_seo_consent_platforms.sql # additive: legal_pages seed, platform check, consent seed, seo path index
   policies/
     0001_rls.sql                # base RLS per docs/06
     0002_rls_foundation.sql     # additive: public read on is_public site_settings; assert no public read on booking/admin
+    0005_booking_show_workflow.sql # additive: booking workflow policies
+    0006_phase05_member_full_read.sql # additive: full member read for the public client
+    0006_legal_seo_consent_platforms.sql # re-asserts legal/seo/platform/consent public-read + admin-write
 public/assets/                  # hero, branding, members, band-cards, gallery, audio/demos
 handoff/                        # ← Claude Design source of truth (read-only reference)
 ```
@@ -290,6 +295,17 @@ Auth + an active row in `admin_profiles`.
   slug, sort, visibility — names/roles/bios stay dictionary-driven).
 - Site assets: `/[locale]/admin/settings/assets` (replace hero image,
   hero signature, bandinfo image; clearing falls back to repo asset).
+- Legal: `/[locale]/admin/legal` (imprint/privacy/cookies × de/en/tr,
+  plain textarea body, `is_published` per page; public falls back to the
+  repo copy with a draft note while the slug is unpublished).
+- SEO: `/[locale]/admin/seo` (per `(path, locale)` Title/Description/OG-Bild
+  overrides; consumed via `generateMetadata` on `/`, `/legal/imprint`,
+  `/legal/privacy`, `/legal/cookies`).
+- Platform Links: `/[locale]/admin/platform-links` (Spotify, YouTube,
+  Instagram, Facebook, SoundCloud, Bandcamp — active rows render in the
+  footer instantly).
+- Consent: `/[locale]/admin/consent` (read-only overview of cookie
+  categories; banner copy is dictionary-driven in this phase).
 - Logout: `POST /api/admin/auth/logout?locale=<locale>` from the shell
   header (or from the change-password page).
 
@@ -417,10 +433,42 @@ Storage URLs. `next.config.mjs` adds the pattern automatically when
 `NEXT_PUBLIC_SUPABASE_URL` is set; without it, the site renders the
 repo assets and never reaches Storage.
 
+## Legal, SEO, Consent & Platform Links
+
+Phase 06 finishes the launch-readiness editors:
+
+- `/[locale]/admin/legal` — imprint/privacy/cookies × DE/EN/TR with
+  `is_published`. Public legal routes are server components that prefer
+  the published Supabase translation and fall back to the curated repo
+  copy with a "Draft" note when the Admin has nothing published yet.
+  Body is plain textarea; the renderer treats `## ` lines as H2.
+- `/[locale]/admin/seo` — per `(path, locale)` Title/Description/OG-Bild
+  overrides. The home page and the three legal routes use
+  `generateMetadata` to surface them, with a path-aware fallback in
+  `src/lib/content/fallback.ts`.
+- `/[locale]/admin/platform-links` — Spotify, YouTube, Instagram,
+  Facebook, SoundCloud and Bandcamp. The CHECK constraint in
+  `0006_legal_seo_consent_platforms.sql` keeps the platform string in
+  that set. Active rows render automatically in the footer (no code
+  change needed). Inactive/deleted rows disappear from the public site.
+- `/[locale]/admin/consent` — read-only overview of consent categories.
+- Cookie banner gained per-category preferences ("External media" is
+  off until explicitly accepted) and a footer "Cookie preferences"
+  trigger to reopen the dialog. Choice persisted in `localStorage`
+  under `typhoon.consent.v1`.
+- `src/components/media/ExternalMediaGate.tsx` is the new entry point
+  for external embeds. Future YouTube/Spotify/SoundCloud/Bandcamp iframes
+  must be wrapped in this gate so no third-party request fires before
+  consent.
+
+Full workflow and manual tests:
+[`docs/admin-legal-seo-consent-platforms.md`](docs/admin-legal-seo-consent-platforms.md).
+
 ## Deferred / next batches
 
 - Per-locale text CRUD (members, hero, about) and rich-text editor.
-- Legal page editor + SEO entries admin.
 - Owner-only mutations (admin-profile management UI, legal page deletes).
+- Editable consent banner copy (currently dictionary-driven).
+- Real external embeds (always behind `ExternalMediaGate`).
 - Shop/tickets phase.
 - Launch hardening (rate limit, monitoring, generated Supabase types).
