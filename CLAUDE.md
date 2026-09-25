@@ -6,10 +6,13 @@ Durable rules for Claude Code in the new `typhoon.band-website` repository.
 
 ## Absolute source of truth order
 
-1. Claude Design handoff files uploaded by the user:
-   - desktop HTML
-   - mobile HTML
-   - handoff / transfer protocol
+Since the 2026 redesign (owner request, September 2026: "komplett neue,
+viel bessere Website"), the visual source of truth is the design system in
+`docs/design/DESIGN.md`. The Claude Design handoff in `/handoff` is kept as a
+historical reference for the elements the owner approved (see DESIGN.md).
+
+1. Explicit owner instructions and `docs/design/DESIGN.md` (visuals, layout,
+   typography, components, responsive behaviour).
 2. Real uploaded assets in the repository:
    - hero image
    - Typhoon logo
@@ -22,13 +25,17 @@ Durable rules for Claude Code in the new `typhoon.band-website` repository.
    - Source behavior files:
      - `src/components/audio/AudioPlayerProvider.tsx`
      - `src/components/audio/Waveform.tsx`
-4. These project docs in `/docs`
+4. These project docs in `/docs` (redesign report:
+   `docs/redesign/2026-09-redesign.md`)
+5. Claude Design handoff files (`/handoff`) — historical reference only.
 
 Do not use old failed frontend layouts as inspiration.
 
 ## Current goal
 
-Implement the Typhoon website so the frontend visually follows the Claude Design handoff while the technical architecture remains ready for Supabase, Resend, Admin, Booking, media/audio and later shop.
+Ship the redesigned Typhoon website (branch `claude/typhoon-website-redesign-7xjozt`)
+following `docs/design/DESIGN.md`, while the architecture stays ready for
+Supabase, Resend, Admin, Booking, media/audio and later shop.
 
 ## Stack
 
@@ -41,7 +48,7 @@ Implement the Typhoon website so the frontend visually follows the Claude Design
 
 ## Non-negotiable frontend rule
 
-The Claude Design handoff controls:
+`docs/design/DESIGN.md` controls:
 - player size
 - player card layout
 - spacing
@@ -59,7 +66,12 @@ The old Claude branch controls only:
 - one-song-at-a-time playback
 - seek/progress behavior
 
-Do not copy the old player card visual layout if it conflicts with the Claude Design handoff.
+Do not copy the old player card visual layout if it conflicts with DESIGN.md.
+
+Content rules that stay: exactly 8 members in the documented order (Typhoon,
+Mika, Schack, Hardy, Stefan, Tom, Buğra, Jürgen — never "Taifun", never
+"Daniel"), only `booking@typhoon.band` (no `info@`), never invent show dates,
+no placeholder badges, no horizontal overflow on mobile (test 320/390 px).
 
 ## Non-negotiable security rules
 
@@ -89,7 +101,7 @@ Fix all errors.
 
 Always summarize:
 1. changed files
-2. design handoff implementation status
+2. design system (DESIGN.md) implementation status
 3. audio player behavior integration
 4. asset usage for hero, gallery and band info cards
 5. backend/Supabase/Resend foundation status

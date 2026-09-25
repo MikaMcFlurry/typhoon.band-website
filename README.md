@@ -1,9 +1,19 @@
 # Typhoon Website
 
-Frontend follows the Claude Design handoff (`/handoff`); architecture is ready
-for Supabase, Resend, Admin and Booking. The public site keeps rendering when
-no backend env vars are configured (static fallback content + graceful booking
-fallback).
+Website of the band Typhoon (Bluesrock · Funk · Soul · Jazz · Southern Rock
+with Turkish lyrics). Live on `typhoon.band` / `www.typhoon.band` via the
+Vercel project `typhoon-band-website` (production = `main`).
+
+The branch `claude/typhoon-website-redesign-7xjozt` contains the **2026
+redesign**: a completely rebuilt public frontend on a new design system
+([`docs/design/DESIGN.md`](docs/design/DESIGN.md)), the merged Phase 06
+(legal/SEO/consent/platform links) and a set of backend fixes. The full
+report — live-version analysis, feature parity, changes and open owner
+decisions — is in [`docs/redesign/2026-09-redesign.md`](docs/redesign/2026-09-redesign.md).
+
+Architecture is ready for Supabase, Resend, Admin and Booking. The public
+site keeps rendering when no backend env vars are configured (static
+fallback content + graceful booking fallback).
 
 ## Stack
 
@@ -22,7 +32,8 @@ cp .env.example .env.local
 npm run dev
 ```
 
-The site is served at `/de` (root redirects there).
+The site is served at `/de`, `/en` and `/tr`. `/` redirects to the best
+match from the browser's `Accept-Language` (default `de`); no cookie is set.
 
 ## Scripts
 
@@ -36,90 +47,97 @@ npm run build   # production build
 
 ```text
 src/
+  middleware.ts                 # locale redirect (Accept-Language) + admin Supabase session refresh
   app/
     [locale]/
-      page.tsx                  # onepager (Hero, Player, Shows, About, Members, Demos, Gallery, Booking)
-      layout.tsx                # wraps with AudioPlayerProvider, Header, Footer, CookieConsent
-      legal/imprint/page.tsx
-      legal/privacy/page.tsx
-      legal/cookies/page.tsx
-      admin/                    # protected Admin shell (login, dashboard, booking)
-        layout.tsx              # forwards children — auth gating happens per-route
-        page.tsx                # dashboard cards
-        login/                  # email + password form (server action)
-        change-password/        # forced first-login password rotation
-        booking/                # read-only booking requests view
-        _components/AdminShell.tsx
-    api/booking/route.ts        # POST handler (validation, honeypot, Supabase insert, Resend email)
+      layout.tsx                # root layout: <html lang>, fonts (Archivo + Newsreader), metadata, DictProvider
+      (site)/                   # public site (route group, URLs unchanged)
+        layout.tsx              # AudioPlayerProvider, Header, Footer, PlayerDock, ConsentBanner, MotionInit
+        page.tsx                # one-pager: Hero → Featured single → Shows → Band/Line-up → Music → Photos → Booking
+        legal/{imprint,privacy,cookies}/page.tsx  # Admin Markdown or curated fallback (src/content/legal.ts)
+        not-found.tsx, [...rest]/page.tsx         # styled 404
+      admin/                    # protected Admin (own chrome, noindex)
+        layout.tsx              # admin top bar; auth gating happens per route
+        login/, change-password/, booking/, shows/, media/, music/, members/,
+        settings/assets/, legal/, seo/, platform-links/, consent/
+    api/booking/route.ts        # POST handler (same-origin JSON, rate limit, validation, Supabase + Resend)
     api/admin/auth/logout/      # POST handler — clears Supabase session cookies
+    sitemap.ts, robots.ts, manifest.ts
   components/
-    audio/                      # AudioPlayerProvider, Waveform, FeaturedPlayer, DemoRow
-    layout/                     # Header (with mobile drawer), Footer, CookieConsent
-    sections/                   # Hero, About, Members, Demos, Gallery, Booking, Shows
-  data/                         # static seed data (members, songs, gallery, shows, site)
+    audio/                      # AudioPlayerProvider, Waveform, FeaturedPlayer, PlayerDock, PlayTrackButton
+    consent/                    # consent contract, ConsentBanner, ExternalMediaGate, settings button
+    legal/                      # LegalShell (safe renderer), LegalPage (shared server view)
+    sections/                   # Hero, Shows, Band, Music, Gallery, Booking, BookingForm
+    site/                       # Header, Footer, LocaleSwitcher, PlatformLinks, MotionInit
+    ui/                         # Icon set, CollapsibleList
+  content/legal.ts              # fallback legal texts DE/EN/TR (not legal advice)
+  data/                         # static seed data (members, songs + covers, gallery + alt texts, site)
   i18n/                         # locale registry + dictionaries (de/en/tr)
   lib/
-    admin/                      # admin-only helpers (auth guard, role helpers, booking reader)
-    content/                    # Supabase-first / static-fallback content provider
-    env.ts                      # central env access + helper booleans
-    supabase/                   # client/server/admin typed Supabase clients + cookie-aware SSR helpers + booking writer
+    admin/                      # admin-only helpers (auth guard, bookings, shows, media, songs, members, legal, seo, platform links)
+    content/                    # Supabase-first / static-fallback content provider (request-memoised)
+    env.ts, site-url.ts         # env access + canonical site URL
+    supabase/                   # typed clients + SSR auth + booking writer
     resend/                     # server-only mail helper
-    validation/                 # booking input validation
+    validation/                 # booking, show, upload, legal/seo/platform validators
 supabase/
   migrations/
-    0001_init.sql               # schema for all tables in docs/05
-    0002_supabase_foundation.sql  # additive: site_settings.locale/is_public, booking_requests.locale,
-                                  #            shows.is_tba + nullable starts_at, media_items.alt_text/title
-    0003_storage_buckets.sql    # public asset buckets + admin-only write policies
-    0004_admin_password_flow.sql  # additive: admin_profiles.must_change_password + password_changed_at + initial_password_issued_at
-    0005_booking_show_workflow.sql # additive: booking statuses + soft delete + converted_show_id
+    0001_init.sql … 0005_booking_show_workflow.sql   # schema history (see below)
     0006_legal_seo_consent_platforms.sql # additive: legal_pages seed, platform check, consent seed, seo path index
+    0007_security_hardening.sql # OPTIONAL: stop anon storage listing, bucket size/MIME limits, SECURITY DEFINER helpers
   policies/
-    0001_rls.sql                # base RLS per docs/06
-    0002_rls_foundation.sql     # additive: public read on is_public site_settings; assert no public read on booking/admin
-    0005_booking_show_workflow.sql # additive: booking workflow policies
-    0006_phase05_member_full_read.sql # additive: full member read for the public client
-    0006_legal_seo_consent_platforms.sql # re-asserts legal/seo/platform/consent public-read + admin-write
-public/assets/                  # hero, branding, members, band-cards, gallery, audio/demos
-handoff/                        # ← Claude Design source of truth (read-only reference)
+    0001_rls.sql, 0002_rls_foundation.sql, 0005_booking_show_workflow.sql,
+    0006_phase05_member_full_read.sql, 0006_legal_seo_consent_platforms.sql
+public/
+  assets/                       # hero, branding, members, band-cards, gallery, audio/demos
+  og-image.jpg, icon.svg, icon-192.png, icon-512.png, apple-icon.png
+docs/design/DESIGN.md           # design system of the redesign (tokens, type, components, rules)
+handoff/                        # historical Claude Design handoff (reference only since the redesign)
 ```
 
 ## Booking
 
-The booking flow is the first production-grade backend function.
+The booking flow is the most important production function.
 
-- Frontend: `src/components/sections/Booking.tsx` (German/English/Turkish copy
-  via dictionaries; success/fallback/error UI).
-- API: `POST /api/booking` (`src/app/api/booking/route.ts`).
-- Validation: `src/lib/validation/booking.ts` — server-side, honeypot, ISO date
-  check, length caps, required fields (`name`, `email`, `event_location`,
-  `event_type`, `message`).
+- Frontend: `src/components/sections/Booking.tsx` (promoter facts, poster,
+  direct contact) + `BookingForm.tsx` (labelled fields, event-type select,
+  inline validation, focus to first error, success/fallback states, privacy
+  note). Copy in DE/EN/TR via dictionaries.
+- API: `POST /api/booking` (`src/app/api/booking/route.ts`):
+  same-origin + `application/json` only, best-effort per-IP rate limit
+  (5 per 10 min per instance), honeypot `hp_field` and a 2.5 s time trap
+  (both answer with a fake success), messages in the visitor's language.
+- Validation: `src/lib/validation/booking.ts` — required `name`, `email`,
+  `event_location`, `event_type`, `message` (≥ 10 chars); optional `phone`,
+  `event_date` (must be a real calendar date). Event-type keys from the
+  select are stored as German labels (`Festival`, `Firmenevent`, …) so the
+  admin inbox and the mail stay readable; free text is still accepted.
 - Persistence: `src/lib/supabase/booking.ts` inserts into `booking_requests`
-  via the typed service-role client (`src/lib/supabase/admin.ts`). Service-role
-  bypasses RLS — no public insert policy exists on the table.
+  via the typed service-role client. No public insert policy exists.
 - Mail: `src/lib/resend/client.ts` — Resend REST, server-only key, Reply-To
-  set to the sender's address. Subject:
-  `Neue Booking-Anfrage über typhoon.band`.
+  set to the sender. Subject: `Neue Booking-Anfrage über typhoon.band`.
+- **Preview deployments share the production Supabase/Resend env vars**
+  (Vercel env targets production + preview), so a test submission on a
+  preview URL creates a real booking row and sends a real e-mail.
 
 ### API response shape
 
 ```ts
-// success — Supabase insert and/or Resend mail succeeded
+// success — at least one configured channel (Supabase insert or Resend mail) succeeded
 { ok: true, status: "sent",      message: string }
 
-// success — env not configured yet, no insert, no mail
+// success — env not configured, nothing stored or sent
 { ok: true, status: "fallback",  message: string }
 
-// validation — input rejected (per-field message)
-{ ok: false, status: "validation", field: string, message: string }
+// validation — input rejected (400, per-field message)
+{ ok: false, status: "validation", field?: string, message: string }
 
-// hard failure — every configured channel failed
+// rate limited (429) / foreign origin (403) / wrong content type (415)
+{ ok: false, status: "rate_limited" | "error" | "validation", message: string }
+
+// hard failure — every configured channel failed (502)
 { ok: false, status: "error",      message: string }
 ```
-
-When env values are missing, the route never crashes — it returns the
-`fallback` status with a clear "Booking ist vorbereitet, aber der Versand ist
-noch nicht vollständig angebunden." message.
 
 ## Content provider
 
@@ -151,17 +169,19 @@ getPublicPageContent(locale)   // bundle for the homepage
 Frontend code never reads from Supabase Storage directly — it always reads
 DB rows that hold the asset URL. Missing URLs fall back to the static asset.
 
-## Demo audio player
+## Audio player
 
-- Visual layout: Claude Design handoff (`audio-card` / `audio-card-m`).
-- Behavior ported from `MikaMcFlurry/typhoon.band` branch
-  `claude/typhoon-premium-redesign-x01JL`:
-  - one shared `HTMLAudioElement`
-  - one song plays at a time (`AudioPlayerProvider.toggle()`)
-  - lazy `AudioContext` + `AnalyserNode` (fftSize 256)
-  - live FFT-driven waveform when playing, deterministic per-song idle shape
-    when paused
-  - seek by clicking the waveform
+- Behaviour ported from `MikaMcFlurry/typhoon.band` branch
+  `claude/typhoon-premium-redesign-x01JL` (docs/13-audio-player-source.md):
+  one shared `HTMLAudioElement`, one song at a time, lazy `AudioContext` +
+  `AnalyserNode` (fftSize 256, smoothing 0.78), live FFT waveform with a
+  deterministic idle shape per song, auto-advance, `previous()` restarts
+  after 3 s, `crossOrigin="anonymous"` before every `src`.
+- Redesign additions: separate playback/time contexts (no full re-render
+  4×/s), persistent **player dock** after the first play (keeps playing on
+  legal pages), Media Session API (lock screen / hardware keys), loading and
+  error states, waveforms auto-fit the available width, keyboard-operable
+  seek slider, reduced-motion support, durations shown before playback.
 - No download button, no native browser controls, no external embeds.
 
 ## Environment variables
@@ -435,40 +455,48 @@ repo assets and never reaches Storage.
 
 ## Legal, SEO, Consent & Platform Links
 
-Phase 06 finishes the launch-readiness editors:
-
 - `/[locale]/admin/legal` — imprint/privacy/cookies × DE/EN/TR with
-  `is_published`. Public legal routes are server components that prefer
-  the published Supabase translation and fall back to the curated repo
-  copy with a "Draft" note when the Admin has nothing published yet.
-  Body is plain textarea; the renderer treats `## ` lines as H2.
-- `/[locale]/admin/seo` — per `(path, locale)` Title/Description/OG-Bild
-  overrides. The home page and the three legal routes use
-  `generateMetadata` to surface them, with a path-aware fallback in
-  `src/lib/content/fallback.ts`.
-- `/[locale]/admin/platform-links` — Spotify, YouTube, Instagram,
-  Facebook, SoundCloud and Bandcamp. The CHECK constraint in
-  `0006_legal_seo_consent_platforms.sql` keeps the platform string in
-  that set. Active rows render automatically in the footer (no code
-  change needed). Inactive/deleted rows disappear from the public site.
-- `/[locale]/admin/consent` — read-only overview of consent categories.
-- Cookie banner gained per-category preferences ("External media" is
-  off until explicitly accepted) and a footer "Cookie preferences"
-  trigger to reopen the dialog. Choice persisted in `localStorage`
-  under `typhoon.consent.v1`.
-- `src/components/media/ExternalMediaGate.tsx` is the new entry point
-  for external embeds. Future YouTube/Spotify/SoundCloud/Bandcamp iframes
-  must be wrapped in this gate so no third-party request fires before
-  consent.
+  `is_published`. Public legal routes render the published Admin text
+  (Markdown-ish: `## ` headings, `- ` lists, auto-linked e-mails/URLs, no
+  HTML) and otherwise the curated fallback in `src/content/legal.ts`
+  (updated to § 5 DDG / § 18 Abs. 2 MStV, names Vercel, Supabase and Resend
+  as processors, Art. 77 complaint right). **Not legal advice — have it
+  reviewed before relying on it.**
+- `/[locale]/admin/seo` — per `(path, locale)` Title/Description/OG image
+  overrides for `/` and the legal routes. Defaults come from the
+  dictionaries (`meta.*`) and `/og-image.jpg` (1200×630).
+- Built-in SEO: per-locale `<html lang>`, canonical + hreflang alternates,
+  Open Graph/Twitter cards, `sitemap.xml`, `robots.txt` (admin/api
+  disallowed, admin also `noindex`), web manifest, JSON-LD `MusicGroup`
+  with members and `MusicEvent` for upcoming dated shows.
+- `/[locale]/admin/platform-links` — Spotify, YouTube, Instagram, Facebook,
+  SoundCloud, Bandcamp. Active rows appear automatically in the footer and
+  as "Also on" links in the music section; none → the blocks are hidden.
+- Consent: first visit shows a small non-blocking notice; the footer button
+  "Datenschutz-Einstellungen" reopens it as a dialog (focus trap, Esc).
+  Stored only in `localStorage` (`typhoon.consent.v1`; the old key
+  `typhoon.cookie-consent` is honoured). The public site sets no cookies.
+  Wrap any future embed in `src/components/consent/ExternalMediaGate.tsx`.
 
-Full workflow and manual tests:
+Full admin workflow and manual tests:
 [`docs/admin-legal-seo-consent-platforms.md`](docs/admin-legal-seo-consent-platforms.md).
+
+## Security hardening (optional migration 0007)
+
+`supabase/migrations/0007_security_hardening.sql` is **not required** by
+the code. It stops anonymous listing of Storage objects (public file URLs
+keep working), enforces bucket size/MIME limits (50 MB MP3, 10 MB
+JPG/PNG/WebP) and makes the RLS helper functions `SECURITY DEFINER` with an
+empty `search_path`. It was verified against a local Postgres 16 with all
+earlier migrations applied. Apply it in the Supabase SQL editor after a
+backup.
 
 ## Deferred / next batches
 
-- Per-locale text CRUD (members, hero, about) and rich-text editor.
-- Owner-only mutations (admin-profile management UI, legal page deletes).
-- Editable consent banner copy (currently dictionary-driven).
+- Owner decisions listed in `docs/redesign/2026-09-redesign.md` (facts to
+  confirm, legal review, apply 0007, real photos for members 3–8).
+- Role enforcement (`editor` currently has the same rights as `owner`).
+- Per-locale text CRUD (hero, about) and News/"Aus dem Proberaum" module.
 - Real external embeds (always behind `ExternalMediaGate`).
 - Shop/tickets phase.
-- Launch hardening (rate limit, monitoring, generated Supabase types).
+- Monitoring and generated Supabase types.
