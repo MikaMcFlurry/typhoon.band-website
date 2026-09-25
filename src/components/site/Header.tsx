@@ -147,7 +147,7 @@ export function Header({
               alt="Typhoon"
               className="h-8 w-auto md:h-10"
               height={724}
-              priority
+              priority={!isHome}
               sizes="140px"
               src="/assets/branding/typhoon-signature-gold-bold.png"
               width={2099}

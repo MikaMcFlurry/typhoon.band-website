@@ -35,11 +35,51 @@ typography:
     fontSize: "clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem)"
     fontWeight: 800
     lineHeight: 0.95
+  display-lg:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "4.25rem"
+    fontWeight: 900
+    lineHeight: 0.92
+  title-xl:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "3rem"
+    fontWeight: 900
+    lineHeight: 0.85
+  title-lg:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "2.125rem"
+    fontWeight: 800
+    lineHeight: 0.95
+  title-md:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "2rem"
+    fontWeight: 900
+    lineHeight: 1
   title:
     fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
     fontSize: "1.875rem"
     fontWeight: 800
     lineHeight: 1.02
+  title-sm:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "1.625rem"
+    fontWeight: 800
+    lineHeight: 1.02
+  title-xs:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 800
+    lineHeight: 1
+  title-2xs:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "1.375rem"
+    fontWeight: 800
+    lineHeight: 1
+  title-3xs:
+    fontFamily: "Big Shoulders (opsz), Arial Narrow, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 800
+    lineHeight: 1
   body-lg:
     fontFamily: "Schibsted Grotesk, system-ui, sans-serif"
     fontSize: "clamp(1.125rem, 1rem + 0.45vw, 1.3125rem)"
@@ -50,6 +90,26 @@ typography:
     fontSize: "1.0625rem"
     fontWeight: 400
     lineHeight: 1.6
+  body-base:
+    fontFamily: "Schibsted Grotesk, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.55
+  input:
+    fontFamily: "Schibsted Grotesk, system-ui, sans-serif"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.4
+  small:
+    fontFamily: "Schibsted Grotesk, system-ui, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 400
+    lineHeight: 1.6
+  fine:
+    fontFamily: "Schibsted Grotesk, system-ui, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.55
   data:
     fontFamily: "Martian Mono (wdth 87.5%), ui-monospace, monospace"
     fontSize: "0.8125rem"
@@ -211,6 +271,7 @@ All three are self-hosted through next/font with latin-ext, for Turkish ğ ı ş
 - **Title** (800 to 900, 1.375 to 3rem, line-height 0.85 to 1.02, uppercase): setlist song titles (1.625rem, 1.875rem from sm), the setlist sheet heading (2.5/3rem), show venues, musician names, the dock title, sheet headings, and the line-up name tapes.
 - **Body large** (400, clamp 1.125 to 1.3125rem, line-height 1.55, chalk, max 58ch): intro sentences.
 - **Body** (400, 1.0625rem, line-height 1.6, chalk-2, max 62ch, pretty wrap): running copy. The base size is 16px/1.55.
+- **Small / Fine** (400, 0.9375rem / 0.875rem): member bios, the setlist note, reply time, form privacy note, consent text, footer meta. Never smaller than 0.875rem for sentences; inputs stay at 16px (no iOS zoom).
 - **Data** (mono 0.8125rem, 0.02em, tabular numbers): times, durations, counters, and preview values.
 - **Label** (mono 0.75rem, 0.06em, uppercase, tabular numbers): nav items, field labels, fact labels, and rider data.
 - **Button** (Big Shoulders 800, 1.1875rem, 1.0625rem for small, 0.02em, uppercase).

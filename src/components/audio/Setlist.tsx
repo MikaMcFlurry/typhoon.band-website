@@ -53,11 +53,6 @@ function Row({
   return (
     <li className="border-t border-[rgba(18,17,16,0.16)] first:border-t-0" ref={rowRef}>
       <button
-        aria-label={
-          playing
-            ? fill(dict.player.pauseTrack, { title: track.title })
-            : fill(dict.player.playTrack, { title: track.title })
-        }
         aria-pressed={playing}
         className="group grid w-full grid-cols-[1.75rem_minmax(0,1fr)_auto_2.75rem] items-center gap-x-3 py-2.5 text-left sm:grid-cols-[2rem_minmax(0,1fr)_auto_2.75rem] sm:gap-x-4"
         onClick={() => toggle(track.id, track.src)}
@@ -85,6 +80,11 @@ function Row({
         <span className="mono text-right text-[rgba(18,17,16,0.72)]">
           {isCurrent && position > 0 ? `${formatTime(position)} / ` : ""}
           {shownDuration ? formatTime(shownDuration) : "–:––"}
+        </span>
+        {/* Accessible name = the visible row text plus the action, so the
+            spoken label matches what is on screen (WCAG 2.5.3). */}
+        <span className="sr-only">
+          {playing ? dict.player.pause : dict.player.play}
         </span>
         <span
           aria-hidden

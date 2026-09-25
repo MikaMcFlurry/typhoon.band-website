@@ -20,6 +20,7 @@ export type Dict = {
     title: string;
     description: string;
     ogAlt: string;
+    shareAlt: string;
   };
   a11y: {
     skip: string;
@@ -287,6 +288,7 @@ const de: Dict = {
     description:
       "Typhoon aus Hechingen verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock. Demos anhören, Konzerte finden, Band buchen.",
     ogAlt: "Typhoon: acht Musiker in einer Sepia-Collage mit goldenem Schriftzug",
+    shareAlt: "Typhoon: goldener Schriftzug, „Smooth. Exzeptionell. Funk.“ auf Tape und der Sänger live an den roten Keyboards",
   },
   a11y: {
     skip: "Zum Inhalt springen",
@@ -532,6 +534,7 @@ const en: Dict = {
     description:
       "Typhoon from Hechingen, Germany, blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock. Listen to the demos, find a show, book the band.",
     ogAlt: "Typhoon: eight musicians in a sepia collage with a gold signature logo",
+    shareAlt: "Typhoon: gold signature, “Smooth. Exceptional. Funk.” on tape and the singer live at the red keyboards",
   },
   a11y: {
     skip: "Skip to content",
@@ -775,6 +778,7 @@ const tr: Dict = {
     description:
       "Hechingen'den Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir. Demoları dinleyin, konserleri bulun, grubu davet edin.",
     ogAlt: "Typhoon: altın imzalı sepya bir kolajda sekiz müzisyen",
+    shareAlt: "Typhoon: altın imza, bant üzerinde „Smooth. Olağanüstü. Funk.“ ve kırmızı klavyelerde canlı solist",
   },
   a11y: {
     skip: "İçeriğe geç",

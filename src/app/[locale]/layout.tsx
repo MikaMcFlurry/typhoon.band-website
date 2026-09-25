@@ -87,7 +87,7 @@ export async function generateMetadata({
           url: "/og-image.jpg",
           width: 1200,
           height: 630,
-          alt: dict.meta.ogAlt,
+          alt: dict.meta.shareAlt,
         },
       ],
     },

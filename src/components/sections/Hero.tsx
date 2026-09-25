@@ -50,6 +50,7 @@ export function Hero({
             <Image
               alt="Typhoon"
               className="h-auto w-[min(86%,480px)] -translate-x-[2%] lg:w-[min(88%,560px)]"
+              fetchPriority="high"
               height={724}
               priority
               sizes="(min-width: 1024px) 560px, 88vw"
@@ -99,7 +100,7 @@ export function Hero({
               alt={dict.hero.photoAlt}
               className="object-cover object-[72%_35%] lg:object-[74%_center]"
               fill
-              priority
+              loading="eager"
               sizes="(min-width: 1024px) 30vw, 100vw"
               src={STAGE_PHOTO}
             />
