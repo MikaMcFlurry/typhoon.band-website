@@ -54,6 +54,11 @@ function tileClass(i: number, count: number) {
   return `${mobile} aspect-[4/3] ${desktop} ${wide}`;
 }
 
+// The page shows at most PREVIEW tiles (one large + four small on desktop,
+// one large + two pairs on phones); the last tile opens the viewer, which
+// holds every image. Keeps the one-pager compact (owner rule).
+const PREVIEW = 5;
+
 export function Gallery({ items }: { items: GalleryImage[] }) {
   const { dict } = useDict();
   const [index, setIndex] = useState<number | null>(null);
@@ -61,16 +66,20 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const touchX = useRef<number | null>(null);
   const count = items.length;
+  const shown = Math.min(count, PREVIEW);
+  const more = count - shown;
 
   const close = useCallback(() => {
     setIndex((current) => {
       if (current !== null) {
         // Return focus to the thumbnail that opened the viewer.
-        requestAnimationFrame(() => triggerRefs.current[current]?.focus());
+        requestAnimationFrame(() =>
+          (triggerRefs.current[Math.min(current, shown - 1)] ?? triggerRefs.current[0])?.focus(),
+        );
       }
       return null;
     });
-  }, []);
+  }, [shown]);
   const step = useCallback(
     (delta: number) => setIndex((i) => (i === null ? i : (i + delta + count) % count)),
     [count],
@@ -118,10 +127,14 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
         </h2>
 
         <ul className="mt-10 grid grid-cols-2 gap-3 md:mt-14 md:grid-cols-12 md:gap-4">
-          {items.map((item, i) => (
-            <li className={`reveal ${tileClass(i, count)}`} key={item.id} style={{ ["--reveal-delay" as string]: `${(i % 4) * 50}ms` }}>
+          {items.slice(0, shown).map((item, i) => (
+            <li className={`reveal ${tileClass(i, shown)}`} key={item.id} style={{ ["--reveal-delay" as string]: `${(i % 4) * 50}ms` }}>
               <button
-                aria-label={`${dict.media.open}: ${item.alt}`}
+                aria-label={
+                  more > 0 && i === shown - 1
+                    ? fill(dict.media.showAll, { count })
+                    : `${dict.media.open}: ${item.alt}`
+                }
                 className="group relative block size-full overflow-hidden rounded-md border border-line bg-ink-3"
                 onClick={() => setIndex(i)}
                 ref={(el) => {
@@ -133,9 +146,17 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
                   alt=""
                   className="object-cover sepia-img transition-[filter] duration-500 group-hover:[filter:none]"
                   fill
-                  sizes={tileSizes(i, count)}
+                  sizes={tileSizes(i, shown)}
                   src={item.src}
                 />
+                {more > 0 && i === shown - 1 ? (
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 flex items-center justify-center bg-ink/60 font-display text-[2.5rem] text-paper transition-colors group-hover:bg-ink/40 md:text-[3.25rem]"
+                  >
+                    +{more}
+                  </span>
+                ) : null}
               </button>
             </li>
           ))}

@@ -4,6 +4,7 @@ import {
   Children,
   cloneElement,
   isValidElement,
+  useEffect,
   useId,
   useState,
   type ReactElement,
@@ -13,10 +14,10 @@ import { Icon } from "@/components/ui/Icon";
 
 // Shows the first `initial` children and reveals the rest on demand, so the
 // one-pager stays compact (owner rule: "preview first, reveal all").
-// All items are in the HTML (crawlable) and visible without JavaScript: the
-// extra items are only hidden by CSS once <html data-js> is set (inline
-// script in the root layout), so a visitor without JS still sees everything.
-// Children must be <li> elements.
+// All items are in the HTML (crawlable). CSS hides the extra items when the
+// browser runs scripts (see globals.css: `@media (scripting: enabled)`), so
+// visitors without JavaScript see everything and no toggle. Children must be
+// <li> elements (or components that forward `data-extra` to their <li>).
 
 export function CollapsibleList({
   children,
@@ -35,6 +36,11 @@ export function CollapsibleList({
 }) {
   const [open, setOpen] = useState(false);
   const id = useId();
+  // Fallback for browsers without the `scripting` media feature. Set on every
+  // mount: a locale switch re-creates <html> and drops the attribute.
+  useEffect(() => {
+    document.documentElement.setAttribute("data-js", "");
+  }, []);
   const items = Children.toArray(children);
   const hiddenCount = Math.max(0, items.length - initial);
 
@@ -49,7 +55,7 @@ export function CollapsibleList({
         })}
       </Tag>
       {hiddenCount > 0 ? (
-        <div className="mt-8 flex justify-center">
+        <div className="collapsible-toggle mt-8 flex justify-center">
           <button
             aria-controls={id}
             aria-expanded={open}

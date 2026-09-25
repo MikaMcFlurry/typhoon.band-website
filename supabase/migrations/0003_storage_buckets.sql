@@ -25,6 +25,24 @@ values
   ('legal-assets',  'legal-assets',  true)
 on conflict (id) do update set public = excluded.public;
 
+-- Size + MIME limits enforced by Storage itself (mirror
+-- src/lib/validation/upload.ts), so a signed upload URL cannot be used for
+-- arbitrary files. Same statements as 0007_security_hardening.sql.
+update storage.buckets
+   set file_size_limit = 52428800, -- 50 MB
+       allowed_mime_types = array['audio/mpeg', 'audio/mp3']
+ where id = 'audio-demos';
+
+update storage.buckets
+   set file_size_limit = 10485760, -- 10 MB
+       allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp']
+ where id in ('public-media', 'member-images', 'gallery');
+
+update storage.buckets
+   set file_size_limit = 10485760,
+       allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+ where id = 'legal-assets';
+
 -- ---------------------------------------------------------------
 -- No public SELECT policy on storage.objects.
 -- Public buckets serve files by URL without one; a SELECT policy would

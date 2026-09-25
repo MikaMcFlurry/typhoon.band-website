@@ -7,6 +7,13 @@ import type { LegalSection } from "@/content/legal";
 // is split into paragraphs/lists and only e-mail addresses and http(s)
 // URLs become links.
 
+// Soft hyphen at the compound boundary: the long German privacy heading
+// then breaks as "Datenschutz-/erklärung" on narrow screens in every
+// browser, even where no hyphenation dictionary is installed.
+function breakCompounds(title: string) {
+  return title.replace("Datenschutzerklärung", "Datenschutz\u00ADerklärung");
+}
+
 export function LegalShell({
   homeHref,
   backLabel,
@@ -30,7 +37,7 @@ export function LegalShell({
           <Icon name="arrow-left" size={16} />
           {backLabel}
         </Link>
-        <h1 className="h-section mt-6">{title}</h1>
+        <h1 className="h-section mt-6">{breakCompounds(title)}</h1>
         {meta ? <p className="mt-4 text-[0.9375rem] text-paper-3">{meta}</p> : null}
         <div className="mt-12 border-t border-line pt-4">{children}</div>
       </div>

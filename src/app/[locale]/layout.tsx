@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { DictProvider } from "@/components/i18n/DictProvider";
 import { getDict } from "@/i18n/dictionaries";
 import { isLocale, LOCALES } from "@/i18n/locales";
@@ -93,11 +92,6 @@ export default async function LocaleRootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans">
-        {/* Marks JS support before first paint: only then do collapsed
-            lists hide their extra items (no-JS visitors see everything). */}
-        <Script id="js-flag" strategy="beforeInteractive">
-          {"document.documentElement.setAttribute('data-js','')"}
-        </Script>
         <DictProvider dict={dict} locale={locale}>
           {children}
         </DictProvider>

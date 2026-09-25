@@ -257,7 +257,7 @@ function privacy(locale: Locale, f: Facts): LegalSection[] {
       {
         heading: "İtiraz hakkı (GDPR Madde 21)",
         blocks: [
-          `Verileri GDPR Madde 6(1)(f) (meşru menfaat; örneğin sunucu kayıtları, müzik ve görsellerin sunulması) kapsamında işlediğimiz durumlarda, özel durumunuzdan kaynaklanan nedenlerle bu işlemeye her zaman itiraz etme hakkınız vardır. Bu durumda, menfaatlerinize üstün gelen zorlayıcı meşru gerekçeler ortaya koyamadığımız veya işleme hukuki taleplerin ileri sürülmesi, kullanılması ya da savunulması için gerekli olmadığı sürece işlemeyi durdururuz. ${f.email} adresine kısa bir mesaj yeterlidir.`,
+          `Verileri GDPR Madde 6(1)(f) (meşru menfaat; örneğin sunucu kayıtları, müzik ve görsellerin sunulması) kapsamında işlediğimiz durumlarda, özel durumunuzdan kaynaklanan nedenlerle bu işlemeye her zaman itiraz etme hakkınız vardır. Bu durumda, menfaatlerinize üstün gelen zorlayıcı meşru gerekçeler ya da işlemenin hukuki taleplerin ileri sürülmesi, kullanılması veya savunulması için gerekli olduğunu ortaya koyamadığımız sürece işlemeyi durdururuz. ${f.email} adresine kısa bir mesaj yeterlidir.`,
         ],
       },
     ];

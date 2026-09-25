@@ -10,7 +10,7 @@ import { Icon } from "@/components/ui/Icon";
 export default function NotFound() {
   const { dict, locale } = useDict();
   useEffect(() => {
-    document.title = `${dict.notFound.title} · Typhoon`;
+    document.title = `${dict.notFound.title.replace(/[.!]$/, "")} · Typhoon`;
   }, [dict.notFound.title]);
   return (
     <section className="container-x flex min-h-[70svh] flex-col items-start justify-center pb-24 pt-[calc(var(--header-h)+48px)]">

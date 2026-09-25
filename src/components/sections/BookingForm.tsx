@@ -39,14 +39,19 @@ export function BookingForm({ email }: { email: string }) {
   // Until hydration the form works as a plain POST with native validation;
   // afterwards JavaScript takes over (inline errors, no page reload).
   const [enhanced, setEnhanced] = useState(false);
-  // Time trap: measured on the client with a monotonic clock and sent as a
-  // duration, so a wrong device clock can never drop a real request.
+  // Time trap: milliseconds since the page started loading (monotonic
+  // performance.now(), so the device clock does not matter). -1 = unknown
+  // (fields were already filled when the script ran) → nothing is sent.
   const startedAt = useRef<number>(0);
   const formRef = useRef<HTMLFormElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    startedAt.current = performance.now();
+    const prefilled = Array.from(formRef.current?.elements ?? []).some((el) => {
+      const field = el as HTMLInputElement;
+      return field.name && !["locale", "hp_field", "event_type"].includes(field.name) && field.value.trim() !== "";
+    });
+    startedAt.current = prefilled ? -1 : 0;
     setMinDate(todayIso());
     setEnhanced(true);
   }, []);
@@ -90,7 +95,9 @@ export function BookingForm({ email }: { email: string }) {
         body: JSON.stringify({
           ...data,
           locale,
-          elapsed_ms: Math.round(performance.now() - startedAt.current),
+          ...(startedAt.current >= 0
+            ? { elapsed_ms: Math.round(performance.now() - startedAt.current) }
+            : {}),
         }),
       });
       const body = (await res.json().catch(() => null)) as ApiResponse | null;
@@ -132,7 +139,7 @@ export function BookingForm({ email }: { email: string }) {
           <Icon name={status.kind === "sent" ? "check" : "mail"} size={24} />
         </span>
         <h3 className="mt-6 font-display text-[2rem] leading-tight text-paper">
-          {status.kind === "sent" ? t.submitOkTitle : t.direct}
+          {status.kind === "sent" ? t.submitOkTitle : t.result.fallbackTitle}
         </h3>
         <p className="mt-3 max-w-[48ch] text-paper-2">{status.message}</p>
         {status.kind === "fallback" ? (
@@ -218,8 +225,8 @@ export function BookingForm({ email }: { email: string }) {
       <div className="grid gap-5 sm:grid-cols-2">
         {field("name", t.nameLabel, <input {...a11y("name")} autoComplete="name" minLength={2} required type="text" />, { required: true })}
         {field("email", t.emailLabel, <input {...a11y("email")} autoComplete="email" inputMode="email" required type="email" />, { required: true })}
-        {field("phone", t.phoneLabel, <input {...a11y("phone")} autoComplete="tel" inputMode="tel" type="tel" />)}
-        {field("event_date", t.dateLabel, <input {...a11y("event_date")} min={minDate} type="date" />)}
+        {field("phone", t.phoneLabel, <input {...a11y("phone")} autoComplete="tel" inputMode="tel" maxLength={60} type="tel" />)}
+        {field("event_date", t.dateLabel, <input {...a11y("event_date")} max="2100-12-31" min={minDate ?? "2000-01-01"} type="date" />)}
         {field(
           "event_location",
           t.locationLabel,

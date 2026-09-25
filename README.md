@@ -526,7 +526,12 @@ Booking data retention: archiving a request in Admin is a soft delete;
 archived requests can be **deleted permanently** (owner/admin, with a
 confirmation checkbox) — for erasure requests (Art. 17 GDPR) or once a
 request is no longer needed. A show converted from the request survives
-(`ON DELETE SET NULL`).
+(`ON DELETE SET NULL`). The notification e-mail in the booking mailbox
+holds the same data and has to be deleted there as well.
+
+Time-trap hits (submitted within 2.5 s of the page load) are not dropped:
+they are stored with status `spam` (no notification mail) so a false
+positive can be recovered in Admin → Booking.
 
 ## Deferred / next batches
 

@@ -233,6 +233,8 @@ export default async function AdminBookingDetailPage({
             <p className="mt-2 text-xs text-[color:var(--muted-cream)]">
               Versteckt die Anfrage aus der aktiven Liste. Eine bereits in
               eine Show umgewandelte Anfrage bleibt mit der Show verknüpft.
+              Archivierte Anfragen können Owner/Admin anschließend endgültig
+              löschen (z. B. bei einem Löschwunsch).
             </p>
             {isArchived ? (
               <form action={restoreBookingAction} className="mt-3">
@@ -261,6 +263,9 @@ export default async function AdminBookingDetailPage({
                 aus der Datenbank (z. B. auf Löschwunsch nach Art. 17 DSGVO
                 oder wenn sie nicht mehr gebraucht wird). Eine daraus
                 erstellte Show bleibt bestehen. Nicht rückgängig zu machen.
+                Die Benachrichtigungs-E-Mail mit denselben Daten liegt
+                zusätzlich im Booking-Postfach – bei einem Löschwunsch bitte
+                dort ebenfalls löschen.
               </p>
               <form action={deleteBookingPermanentlyAction} className="mt-3 flex flex-col gap-3">
                 <input type="hidden" name="locale" value={locale} />

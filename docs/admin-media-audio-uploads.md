@@ -34,7 +34,10 @@ member-images  → band member photos
 legal-assets   → reserved for later
 ```
 
-Public read is allowed by Storage policy (`typhoon_public_read_*`).
+Files are served by public bucket URL; there is intentionally no SELECT
+(listing) policy on `storage.objects` — the old `typhoon_public_read_*`
+policies are dropped by `0003` and `0007`, so hidden files cannot be
+enumerated.
 Writes are restricted to authenticated admins, plus the service role
 which we use server-side to mint signed upload URLs.
 

@@ -92,7 +92,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
-  padding-bottom: var(--dock-h);
+  /* Room for the player dock and the privacy notice at the end of the page
+     (the last footer links must not stay under them). */
+  padding-bottom: calc(var(--dock-h) + var(--notice-h));
   transition: padding-bottom 240ms var(--ease-out);
 }
 
@@ -175,6 +177,7 @@ a {
     text-wrap: balance;
     /* Long German compounds ("Datenschutzerklärung") on 320 px phones. */
     overflow-wrap: break-word;
+    -webkit-hyphens: auto;
     hyphens: auto;
   }
 
@@ -570,10 +573,24 @@ a {
     mix-blend-mode: overlay;
   }
 
-  /* CollapsibleList: extra items are hidden only when JS is available
-     (<html data-js> is set by an inline script before first paint). */
+  /* CollapsibleList: extra items are hidden from the first paint when the
+     browser runs scripts (media feature `scripting`), so there is no layout
+     shift; without JavaScript every item stays visible and the toggle is
+     hidden. Browsers without `scripting` support collapse once
+     CollapsibleList has mounted (<html data-js>). */
+  @media (scripting: enabled) {
+    [data-collapsed="true"] > [data-extra] {
+      display: none;
+    }
+  }
   html[data-js] [data-collapsed="true"] > [data-extra] {
     display: none;
+  }
+  @media (scripting: none) {
+    /* !important: the wrapper also carries the `flex` utility. */
+    .collapsible-toggle {
+      display: none !important;
+    }
   }
 
   /* Progressive reveal: visible by default, animated only when JS marks

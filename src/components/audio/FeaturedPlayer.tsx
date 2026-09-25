@@ -91,8 +91,7 @@ export function FeaturedPlayer({
           </a>
         </div>
 
-        {/* Phones: controls + mute on the first row, waveform + time below.
-            From sm: one row. Volume slider from md (phones use hardware keys). */}
+        {/* Volume slider from md (phones use hardware keys). */}
         <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4 sm:flex-nowrap sm:gap-3 md:mt-5 md:pt-5">
           <button
             aria-label={
@@ -130,7 +129,15 @@ export function FeaturedPlayer({
             <Icon name="next" size={18} />
           </button>
 
-          <div className="order-last flex w-full min-w-0 items-center gap-3 sm:order-none sm:w-auto sm:flex-1">
+          {/* DOM order = Tab order = visual order on every width:
+              phones: [play prev next ··· time] / [waveform mute];
+              from sm: play prev next waveform time | mute. */}
+          <span className="tabular ml-auto flex-none text-[0.875rem] text-paper-2 sm:order-1 sm:ml-0">
+            {formatTime(isCurrent ? position : 0)}
+            <span className="text-paper-3"> / {formatTime(shownDuration ?? 0)}</span>
+          </span>
+
+          <div className="flex w-full min-w-0 items-center gap-2 sm:contents">
             <Waveform
               className="flex-1 sm:mx-1 md:mx-2"
               heightClass="h-10 md:h-12"
@@ -139,34 +146,30 @@ export function FeaturedPlayer({
               songId={song.id}
               title={song.title}
             />
-            <span className="tabular flex-none text-[0.875rem] text-paper-2">
-              {formatTime(isCurrent ? position : 0)}
-              <span className="text-paper-3"> / {formatTime(shownDuration ?? 0)}</span>
-            </span>
-          </div>
 
-          <div className="ml-auto flex flex-none items-center gap-1 sm:ml-0 sm:border-l sm:border-line sm:pl-3">
-            <button
-              aria-label={muted ? dict.player.unmute : dict.player.mute}
-              aria-pressed={muted}
-              className="icon-btn"
-              onClick={toggleMute}
-              type="button"
-            >
-              <Icon name={muted || volume === 0 ? "mute" : "volume"} size={18} />
-            </button>
-            <input
-              aria-label={dict.player.volume}
-              aria-valuetext={percent.format(muted ? 0 : volume)}
-              className="range hidden md:block"
-              max={1}
-              min={0}
-              onChange={(e) => setVolume(Number(e.target.value))}
-              step={0.01}
-              style={{ ["--fill" as string]: `${volumePct}%` }}
-              type="range"
-              value={muted ? 0 : volume}
-            />
+            <div className="flex flex-none items-center gap-1 sm:order-2 sm:border-l sm:border-line sm:pl-3">
+              <button
+                aria-label={muted ? dict.player.unmute : dict.player.mute}
+                aria-pressed={muted}
+                className="icon-btn"
+                onClick={toggleMute}
+                type="button"
+              >
+                <Icon name={muted || volume === 0 ? "mute" : "volume"} size={18} />
+              </button>
+              <input
+                aria-label={dict.player.volume}
+                aria-valuetext={percent.format(muted ? 0 : volume)}
+                className="range hidden md:block"
+                max={1}
+                min={0}
+                onChange={(e) => setVolume(Number(e.target.value))}
+                step={0.01}
+                style={{ ["--fill" as string]: `${volumePct}%` }}
+                type="range"
+                value={muted ? 0 : volume}
+              />
+            </div>
           </div>
         </div>
         {isCurrent && hasError ? (

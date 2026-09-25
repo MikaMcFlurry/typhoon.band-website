@@ -28,6 +28,9 @@ export function ConsentBanner() {
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const noticeRef = useRef<HTMLElement | null>(null);
   const pillRef = useRef<HTMLButtonElement | null>(null);
+  // Set when the visitor re-opens the notice from the pill: then it stays
+  // open even where space is tight (see the auto-minimise effect).
+  const expandedByUser = useRef(false);
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -87,6 +90,35 @@ export function ConsentBanner() {
     return () => {
       ro.disconnect();
       root.style.removeProperty("--notice-h");
+    };
+  }, [mode]);
+
+  // Short viewports (e.g. 400 % zoom) with the fixed header and player dock:
+  // if the notice would take more than half of the remaining space, show
+  // the pill instead, so focused content never ends up fully covered.
+  useEffect(() => {
+    if (mode !== "notice" || expandedByUser.current) return;
+    const root = document.documentElement;
+    const check = () => {
+      const node = noticeRef.current;
+      if (!node) return;
+      const css = getComputedStyle(root);
+      const free =
+        window.innerHeight - (parseFloat(css.getPropertyValue("--header-h")) || 0) - (parseFloat(css.getPropertyValue("--dock-h")) || 0);
+      if (free < 220 || node.getBoundingClientRect().height > free * 0.5) {
+        const inside = node.contains(document.activeElement);
+        setMode("minimised");
+        if (inside) requestAnimationFrame(() => pillRef.current?.focus());
+      }
+    };
+    check();
+    window.addEventListener("resize", check);
+    // --dock-h changes when the player dock appears.
+    const mo = new MutationObserver(check);
+    mo.observe(root, { attributes: true, attributeFilter: ["style"] });
+    return () => {
+      window.removeEventListener("resize", check);
+      mo.disconnect();
     };
   }, [mode]);
 
@@ -157,7 +189,12 @@ export function ConsentBanner() {
       <button
         aria-label={dict.cookies.title}
         className="btn btn-secondary btn-sm fixed left-2 z-[60] bg-ink-3 shadow-[0_12px_30px_rgba(0,0,0,0.5)] sm:left-6"
-        onClick={() => setMode("notice")}
+        onClick={() => {
+          expandedByUser.current = true;
+          setMode("notice");
+          // Keep keyboard focus: move it into the re-opened notice.
+          requestAnimationFrame(() => noticeRef.current?.querySelector<HTMLElement>("button")?.focus());
+        }}
         ref={pillRef}
         style={{ bottom: "calc(var(--dock-h) + 8px)" }}
         type="button"
@@ -171,9 +208,12 @@ export function ConsentBanner() {
     return (
       <section
         aria-label={dict.cookies.title}
-        className="fixed inset-x-2 z-[60] max-h-[45svh] overflow-y-auto overscroll-contain rounded-md border border-line-2 bg-ink-3 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:inset-x-auto sm:right-6 sm:w-[400px] sm:p-5"
+        className="fixed inset-x-2 z-[60] overflow-y-auto overscroll-contain rounded-md border border-line-2 bg-ink-3 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:inset-x-auto sm:right-6 sm:w-[400px] sm:p-5"
         ref={noticeRef}
-        style={{ bottom: "calc(var(--dock-h) + 8px)" }}
+        style={{
+          bottom: "calc(var(--dock-h) + 8px)",
+          maxHeight: "min(45svh, calc(100svh - var(--header-h) - var(--dock-h) - 16px))",
+        }}
       >
         <h2 className="font-display text-[1.125rem] leading-tight text-paper sm:text-[1.25rem]">
           {dict.cookies.title}

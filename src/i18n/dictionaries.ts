@@ -103,6 +103,7 @@ export type Dict = {
     prev: string;
     next: string;
     counter: string;
+    showAll: string;
   };
   booking: {
     title: string;
@@ -136,6 +137,7 @@ export type Dict = {
     submitAnother: string;
     submitError: string;
     result: {
+      fallbackTitle: string;
       invalidTitle: string;
       invalidBody: string;
       errorTitle: string;
@@ -346,7 +348,7 @@ const de: Dict = {
     cta: "Die Besetzung",
     ctaBook: "Booking anfragen",
     facts: [
-      { label: "Besetzung", value: "{count} Musiker mit Bläsersatz" },
+      { label: "Bühne", value: "Über 30 Jahre Erfahrung" },
       { label: "Texte", value: "Türkisch, eigene Songs" },
       { label: "Homebase", value: "Kanzlei Studio, Hechingen" },
     ],
@@ -393,6 +395,7 @@ const de: Dict = {
     prev: "Vorheriges Bild",
     next: "Nächstes Bild",
     counter: "Bild {index} von {total}",
+    showAll: "Alle {count} Bilder ansehen",
   },
   booking: {
     title: "Typhoon buchen",
@@ -442,9 +445,10 @@ const de: Dict = {
     submitError:
       "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut oder schreib uns direkt.",
     result: {
+      fallbackTitle: "Online-Versand gerade nicht möglich",
       invalidTitle: "Bitte prüfe deine Angaben",
       invalidBody:
-        "Wir brauchen Name, E-Mail, Ort, Art der Veranstaltung und eine kurze Nachricht (mindestens 10 Zeichen). Geh zurück zum Formular oder schreib uns direkt.",
+        "Wir brauchen deinen Namen, deine E-Mail-Adresse, den Ort, die Art der Veranstaltung und eine kurze Nachricht (mindestens 10 Zeichen). Die Telefonnummer darf höchstens 60 Zeichen haben, das Datum muss ein gültiges Datum sein. Mit der Zurück-Funktion deines Browsers bleiben deine Eingaben erhalten.",
       errorTitle: "Das hat nicht geklappt",
       rateTitle: "Kurz durchatmen",
       back: "Zurück zum Formular",
@@ -470,7 +474,7 @@ const de: Dict = {
     cookies: "Cookies",
     consentSettings: "Datenschutz-Einstellungen",
     blurb:
-      "Typhoon verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock.",
+      "Eigene Songs mit türkischen Texten, live gespielt mit Bläsersatz.",
     copyrightTemplate: "© {year} Typhoon. Alle Rechte vorbehalten.",
     toTop: "Nach oben",
   },
@@ -595,7 +599,7 @@ const en: Dict = {
     cta: "Meet the line-up",
     ctaBook: "Request a booking",
     facts: [
-      { label: "Line-up", value: "{count} musicians incl. horn section" },
+      { label: "Stage", value: "30+ years of experience" },
       { label: "Lyrics", value: "Turkish, original songs" },
       { label: "Home base", value: "Kanzlei Studio, Hechingen (DE)" },
     ],
@@ -641,6 +645,7 @@ const en: Dict = {
     prev: "Previous image",
     next: "Next image",
     counter: "Image {index} of {total}",
+    showAll: "View all {count} photos",
   },
   booking: {
     title: "Book Typhoon",
@@ -689,11 +694,12 @@ const en: Dict = {
     submitError:
       "We couldn't send your request. Please try again later or email us directly.",
     result: {
+      fallbackTitle: "Online sending is unavailable right now",
       invalidTitle: "Please check your details",
       invalidBody:
-        "We need your name, email, location, type of event and a short message (at least 10 characters). Go back to the form or write to us directly.",
+        "We need your name, email address, the location, the type of event and a short message (at least 10 characters). The phone number can have up to 60 characters and the date must be a valid date. Your browser's back button keeps what you entered.",
       errorTitle: "Something went wrong",
-      rateTitle: "Too many requests",
+      rateTitle: "Please wait a moment",
       back: "Back to the form",
     },
     errors: {
@@ -717,7 +723,7 @@ const en: Dict = {
     cookies: "Cookies",
     consentSettings: "Privacy settings",
     blurb:
-      "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock.",
+      "Original songs with Turkish lyrics, played live with a horn section.",
     copyrightTemplate: "© {year} Typhoon. All rights reserved.",
     toTop: "Back to top",
   },
@@ -842,7 +848,7 @@ const tr: Dict = {
     cta: "Kadroyu tanıyın",
     ctaBook: "Booking talebi",
     facts: [
-      { label: "Kadro", value: "Nefesli grubuyla {count} müzisyen" },
+      { label: "Sahne", value: "30 yılı aşkın deneyim" },
       { label: "Sözler", value: "Türkçe, kendi şarkıları" },
       { label: "Merkez", value: "Kanzlei Studio, Hechingen (Almanya)" },
     ],
@@ -888,6 +894,7 @@ const tr: Dict = {
     prev: "Önceki görsel",
     next: "Sonraki görsel",
     counter: "Görsel {index} / {total}",
+    showAll: "Tüm görselleri gör ({count})",
   },
   booking: {
     title: "Typhoon'u davet edin",
@@ -936,11 +943,12 @@ const tr: Dict = {
     submitError:
       "Talep gönderilemedi. Lütfen daha sonra tekrar deneyin ya da bize doğrudan yazın.",
     result: {
+      fallbackTitle: "Çevrimiçi gönderim şu anda yapılamıyor",
       invalidTitle: "Lütfen bilgilerinizi kontrol edin",
       invalidBody:
-        "Adınız, e-posta adresiniz, yer, etkinlik türü ve kısa bir mesaj (en az 10 karakter) gerekli. Forma geri dönün ya da bize doğrudan yazın.",
+        "Adınız, e-posta adresiniz, yer, etkinlik türü ve kısa bir mesaj (en az 10 karakter) gerekli. Telefon numarası en fazla 60 karakter olabilir, tarih geçerli bir tarih olmalıdır. Tarayıcınızın geri tuşunu kullanırsanız girdiğiniz bilgiler korunur.",
       errorTitle: "Bir sorun oluştu",
-      rateTitle: "Çok fazla talep",
+      rateTitle: "Lütfen biraz bekleyin",
       back: "Forma geri dön",
     },
     errors: {
@@ -964,7 +972,7 @@ const tr: Dict = {
     cookies: "Çerezler",
     consentSettings: "Gizlilik ayarları",
     blurb:
-      "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir.",
+      "Türkçe sözlü kendi şarkıları, sahnede nefesli bölümüyle canlı.",
     copyrightTemplate: "© {year} Typhoon. Tüm hakları saklıdır.",
     toTop: "Başa dön",
   },

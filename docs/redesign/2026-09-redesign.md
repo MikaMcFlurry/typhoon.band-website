@@ -59,10 +59,10 @@ Band — mindestens alle aktuellen Funktionen, gerne besser umgesetzt."
 | 5 | Featured player (play/pause, prev/next, waveform seek, time, mute, volume) | same controls, full-width live waveform, keyboard seek, duration before playback |
 | 6 | Demo list (6 songs, one at a time, auto-advance) | record-sleeve tracklist, per-song covers, durations, 4 shown + "show all" |
 | 7 | — | **new**: persistent player dock + lock-screen/hardware media keys |
-| 8 | Shows (Supabase, TBA placeholders) | TBA rows now visible (old bug), upcoming/past split, localized dates, times, event type, ticket button, honest empty state |
+| 8 | Shows (Supabase, TBA placeholders) | TBA rows now visible (old bug), upcoming/past split, localized dates, times, event type, ticket button, honest empty state as a slim strip with a booking link |
 | 9 | About/band info (image + text) | editorial split, "Mehr über Typhoon" disclosure, band facts |
 | 10 | Members (8 cards with bios, Supabase merge) | cards with bios, 4 shown + reveal, no placeholder badge |
-| 11 | Gallery + lightbox | contact sheet for any image count, viewer with counter, captions, swipe, focus return |
+| 11 | Gallery + lightbox | contact sheet (5-tile preview, "+N" tile opens the viewer with every image), viewer with counter, captions, swipe, focus return |
 | 12 | Booking form + API (Supabase insert, Resend mail, honeypot) | labelled fields, event-type select, inline errors, success state, privacy note; API localized, rate-limited, clock-independent time trap, correct success semantics; also works without JavaScript (POST + status pages) |
 | 13 | Cookie banner (localStorage) | privacy notice (reachable first by keyboard, Esc minimises) + preferences dialog, reopen from footer, old choice honoured |
 | 14 | Footer (contact, socials, legal) | contact as mailto/tel links, platform links from Admin (no dead `#` icons), privacy settings |
@@ -176,3 +176,49 @@ session scratchpad, results summarised here):
   `/de/booking/error`; `text/plain` → 415.
 - Page height (collapsed): 6706 px at 1440 (was 7083), 9387 px at 390
   (was 9764).
+
+### Second review round
+
+A fresh adversarial re-review of the fix commit (5 lenses, 42 agents,
+every finding re-checked by a skeptic) confirmed 36 findings (1 refuted),
+most of them duplicates of about 20 distinct issues — mainly side effects
+of the first round. All fixed:
+
+- Lists stopped collapsing after a client-side language switch (the
+  `<html data-js>` flag was lost) and collapsed only after hydration
+  (layout shift, CLS up to 1.0 on `#music` links) → collapsing now uses
+  the CSS media feature `scripting` (collapsed from the first paint,
+  everything visible and no toggle without JavaScript), with a
+  mount-time fallback for old browsers.
+- Mobile menu left the page inert when the viewport grew past 1024 px →
+  closes at the lg breakpoint.
+- Time trap could still catch visitors whose fields were typed before
+  hydration or restored by the browser → measured from page load; values
+  present at hydration skip the check; trapped requests are stored as
+  `spam` instead of being dropped.
+- Privacy notice: covered the last footer links (body padding now
+  reserves it), filled the screen at 400 % zoom with the dock (starts as a
+  pill when space is short), the pill dropped focus (focus moves into the
+  notice).
+- Dock close focused a far-away button → nearest visible control.
+- Featured player Tab order now matches the visual order on phones; dock
+  title/status no longer truncated at 320 px.
+- Booking status pages: revalidate every 5 min, own canonical/og:url, the
+  "fallback" page says the request was not sent and offers e-mail first;
+  "invalid" page names phone/date rules; phone `maxlength`, date range.
+- TR Art. 21 sentence corrected; rate-limit headings; 404 title without
+  period; `İsviçre` recognised; admin erase copy mentions the mailbox;
+  footer blurb and band facts no longer repeat hero/booking copy.
+- Bucket size/MIME limits folded into `0003` too (docs now accurate).
+- Page length: slim Termine strip, 5-tile gallery preview, 2-column
+  promoter facts on phones, band image 4:3 on phones → 6197 px at 1440 and
+  8601 px at 390 (originally 7083 / 9764).
+- Mobile LCP: 3× phones get the 828 w hero (measured 2.8 s → 1.8 s by the
+  reviewer); privacy heading breaks at "Datenschutz-/erklärung".
+
+Evidence: lint ✔, build ✔, 17/17 round-2 browser checks, 41/42 round-1
+checks (the remaining one asserted the old dock-close focus target, which
+was changed on purpose), DE/EN/TR journeys without console errors, ghost
+playback 0 → 1, no overflow at 320–1920 px, SQL re-run test on Postgres 16
+(listing policies stay dropped, helpers stay SECURITY DEFINER, bucket
+limits kept).

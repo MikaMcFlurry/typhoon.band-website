@@ -102,7 +102,9 @@ export function countryCode(country: string | null): string | null {
   if (!country) return null;
   const raw = country.trim();
   if (/^[A-Za-z]{2}$/.test(raw)) return raw.toUpperCase();
-  const lower = raw.toLocaleLowerCase("de");
+  // "İsviçre": map the Turkish dotted İ first, German lower-casing would
+  // turn it into "i̇" (i + combining dot).
+  const lower = raw.replace(/İ/g, "i").toLocaleLowerCase("de");
   return Object.hasOwn(COUNTRY_CODES, lower) ? COUNTRY_CODES[lower] : null;
 }
 
@@ -206,8 +208,9 @@ export function Shows({
   return (
     <section
       aria-labelledby="shows-title"
-      // No dates yet: a slim strip instead of a full section.
-      className={empty ? "pb-10 pt-16 md:pb-14 md:pt-24" : "section"}
+      // No dates yet: one slim strip (heading + status + booking link)
+      // instead of a full section.
+      className={empty ? "pb-8 pt-14 md:pb-10 md:pt-20" : "section"}
       id="shows"
     >
       <div className="container-x">
@@ -219,7 +222,23 @@ export function Shows({
             <p className="reveal text-paper-2 md:col-span-5 md:justify-self-end md:text-right">
               {dict.shows.intro}
             </p>
-          ) : null}
+          ) : (
+            <div className="reveal md:col-span-5 md:justify-self-end md:text-right">
+              <p className="font-display text-[1.375rem] leading-tight text-paper md:text-[1.625rem]">
+                {dict.shows.emptyTitle}
+              </p>
+              <p className="mt-2 text-paper-2">
+                {dict.shows.emptyBody}{" "}
+                <a
+                  className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-gold-hi underline decoration-line-2 underline-offset-4 hover:text-paper"
+                  href="#booking"
+                >
+                  {dict.shows.emptyCta}
+                  <Icon name="arrow-right" size={16} />
+                </a>
+              </p>
+            </div>
+          )}
         </div>
 
         {upcoming.length > 0 ? (
@@ -228,20 +247,7 @@ export function Shows({
               <ShowRow dict={dict} key={show.id} locale={locale} show={show} />
             ))}
           </ul>
-        ) : (
-          <div className="reveal mt-8 grid gap-5 rounded-md border border-line bg-ink-2 p-5 md:mt-10 md:grid-cols-[1fr_auto] md:items-center md:px-8 md:py-6">
-            <div>
-              <p className="font-display text-[1.5rem] leading-tight text-paper md:text-[1.875rem]">
-                {dict.shows.emptyTitle}
-              </p>
-              <p className="mt-3 max-w-[56ch] text-paper-2">{dict.shows.emptyBody}</p>
-            </div>
-            <a className="btn btn-primary justify-self-start" href="#booking">
-              {dict.shows.emptyCta}
-              <Icon name="arrow-right" size={18} />
-            </a>
-          </div>
-        )}
+        ) : null}
 
         {past.length > 0 ? (
           <details className="group mt-10">

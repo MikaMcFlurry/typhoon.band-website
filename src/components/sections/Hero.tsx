@@ -56,7 +56,9 @@ export function Hero({
               fill
               priority
               quality={70}
-              sizes="(min-width: 1024px) 58vw, (min-width: 768px) 600px, 100vw"
+              // 3× phones get the 828w file: sharp enough behind the soft
+              // mask and ~40 % fewer bytes for the LCP image.
+              sizes="(min-width: 1024px) 58vw, (min-width: 768px) 600px, (min-resolution: 2.5dppx) 70vw, 100vw"
               src={imageUrl}
               style={{ filter: "sepia(0.28) saturate(0.9) contrast(1.06) brightness(0.9)" }}
             />

@@ -128,6 +128,18 @@ export function Header({
     setOpen(false);
   }, [pathname]);
 
+  // The sheet only exists below lg: close it when the viewport grows past
+  // that (tablet rotation, window resize), otherwise the page would stay
+  // inert and scroll-locked behind an invisible dialog.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   const solid = scrolled || open || !isHome;
 
   return (

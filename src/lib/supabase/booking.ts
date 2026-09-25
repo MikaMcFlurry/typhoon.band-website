@@ -17,7 +17,7 @@ export type StoreOutcome = {
 
 export async function storeBookingRequest(
   data: BookingData,
-  meta: { userAgent?: string; ipHash?: string | null },
+  meta: { userAgent?: string; ipHash?: string | null; status?: "new" | "spam" },
 ): Promise<StoreOutcome> {
   const supabase = getAdminSupabase();
   if (!supabase) {
@@ -32,7 +32,7 @@ export async function storeBookingRequest(
     event_location: data.event_location || null,
     event_type: data.event_type || null,
     message: data.message,
-    status: "new",
+    status: meta.status ?? "new",
     locale: data.locale,
     user_agent: meta.userAgent ?? null,
     ip_hash: meta.ipHash ?? null,

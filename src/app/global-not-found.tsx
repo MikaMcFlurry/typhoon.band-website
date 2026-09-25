@@ -30,7 +30,7 @@ export default async function GlobalNotFound() {
   return (
     <html className={`${archivo.variable} ${newsreader.variable}`} lang={locale}>
       <head>
-        <title>{`${dict.notFound.title} · Typhoon`}</title>
+        <title>{`${dict.notFound.title.replace(/[.!]$/, "")} · Typhoon`}</title>
       </head>
       <body className="font-sans">
         <DictProvider dict={dict} locale={locale}>

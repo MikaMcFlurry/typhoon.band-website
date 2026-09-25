@@ -140,9 +140,10 @@ export async function POST(request: Request) {
   }
 
   // Time trap: humans need more than a couple of seconds to fill the form.
-  // The client measures the time itself (performance.now), so a wrong
-  // device clock can never drop a real request. No value (plain form POST
-  // without JavaScript) means no check.
+  // The client measures the time since the page started loading
+  // (performance.now), so a wrong device clock can never matter; it omits
+  // the value when the fields were filled before the script ran (typed
+  // before hydration or restored by the browser). No value means no check.
   const elapsed = Number((payload as Record<string, unknown>).elapsed_ms);
   const tooFast = Number.isFinite(elapsed) && elapsed >= 0 && elapsed < MIN_FILL_MS;
 
@@ -154,10 +155,16 @@ export async function POST(request: Request) {
       result.field === "_global" ? t.submitError : t.errors[result.field];
     return reply("validation", message, { status: 400, field: result.field });
   }
-  if (tooFast) return reply("sent", t.submitOk);
-
   const env = readServerEnv();
   const userAgent = request.headers.get("user-agent")?.slice(0, 400) ?? undefined;
+
+  if (tooFast) {
+    // Probably a bot, but never lose a real request silently: keep it in
+    // the Admin inbox as "spam" (no notification mail), answer as usual.
+    const kept = await storeBookingRequest(result.data, { userAgent, status: "spam" });
+    if (kept.attempted && !kept.ok) console.error("[booking] Spam insert failed:", kept.reason);
+    return reply("sent", t.submitOk);
+  }
 
   const [stored, mailed] = await Promise.all([
     storeBookingRequest(result.data, { userAgent }),

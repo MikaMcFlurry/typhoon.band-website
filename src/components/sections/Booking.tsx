@@ -38,7 +38,7 @@ export function Booking({
 
         <div className="reveal mt-10 md:mt-14">
           <h3 className="sr-only">{t.factsTitle}</h3>
-          <dl className="grid gap-px overflow-hidden rounded-md border border-line bg-line md:grid-cols-3">
+          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line md:grid-cols-3 [&>*:last-child]:col-span-2 md:[&>*:last-child]:col-span-1">
             {t.facts.map((f) => (
               <div className="bg-ink px-5 py-4 md:p-5" key={f.label}>
                 <dt className="label">{f.label}</dt>

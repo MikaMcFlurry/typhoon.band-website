@@ -81,16 +81,20 @@ Tailwind opacity modifiers work (`bg-ink/80`). Legacy names (`--bg`,
   prev/play/next, waveform + time (desktop), volume (lg), close = stop.
 - **Shows**: poster list — big day numeral, month/weekday, venue, place,
   time, event type, "Tickets" action. TBA rows after dated ones, past shows
-  in a disclosure, honest empty state with booking CTA.
+  in a disclosure; with no dates an honest one-line strip with a booking
+  link (never invented dates).
 - **Band**: editorial split (photo / headline, body, "Mehr über Typhoon"
   disclosure, facts), then line-up cards with bios (4 shown, reveal all).
 - **Music**: record-sleeve tracklist — real track numbers, cover, title,
   status, auto-width waveform, duration, play button (4 shown, reveal all).
-- **Gallery**: contact sheet (one large tile + varied spans), in-site viewer
+- **Gallery**: contact sheet preview of 5 tiles (one large + four small;
+  a "+N" last tile when there are more), in-site viewer with every image
   with counter, captions, arrows, swipe, Esc, focus trap/return.
 - **Booking**: promoter facts strip, uncropped band poster + direct contact,
   form with labels, select, inline errors, success/fallback states.
-- **Consent**: small non-blocking notice; preferences dialog from the footer.
+- **Consent**: small non-blocking notice (first in the Tab order, Esc →
+  pill, pill when the viewport is too short); preferences dialog from the
+  footer.
 
 ## Rules (anti-"AI slop", from impeccable.style)
 

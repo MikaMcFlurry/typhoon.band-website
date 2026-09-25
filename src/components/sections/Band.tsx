@@ -24,7 +24,7 @@ export function Band({
       <div className="container-x">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
           <figure className="reveal relative lg:col-span-5">
-            <div className="grain relative aspect-[4/5] overflow-hidden rounded-md border border-line">
+            <div className="grain relative aspect-[4/3] overflow-hidden rounded-md border border-line lg:aspect-[4/5]">
               <Image
                 alt={dict.about.imageAlt}
                 className="object-cover object-[60%_30%]"

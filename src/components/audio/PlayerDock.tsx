@@ -63,17 +63,32 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
   const volumePct = Math.round((muted ? 0 : volume) * 100);
   const canSkip = playlist.length > 1;
 
-  // Closing the dock must not drop keyboard focus to <body>: move it to the
-  // play button of the same song on the page, else to <main>.
+  // Closing the dock must not drop keyboard focus to <body>, and must not
+  // jump somewhere off-screen either: prefer the play button of the same
+  // song if it is visible, else the first visible control in <main>, else
+  // <main> itself. The page does not scroll.
   const close = () => {
     const id = currentTrack?.id;
-    const target =
-      (id
-        ? Array.from(document.querySelectorAll<HTMLElement>("[data-track-play]")).find(
-            (el) => el.dataset.trackPlay === id && el.getClientRects().length > 0,
-          )
-        : undefined) ?? document.getElementById("main");
-    target?.focus({ preventScroll: true });
+    const top = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+    const bottom = window.innerHeight - DOCK_HEIGHT;
+    const visible = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0 && r.top >= top && r.bottom <= bottom;
+    };
+    const main = document.getElementById("main");
+    const sameSong = id
+      ? Array.from(document.querySelectorAll<HTMLElement>("[data-track-play]")).find(
+          (el) => el.dataset.trackPlay === id && visible(el),
+        )
+      : undefined;
+    const firstVisible = main
+      ? Array.from(
+          main.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([type="hidden"]), select, textarea, [tabindex="0"]',
+          ),
+        ).find(visible)
+      : undefined;
+    (sameSong ?? firstVisible ?? main)?.focus({ preventScroll: true });
     stop();
   };
 
@@ -103,7 +118,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
 
       <div className="container-x flex h-full items-center gap-3 md:gap-5">
         <div className="flex min-w-0 flex-1 items-center gap-3 md:w-[260px] md:flex-none">
-          <div className="relative size-11 flex-none overflow-hidden rounded-sm bg-ink-3">
+          <div className="relative hidden size-11 flex-none overflow-hidden rounded-sm bg-ink-3 min-[360px]:block">
             {currentTrack ? (
               <Image
                 alt=""
@@ -115,7 +130,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
             ) : null}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-display text-[1.0625rem] leading-tight text-paper">
+            <p className="line-clamp-2 font-display text-[1rem] leading-[1.15] text-paper xs:truncate xs:text-[1.0625rem] xs:leading-tight">
               {title}
             </p>
             <p
@@ -123,7 +138,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
             >
               <span className="hidden xs:inline">{dict.player.by} · </span>
               {status}
-              <span className="tabular md:hidden"> · {formatTime(position)}</span>
+              <span className="tabular hidden min-[360px]:inline md:hidden"> · {formatTime(position)}</span>
             </p>
           </div>
         </div>
