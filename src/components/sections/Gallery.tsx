@@ -11,12 +11,38 @@ import { fill } from "@/i18n/dictionaries";
 
 export type GalleryImage = { id: string; src: string; alt: string };
 
+// Balanced contact sheet for any number of images (Admin decides how many).
+// Mobile (2 cols): first image full width, then pairs; an odd last image
+// spans both columns. Desktop (12 cols): one large tile + four small ones,
+// then rows of three; a remainder is spread over rows of two so no image
+// is ever left alone in a row.
 function tileClass(i: number, count: number) {
-  if (i === 0) return "col-span-2 aspect-[4/3] md:col-span-6 md:row-span-2 md:aspect-auto";
-  const lastAlone = (count - 1) % 2 === 1 && i === count - 1;
-  const mobile = lastAlone ? "col-span-2" : "";
-  const desktop = i <= 4 ? "md:col-span-3" : "md:col-span-4";
-  return `${mobile} aspect-[4/3] ${desktop}`;
+  const mobileLastAlone = i > 0 && (count - 1) % 2 === 1 && i === count - 1;
+  const mobile = i === 0 || mobileLastAlone ? "col-span-2" : "";
+  let desktop: string;
+  if (count < 5) {
+    desktop = count === 1 ? "md:col-span-12" : count === 3 ? "md:col-span-4" : "md:col-span-6";
+  } else if (i === 0) {
+    desktop = "md:col-span-6 md:row-span-2 md:aspect-auto";
+  } else if (i <= 4) {
+    desktop = "md:col-span-3";
+  } else {
+    const rest = count - 5;
+    const idx = i - 5;
+    const remainder = rest % 3;
+    // Items that must go into rows of two: 2 when remainder is 2, 4 when 1.
+    const pairItems = remainder === 2 ? 2 : remainder === 1 ? (rest >= 4 ? 4 : 1) : 0;
+    const inPairs = idx >= rest - pairItems;
+    desktop = inPairs ? (pairItems === 1 ? "md:col-span-12" : "md:col-span-6") : "md:col-span-4";
+  }
+  // A full-width single tile would be huge at 4:3; use a cinematic crop.
+  const wide =
+    desktop === "md:col-span-12"
+      ? "md:aspect-[21/9]"
+      : desktop === "md:col-span-6"
+        ? "md:aspect-[16/10]"
+        : "";
+  return `${mobile} aspect-[4/3] ${desktop} ${wide}`;
 }
 
 export function Gallery({ items }: { items: GalleryImage[] }) {
