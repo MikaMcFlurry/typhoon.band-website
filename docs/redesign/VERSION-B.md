@@ -43,8 +43,10 @@ built site by Impeccable's documenter). Product record:
 
 **The evening seen from the stage.**
 - The songs are the **setlist** taped to the floor: every row plays.
-- The line-up is a **stage plot**: spike-tape marks where each musician
-  stands, with a drum riser and monitor wedges.
+- The line-up is a row of **taped member cards** (photo, name on gaffer
+  tape, instrument on green tape, bio). The first build had a stage plot
+  with positions; the owner rejected it (the band has no fixed stage
+  placement), so it was removed.
 - Booking is the **rider**, with a live preview of the request as it will
   arrive.
 
@@ -66,7 +68,7 @@ Square corners, no gradients, no glow. Gold appears only in the signature
 logo.
 
 The signature interaction is **one shared clock**. While a song plays, the
-live Web Audio level pulses the stage-plot marks and the dock cover, and the
+live Web Audio level pulses the now-playing tape and the dock cover, and the
 active setlist row carries the pink tape and a seekable waveform. The pulse is
 off under reduced motion.
 
@@ -78,7 +80,7 @@ off under reduced motion.
 | First screen | collage + serif headline, player card below | collage with signature bleeding into a featured player | big gold signature, tagline laid as three tape strips, **setlist with all six songs** taped over a colour live photo; play + booking CTAs |
 | Music | featured player + list | featured player + record-sleeve tracklist (4 + "show all") | the setlist *is* the tracklist; the active row shows a waveform and pink tape; persistent dock |
 | Shows | TBA placeholder cards | list / honest empty state | dates on blue tape next to the **band poster** (admin hero image, always shown whole); honest empty state → booking |
-| Band | image + text, member cards | editorial split + member cards with bios | statement headline, story, rider-style facts, **interactive stage plot** (tabs, arrow keys) with a member panel |
+| Band | image + text, member cards | editorial split + member cards with bios | statement headline, story, rider-style facts, member cards with name on gaffer tape, instrument on green tape and bio |
 | Photos | grid + lightbox | contact sheet + viewer | taped contact sheet with frame numbers + the same viewer |
 | Booking | form | facts + poster + form | rider: orange tape heading, facts, direct line, form with a **live request preview above submit**; errors re-check while typing |
 | Colour | gold accents | gold for the primary action | orange only for booking; pink only for audio |
@@ -107,7 +109,7 @@ Behaviour changes:
   - only one song plays at a time
   - a seek slider appears on the active row
   - no download links or native controls
-  - stage-plot tab switching and arrow keys
+  - line-up renders all member cards (no stage plot)
   - lightbox: open, arrow key, Esc, focus returns
   - booking: client validation and preview updates
   - DE→TR switch keeps `#band`, with correct Turkish uppercase (OLAĞANÜSTÜ)
@@ -130,7 +132,7 @@ Behaviour changes:
   - `de-{320,390,768,1024,1440}-{fold,full}.jpg`
   - `tr-{390,1440}-*.jpg`
   - `legal-en-390-*.jpg`
-  - `journey-*.png` (playing, stage plot, booking validation + preview,
+  - `journey-*.png` (playing, line-up, booking validation + preview,
     lightbox, mobile menu, mobile dock)
 
 ## 5. Open points
@@ -149,7 +151,4 @@ Behaviour changes:
     the booking "Basis" row)
   - real platform links
   - song covers
-  - higher-resolution member photos (the stage-plot panel shows them at up
-    to 380 px)
-- The stage plot is a schematic of the line-up, not a technical rider. A real
-  rider (inputs, power) would need the band's data.
+  - higher-resolution member photos (cards show them at up to ~300 px)

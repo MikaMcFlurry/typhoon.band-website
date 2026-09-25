@@ -211,12 +211,6 @@ export type Dict = {
   stage: {
     setlist: string;
     setlistNote: string;
-    plotLabel: string;
-    plotHint: string;
-    audience: string;
-    riser: string;
-    monitor: string;
-    more: string;
     previewTitle: string;
     previewTo: string;
     previewFrom: string;
@@ -525,12 +519,6 @@ const de: Dict = {
   stage: {
     setlist: "Setlist",
     setlistNote: "Tippen zum Abspielen · nur Stream, kein Download",
-    plotLabel: "Bühnenplan der Besetzung",
-    plotHint: "Tippe auf eine Position, um die Musiker kennenzulernen.",
-    audience: "Publikum",
-    riser: "Drum-Riser",
-    monitor: "Mon",
-    more: "Weitere Musiker",
     previewTitle: "So kommt deine Anfrage an",
     previewTo: "An",
     previewFrom: "Von",
@@ -774,12 +762,6 @@ const en: Dict = {
   stage: {
     setlist: "Setlist",
     setlistNote: "Tap to play · streaming only, no download",
-    plotLabel: "Stage plot of the line-up",
-    plotHint: "Tap a position to meet the musicians.",
-    audience: "Audience",
-    riser: "Drum riser",
-    monitor: "Mon",
-    more: "More musicians",
     previewTitle: "This is how your request arrives",
     previewTo: "To",
     previewFrom: "From",
@@ -1023,12 +1005,6 @@ const tr: Dict = {
   stage: {
     setlist: "Set listesi",
     setlistNote: "Dinlemek için dokun · yalnızca dinleme, indirme yok",
-    plotLabel: "Kadronun sahne planı",
-    plotHint: "Müzisyenleri tanımak için bir pozisyona dokun.",
-    audience: "Seyirci",
-    riser: "Davul platformu",
-    monitor: "Mon",
-    more: "Diğer müzisyenler",
     previewTitle: "Talebin bize böyle ulaşır",
     previewTo: "Alıcı",
     previewFrom: "Gönderen",

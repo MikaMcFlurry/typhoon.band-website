@@ -1,6 +1,6 @@
 ---
 name: Typhoon
-description: The evening seen from the stage. Stage plot, setlist and rider on a matte black deck.
+description: The evening seen from the stage. Setlist, taped line-up and rider on a matte black deck.
 colors:
   deck: "rgb(18 17 16)"
   deck-2: "rgb(27 25 23)"
@@ -148,7 +148,7 @@ components:
 
 **Creative North Star: "The Evening Seen From the Stage"**
 
-You see the site the way the band sees the room: a matte black stage deck, chalk-white gaffer tape for labels, spike tape in fixed colours marking positions, and paper taped to the floor. The line-up is a stage plot, the songs are a setlist sheet, the booking request is a rider. Everything is flat and square-cut. The only depth comes from paper sheets lying on the deck.
+You see the site the way the band sees the room: a matte black stage deck, chalk-white gaffer tape for labels, spike tape in fixed colours, and paper taped to the floor. The songs are a setlist sheet, the line-up is a row of taped cards, the booking request is a rider. Everything is flat and square-cut. The only depth comes from paper sheets lying on the deck.
 
 Density is working-document density. Big, heavy upright caps carry the signage, a sturdy grotesk handles the reading, and a condensed mono holds every number (times, durations, counters, rider data). Colour means something every time it appears: it shows up only on tape and on state, never on running text. The gold hand-drawn signature is the band's name and is the only gold on public surfaces.
 
@@ -157,7 +157,7 @@ The world rejects the category default (a full-bleed moody band photo with a big
 **Key Characteristics:**
 - Matte deck black ground, chalk text, gaffer-tape labels printed in stage ink.
 - Four spike-tape colours, each with one job: orange for booking, pink for audio, green for the line-up, blue for dates.
-- Square corners everywhere, 2px rules and strips, thin plot lines, and no gradients or glow.
+- Square corners everywhere, 2px rules and strips, and no gradients or glow.
 - Tape is laid on from the left, and content rises 16px. The live audio level pulses the "now playing" marks.
 - Real photos, uncropped band collage, and a gold signature as the logo.
 
@@ -172,7 +172,7 @@ The palette is an achromatic stage (deck and chalk) plus four saturated spike-ta
 - **Now-Playing Pink** (`tape-pink`): audio and "now playing". Used for the play buttons (`btn-play`, `ctl-play`), the current setlist row's tape, the played part of the waveform, the dock's progress line, the volume fill, the tape pieces holding the setlist sheet, the third hero tagline strip, text selection, and the caret. Ink on pink is 6.1:1. Pink on deck is 6.1:1.
 
 ### Tertiary
-- **Position Green** (`tape-green`): line-up positions only. Used for the stage-plot cross marks (70% alpha when unselected), the selected musician's role tape, and the selected role label. Green on deck is 10.6:1.
+- **Line-up Green** (`tape-green`): line-up only. Used for the instrument/role tape on each member card. Green on deck is 10.6:1.
 - **Date Blue** (`tape-blue`): dates only. Used for the show date blocks (past shows use `chalk-2` instead) and the tape piece on the Shows poster. Ink on blue is 6.9:1.
 
 ### Neutral
@@ -208,11 +208,11 @@ All three are self-hosted through next/font with latin-ext, for Turkish ğ ı ş
 - **Display** (900, clamp 2.5 to 6rem, fixed at 4.25rem at lg, line-height 0.92, uppercase): only the hero tagline strips, set on tape.
 - **Headline** (800, clamp 2.75 to 6rem, line-height 0.9, -0.01em, uppercase, balanced): section headings (`h-stage`), the 404 heading (no label above it), and legal titles.
 - **Headline small** (800, clamp 1.75 to 2.75rem, line-height 0.95): sub-section headings such as the line-up heading.
-- **Title** (800 to 900, 1.375 to 3rem, line-height 0.85 to 1.02, uppercase): setlist song titles (1.625rem, 1.875rem from sm), the setlist sheet heading (2.5/3rem), show venues, musician names, the dock title, sheet headings, and the stage-plot labels.
+- **Title** (800 to 900, 1.375 to 3rem, line-height 0.85 to 1.02, uppercase): setlist song titles (1.625rem, 1.875rem from sm), the setlist sheet heading (2.5/3rem), show venues, musician names, the dock title, sheet headings, and the line-up name tapes.
 - **Body large** (400, clamp 1.125 to 1.3125rem, line-height 1.55, chalk, max 58ch): intro sentences.
 - **Body** (400, 1.0625rem, line-height 1.6, chalk-2, max 62ch, pretty wrap): running copy. The base size is 16px/1.55.
 - **Data** (mono 0.8125rem, 0.02em, tabular numbers): times, durations, counters, and preview values.
-- **Label** (mono 0.75rem, 0.06em, uppercase, tabular numbers): nav items, field labels, fact labels, and plot legends.
+- **Label** (mono 0.75rem, 0.06em, uppercase, tabular numbers): nav items, field labels, fact labels, and rider data.
 - **Button** (Big Shoulders 800, 1.1875rem, 1.0625rem for small, 0.02em, uppercase).
 
 ### Named Rules
@@ -223,11 +223,11 @@ All three are self-hosted through next/font with latin-ext, for Turkish ğ ı ş
 ## Layout
 
 - **Shell:** max 1360px, with side padding of 16px, 24px from 640px, and 40px from 1024px. Sections use `block-y` padding (72px, 112px from 768px) and are separated by a `rule` top border.
-- **Grid:** a 12-column grid from lg. Content sections split 7/5 (Shows, StagePlot) or 5/7 (Band).
+- **Grid:** a 12-column grid from lg. Content sections split 7/5 (Shows) or 5/7 (Band).
 - **Hero:** stacked below lg. At lg it splits 6/6, and at xl 7/5 with min-height 100svh minus the header. The photo plate sits absolutely at the top right of the right column (70% width at lg, 74% at xl). The setlist sheet overlaps its lower-left corner (88%/82% width, rotated 1°). On mobile the plate runs full bleed at 16:10 and the setlist overlaps it by 56px (80px from sm).
 - **Header:** 64px tall, 72px from md. Mono nav from lg, with a hamburger menu below lg. The locale switcher and Booking button appear from sm.
 - **Player dock:** fixed to the bottom at 76px. It writes `--dock-h` so the body and the consent banner clear it. Previous/volume controls hide at the smaller breakpoints (xs/lg).
-- **Stage plot:** 1/1.05 aspect on mobile, 16/11 from sm. Role labels under the marks are hidden below 640px, and the monitor word is shortened.
+- **Line-up:** 2 columns on mobile, 3 from md, 4 from lg.
 - **Rider/preview rows:** a two-column dl (7.5 to 12rem label column). The request preview rows stack into one column below 640px.
 - **Hit areas:** at least 44px for every interactive target. No horizontal overflow at 320 or 390px (`overflow-x: clip` on body, `overflow-wrap:anywhere` on long email and phone strings).
 - **Breakpoints:** xs 420, sm 640, md 768, lg 1024, xl 1280.
@@ -245,7 +245,7 @@ The stage is flat. Depth comes from exactly one device: paper lying on the deck.
 
 ## Shapes
 
-All corners are square (0 radius), including buttons, fields, the range thumb (12x16px), and images. Lines are 2px tape strips and rules: `border-t-2 chalk` heads fact lists and legal bodies, the setlist sheet has 2px ink rules, and the stage-plot frame is 2px `rule-2` with a dashed drum riser. Tape strips and sheets sit slightly rotated (±0.6° to 1.4° for strips, 1° for sheets, 2° to 6° for tape pieces), which is how tape actually lands. The band collage poster uses `object-contain` and is never cropped.
+All corners are square (0 radius), including buttons, fields, the range thumb (12x16px), and images. Lines are 2px tape strips and rules: `border-t-2 chalk` heads fact lists and legal bodies, the setlist sheet has 2px ink rules, and the line-up cards carry their names on tape. Tape strips and sheets sit slightly rotated (±0.6° to 1.4° for strips, 1° for sheets, 2° to 6° for tape pieces), which is how tape actually lands. The band collage poster uses `object-contain` and is never cropped.
 
 ## Components
 
@@ -264,8 +264,8 @@ A flat, matte, square-cut strip in one colour with stage-ink text. Padding is 0.
 ### Setlist sheet (signature)
 A chalk sheet held by two pink tape pieces, with an ink 2px header rule and numbered rows (mono index, title, mono duration, and a 44px ink play square that turns pink when playing or hovered). The current row's title gets pink tape and carries `data-live`, and a seekable waveform opens under it (`on-light`: ink bars played, 28% ink unplayed).
 
-### Stage plot
-A 2px framed plot with thin, dashed riser and monitor outlines in `rule-2`. Each musician is a green cross mark (5px arms, `live-mark`), with a name on tape and a mono role label. The selected musician is shown in a 4:5 photo with a green role tape.
+### Line-up cards
+One card per member from live data: a 4:5 photo, the name on gaffer tape overlapping the photo's bottom edge (alternating ±0.8° tilt), the role on green tape, and the short bio in chalk-2. **No stage positions or stage plot:** the band has no fixed placement on stage (owner, 2026-09-25), so nothing may suggest one.
 
 ### Rider (booking)
 A heading on orange tape, a facts dl under a 2px chalk rule, and contact lines in Big Shoulders. The form sits on a `deck-2` panel. A chalk **request preview** sheet (taped in orange) mirrors the draft in mono just above the submit.

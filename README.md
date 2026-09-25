@@ -61,7 +61,7 @@ src/
       layout.tsx                # root layout: <html lang>, fonts (Big Shoulders + Schibsted Grotesk + Martian Mono), metadata, DictProvider
       (site)/                   # public site (route group, URLs unchanged)
         layout.tsx              # AudioPlayerProvider, Header, Footer, PlayerDock, ConsentBanner, MotionInit, LiveLevel
-        page.tsx                # one-pager: Hero + Setlist → Shows (+ band poster) → Band/Stage plot → Photos → Booking
+        page.tsx                # one-pager: Hero + Setlist → Shows (+ band poster) → Band/Line-up → Photos → Booking
         legal/{imprint,privacy,cookies}/page.tsx  # Admin Markdown or curated fallback (src/content/legal.ts)
         not-found.tsx, [...rest]/page.tsx         # styled 404
       admin/                    # protected Admin (own chrome, noindex)
@@ -75,7 +75,7 @@ src/
     audio/                      # AudioPlayerProvider, Waveform, Setlist, PlayerDock, PlayTrackButton, LiveLevel
     consent/                    # consent contract, ConsentBanner, ExternalMediaGate, settings button
     legal/                      # LegalShell (safe renderer), LegalPage (shared server view)
-    sections/                   # Hero, Shows, Band, StagePlot, Gallery, Booking, BookingForm
+    sections/                   # Hero, Shows, Band, Lineup, Gallery, Booking, BookingForm
     site/                       # Header, Footer, LocaleSwitcher, PlatformLinks, MotionInit
     ui/                         # Icon set
   content/legal.ts              # fallback legal texts DE/EN/TR (not legal advice)

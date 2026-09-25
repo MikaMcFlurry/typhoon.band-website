@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { StagePlot } from "@/components/sections/StagePlot";
+import { Lineup } from "@/components/sections/Lineup";
 import { Icon } from "@/components/ui/Icon";
 import type { Dict } from "@/i18n/dictionaries";
 import { fill } from "@/i18n/dictionaries";
@@ -7,7 +7,7 @@ import type { Member } from "@/lib/content/types";
 
 // Who plays: the band statement set big, the story next to a live photo
 // (Site assets → bandinfo_image), the facts as rider lines, then the line-up
-// as a stage plot.
+// as taped cards (no stage positions: the band has no fixed placement).
 
 export function Band({
   dict,
@@ -80,15 +80,7 @@ export function Band({
         <div className="mt-24 md:mt-32" id="lineup">
           <h3 className="h-stage-sm reveal">{dict.members.title}</h3>
           <div className="reveal mt-8 md:mt-10">
-            <StagePlot
-              members={members.map((m) => ({
-                id: m.id,
-                name: m.name,
-                role: m.role,
-                bio: m.bio,
-                photoUrl: m.photoUrl,
-              }))}
-            />
+            <Lineup members={members} />
           </div>
         </div>
       </div>

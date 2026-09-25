@@ -156,7 +156,7 @@
       },
       "tape-green": {
         "role": "tertiary",
-        "displayName": "Position Green",
+        "displayName": "Line-up Green",
         "canonical": "rgb(61 220 132)",
         "tonalRamp": [
           "#0c4123",
@@ -388,11 +388,11 @@
   ],
   "narrative": {
     "northStar": "The Evening Seen From the Stage",
-    "overview": "You see the site the way the band sees the room: a matte black stage deck, chalk-white gaffer tape for labels, spike tape in fixed colours marking positions, and paper taped to the floor. The line-up is a stage plot, the songs are a setlist sheet, the booking request is a rider. Everything is flat and square-cut. The only depth comes from paper sheets lying on the deck.\n\nDensity is working-document density. Big, heavy upright caps carry the signage, a sturdy grotesk handles the reading, and a condensed mono holds every number (times, durations, counters, rider data). Colour means something every time it appears: it shows up only on tape and on state, never on running text. The gold hand-drawn signature is the band's name and is the only gold on public surfaces.\n\nThe world rejects the category default (a full-bleed moody band photo with a big name and a tour list) and Version A's sepia, serif and gold.",
+    "overview": "You see the site the way the band sees the room: a matte black stage deck, chalk-white gaffer tape for labels, spike tape in fixed colours, and paper taped to the floor. The line-up is a row of taped cards, the songs are a setlist sheet, the booking request is a rider. Everything is flat and square-cut. The only depth comes from paper sheets lying on the deck.\n\nDensity is working-document density. Big, heavy upright caps carry the signage, a sturdy grotesk handles the reading, and a condensed mono holds every number (times, durations, counters, rider data). Colour means something every time it appears: it shows up only on tape and on state, never on running text. The gold hand-drawn signature is the band's name and is the only gold on public surfaces.\n\nThe world rejects the category default (a full-bleed moody band photo with a big name and a tour list) and Version A's sepia, serif and gold.",
     "keyCharacteristics": [
       "Matte deck black ground, chalk text, gaffer-tape labels printed in stage ink.",
       "Four spike-tape colours, each with one job: orange for booking, pink for audio, green for the line-up, blue for dates.",
-      "Square corners everywhere, 2px rules and strips, thin plot lines, and no gradients or glow.",
+      "Square corners everywhere, 2px rules and strips, and no gradients or glow.",
       "Tape is laid on from the left, and content rises 16px. The live audio level pulses the \"now playing\" marks.",
       "Real photos, uncropped band collage, and a gold signature as the logo."
     ],
