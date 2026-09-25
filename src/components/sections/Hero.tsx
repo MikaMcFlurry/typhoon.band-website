@@ -6,13 +6,16 @@ import type { Dict } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/locales";
 
 // First viewport: the gold signature is the name, the tagline is laid as
-// three strips of tape, and the setlist is taped to the floor next to it:
-// one tap plays a song. The one orange action is booking.
+// three strips of tape; on the right a real colour stage photo with the
+// setlist taped over its corner: one tap plays a song. The one orange
+// action is booking.
 
 function titleCase(line: string, locale: Locale) {
   const lower = line.toLocaleLowerCase(locale);
   return lower.charAt(0).toLocaleUpperCase(locale) + lower.slice(1);
 }
+
+const STAGE_PHOTO = "/assets/band-cards/typhoon-band-card.jpg";
 
 const STRIPS = [
   { key: "line1", tilt: "-rotate-[1.4deg]", tape: "tape" },
@@ -87,8 +90,22 @@ export function Hero({
           </div>
         </div>
 
-        <div className="lg:col-span-5 lg:rotate-[1deg]">
-          <Setlist featuredId={featured?.id ?? null} footer={setlistFooter} tracks={tracks} />
+        <div className="relative lg:col-span-5">
+          {/* Stage photo plate (real colour live photo); the setlist is taped
+              over its lower-left corner. */}
+          <figure className="relative -mx-4 aspect-[16/10] overflow-hidden bg-deck-3 sm:mx-0 lg:ml-auto lg:w-[84%] lg:aspect-[4/3]">
+            <Image
+              alt={dict.hero.photoAlt}
+              className="object-cover object-[72%_35%]"
+              fill
+              priority
+              sizes="(min-width: 1024px) 36vw, 100vw"
+              src={STAGE_PHOTO}
+            />
+          </figure>
+          <div className="relative z-10 -mt-14 sm:-mt-20 lg:-mt-[34%] lg:w-[92%] lg:rotate-[1deg]">
+            <Setlist featuredId={featured?.id ?? null} footer={setlistFooter} tracks={tracks} />
+          </div>
         </div>
       </div>
     </section>

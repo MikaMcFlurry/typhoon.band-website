@@ -148,7 +148,7 @@ export function Setlist({
             <Row featured={t.id === featuredId} index={i} key={t.id} track={t} />
           ))}
         </ol>
-        <p className="mono mt-2 border-t-2 border-[#121110] pt-3 text-[rgba(18,17,16,0.72)]">
+        <p className="mt-2 border-t-2 border-[#121110] pt-3 text-[0.875rem] text-[rgba(18,17,16,0.76)]">
           {dict.stage.setlistNote}
         </p>
       </section>

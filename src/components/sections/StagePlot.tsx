@@ -20,17 +20,21 @@ export type PlotMember = {
 };
 
 // Schematic positions (percent of the stage area; y grows towards the
-// audience). Keyed by the fixed Admin slot, not by a name.
+// audience), the way the band stands: drums on the riser back centre, bass
+// beside it, the horn line stage left, guitars stage right, vocal front
+// centre. Keyed by the fixed Admin slot, not by a name.
 const POSITIONS: Record<string, { x: number; y: number }> = {
-  hardy: { x: 17, y: 16 },
-  tom: { x: 50, y: 14 },
-  stefan: { x: 83, y: 16 },
-  schack: { x: 17, y: 46 },
-  bugra: { x: 83, y: 46 },
-  mika: { x: 17, y: 76 },
+  tom: { x: 50, y: 15 },
+  stefan: { x: 80, y: 18 },
+  hardy: { x: 15, y: 18 },
+  schack: { x: 23, y: 41 },
+  mika: { x: 31, y: 64 },
+  bugra: { x: 82, y: 44 },
+  jurgen: { x: 70, y: 66 },
   typhoon: { x: 50, y: 74 },
-  jurgen: { x: 83, y: 76 },
 };
+
+const MONITORS = [26, 40, 54, 68];
 
 export function StagePlot({ members }: { members: PlotMember[] }) {
   const { dict } = useDict();
@@ -74,7 +78,7 @@ export function StagePlot({ members }: { members: PlotMember[] }) {
         aria-controls={`${baseId}-panel-${index}`}
         aria-selected={isSel}
         className={`group flex flex-col items-center gap-1.5 ${
-          floating ? "absolute w-[31%] -translate-x-1/2 -translate-y-1/2" : "w-auto"
+          floating ? "absolute w-[28%] -translate-x-1/2 -translate-y-1/2" : "w-auto"
         }`}
         id={`${baseId}-tab-${index}`}
         key={m.id}
@@ -100,6 +104,9 @@ export function StagePlot({ members }: { members: PlotMember[] }) {
         >
           {m.name}
         </span>
+        <span className={`mono-cap hidden max-w-full truncate sm:block ${isSel ? "text-green" : "text-chalk-2"}`}>
+          {m.role}
+        </span>
       </button>
     );
   };
@@ -108,12 +115,23 @@ export function StagePlot({ members }: { members: PlotMember[] }) {
     <div className="grid gap-x-12 gap-y-8 lg:grid-cols-12">
       <div className="lg:col-span-7">
         <div aria-label={dict.stage.plotLabel} role="tablist">
-          <div className="relative aspect-[5/4] border-2 border-rule-2 sm:aspect-[16/11]">
+          <div className="relative aspect-[1/1.05] border-2 border-rule-2 sm:aspect-[16/11]">
             {/* Drum riser */}
-            <span aria-hidden className="absolute left-1/2 top-[5%] h-[20%] w-[30%] -translate-x-1/2 border border-dashed border-rule-2" />
+            <span aria-hidden className="absolute left-1/2 top-[3%] h-[27%] w-[32%] -translate-x-1/2 border border-dashed border-rule-2">
+              <span className="mono-cap absolute bottom-1 left-1.5 text-chalk-3">{dict.stage.riser}</span>
+            </span>
             {/* Monitor wedges along the front edge */}
-            <span aria-hidden className="absolute bottom-[3%] left-[40%] h-[4%] w-[8%] border border-rule-2" />
-            <span aria-hidden className="absolute bottom-[3%] left-[52%] h-[4%] w-[8%] border border-rule-2" />
+            {MONITORS.map((x, i) => (
+              <span
+                aria-hidden
+                className="mono-cap absolute bottom-[2.5%] flex h-[6%] w-[11%] items-center justify-center border border-rule-2 text-chalk-3"
+                key={x}
+                style={{ left: `${x}%` }}
+              >
+                <span className="hidden sm:inline">{dict.stage.monitor}&nbsp;</span>
+                {i + 1}
+              </span>
+            ))}
             {onPlot.map((m) => tab(m, true))}
           </div>
           <p aria-hidden className="mono-cap mt-2 border-t-[3px] border-chalk pt-2 text-center text-chalk-2">
@@ -126,7 +144,7 @@ export function StagePlot({ members }: { members: PlotMember[] }) {
             </div>
           ) : null}
         </div>
-        <p className="mono mt-4 text-chalk-3">{dict.stage.plotHint}</p>
+        <p className="mt-4 text-[0.9375rem] text-chalk-2">{dict.stage.plotHint}</p>
       </div>
 
       <div className="lg:col-span-5">
@@ -139,13 +157,13 @@ export function StagePlot({ members }: { members: PlotMember[] }) {
             role="tabpanel"
             tabIndex={0}
           >
-            <article className="grid grid-cols-[112px_minmax(0,1fr)] gap-x-5 gap-y-4 sm:grid-cols-[160px_minmax(0,1fr)] lg:grid-cols-1">
-              <div className="relative aspect-[4/5] w-full overflow-hidden bg-deck-3 lg:w-[220px]">
+            <article className="grid grid-cols-[112px_minmax(0,1fr)] gap-x-5 gap-y-5 sm:grid-cols-[180px_minmax(0,1fr)] lg:grid-cols-1">
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-deck-3 lg:max-w-[380px]">
                 <Image
                   alt={`${m.name}, ${m.role}`}
                   className="object-cover object-top"
                   fill
-                  sizes="220px"
+                  sizes="(min-width: 1024px) 380px, 180px"
                   src={m.photoUrl}
                 />
               </div>

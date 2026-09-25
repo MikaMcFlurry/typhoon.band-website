@@ -44,6 +44,7 @@ export type Dict = {
     ctaListen: string;
     ctaBook: string;
     playFeatured: string;
+    photoAlt: string;
   };
   brand: {
     genreLine: string;
@@ -213,6 +214,8 @@ export type Dict = {
     plotLabel: string;
     plotHint: string;
     audience: string;
+    riser: string;
+    monitor: string;
     more: string;
     previewTitle: string;
     previewTo: string;
@@ -315,6 +318,7 @@ const de: Dict = {
     ctaListen: "Songs anhören",
     ctaBook: "Booking anfragen",
     playFeatured: "{title} anhören",
+    photoAlt: "Typhoon-Sänger live an den roten Keyboards",
   },
   brand: {
     genreLine: "BLUESROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -342,7 +346,7 @@ const de: Dict = {
     body:
       "Typhoon sprengt Genregrenzen, ohne die eigene Handschrift zu verlieren: markante Blues-Riffs, funkige Grooves, soulige Melodien, jazzige Finessen und türkischsprachige Texte. Eine erfahrene Band, die live sofort zündet.",
     lead:
-      "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.\n\nIm Zentrum steht ein eingespieltes Kollektiv aus acht erfahrenen Musikern mit über 30 Jahren Bühnenerfahrung, getragen von Gesang, Bläsersatz und einer groovenden Rhythmusgruppe.\n\nIm eigenen Kanzlei Studio in Hechingen produziert die Band ihre Arrangements mit viel Liebe zum Detail und moderner Technik. Das Ergebnis ist ein Gesamtpaket aus handwerklicher Präzision und authentischer Spielfreude.",
+      "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.\n\nIm Zentrum steht ein eingespieltes Kollektiv erfahrener Musiker, getragen von Gesang, Bläsersatz und einer groovenden Rhythmusgruppe.",
     more: "Mehr über Typhoon",
     imageAlt: "Typhoon singt live auf der Bühne",
     cta: "Die Besetzung",
@@ -350,7 +354,6 @@ const de: Dict = {
     facts: [
       { label: "Besetzung", value: "{count} Musiker mit Bläsersatz" },
       { label: "Texte", value: "Türkisch, eigene Songs" },
-      { label: "Homebase", value: "Kanzlei Studio, Hechingen" },
     ],
   },
   members: {
@@ -525,6 +528,8 @@ const de: Dict = {
     plotLabel: "Bühnenplan der Besetzung",
     plotHint: "Tippe auf eine Position, um die Musiker kennenzulernen.",
     audience: "Publikum",
+    riser: "Drum-Riser",
+    monitor: "Mon",
     more: "Weitere Musiker",
     previewTitle: "So kommt deine Anfrage an",
     previewTo: "An",
@@ -564,6 +569,7 @@ const en: Dict = {
     ctaListen: "Listen to songs",
     ctaBook: "Booking request",
     playFeatured: "Play {title}",
+    photoAlt: "Typhoon's singer live at the red keyboards",
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -591,7 +597,7 @@ const en: Dict = {
     body:
       "Typhoon breaks genre boundaries without losing their handwriting: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
     lead:
-      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of eight experienced musicians with more than 30 years of stage experience, built on vocals, a horn section and a grooving rhythm section.\n\nIn their own Kanzlei Studio in Hechingen, the band works out its arrangements with great attention to detail and modern equipment. The result is a complete package of craftsmanship and genuine joy of playing.",
+      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of experienced musicians, built on vocals, a horn section and a grooving rhythm section.",
     more: "More about Typhoon",
     imageAlt: "Typhoon singing live on stage",
     cta: "Meet the line-up",
@@ -599,7 +605,6 @@ const en: Dict = {
     facts: [
       { label: "Line-up", value: "{count} musicians incl. horn section" },
       { label: "Lyrics", value: "Turkish, original songs" },
-      { label: "Home base", value: "Kanzlei Studio, Hechingen (DE)" },
     ],
   },
   members: {
@@ -772,6 +777,8 @@ const en: Dict = {
     plotLabel: "Stage plot of the line-up",
     plotHint: "Tap a position to meet the musicians.",
     audience: "Audience",
+    riser: "Drum riser",
+    monitor: "Mon",
     more: "More musicians",
     previewTitle: "This is how your request arrives",
     previewTo: "To",
@@ -811,6 +818,7 @@ const tr: Dict = {
     ctaListen: "Şarkıları dinle",
     ctaBook: "Booking talebi",
     playFeatured: "{title} dinle",
+    photoAlt: "Typhoon solisti kırmızı klavyelerde canlı",
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -838,7 +846,7 @@ const tr: Dict = {
     body:
       "Typhoon, kendi imzasını kaybetmeden tür sınırlarını aşar: vurucu blues riff'leri, funky groove'lar, ruhlu melodiler, jazz incelikleri ve Türkçe sözler. Sahneye çıktığı an alev alan tecrübeli bir grup.",
     lead:
-      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.\n\nMerkezde, 30 yılı aşkın sahne tecrübesine sahip sekiz deneyimli müzisyenden oluşan uyumlu bir kolektif var; vokal, nefesli grubu ve groove dolu bir ritim grubu.\n\nGrup, Hechingen'deki kendi Kanzlei Studio'sunda düzenlemelerini büyük bir özen ve modern teknikle hazırlar. Sonuç: ustalık ve içten çalma keyfinin bir araya geldiği eksiksiz bir paket.",
+      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.\n\nMerkezde deneyimli müzisyenlerden oluşan uyumlu bir kolektif var; vokal, nefesli grubu ve groove dolu bir ritim grubu.",
     more: "Typhoon hakkında daha fazla",
     imageAlt: "Typhoon sahnede canlı söylüyor",
     cta: "Kadroyu tanıyın",
@@ -846,7 +854,6 @@ const tr: Dict = {
     facts: [
       { label: "Kadro", value: "Nefesli grubuyla {count} müzisyen" },
       { label: "Sözler", value: "Türkçe, kendi şarkıları" },
-      { label: "Merkez", value: "Kanzlei Studio, Hechingen (Almanya)" },
     ],
   },
   members: {
@@ -1019,6 +1026,8 @@ const tr: Dict = {
     plotLabel: "Kadronun sahne planı",
     plotHint: "Müzisyenleri tanımak için bir pozisyona dokun.",
     audience: "Seyirci",
+    riser: "Davul platformu",
+    monitor: "Mon",
     more: "Diğer müzisyenler",
     previewTitle: "Talebin bize böyle ulaşır",
     previewTo: "Alıcı",

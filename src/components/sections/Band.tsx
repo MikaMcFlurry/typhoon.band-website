@@ -44,7 +44,7 @@ export function Band({
             <p className="copy-lg reveal">{dict.about.body}</p>
 
             <details className="group reveal mt-6">
-              <summary className="mono-cap inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-chalk hover:text-chalk-2 [&::-webkit-details-marker]:hidden">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 font-semibold text-chalk hover:text-chalk-2 [&::-webkit-details-marker]:hidden">
                 <span className="border-b-[3px] border-gaffer pb-0.5">{dict.about.more}</span>
                 <Icon className="transition-transform group-open:rotate-180" name="arrow-down" size={16} />
               </summary>

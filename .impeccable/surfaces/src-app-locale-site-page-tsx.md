@@ -30,5 +30,10 @@ Signature interaction: while a song plays, the live Web Audio level drives the p
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
+## Build decisions (recorded after the first finish review)
+- Third tagline strip is pink (audio role), orange stays booking-only.
+- The admin hero image (band collage, must stay whole) is the band poster in Shows; the first viewport's photo plate is the live colour photo `public/assets/band-cards/typhoon-band-card.jpg`.
+- Booking section sits on deck black; orange = heading tape + submit.
+
 ## Unresolved
 - Line-up slot 8 (live DB: Tan – Percussion) — rendered from data, no copy change.

@@ -120,11 +120,21 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
     setDraft({
       name: data.name,
       email: data.email,
+      phone: data.phone,
       event_date: data.event_date,
       event_location: data.event_location,
       event_type: data.event_type,
       message: data.message,
     });
+    // Once a field was flagged, re-check it while the visitor corrects it;
+    // the summary alert goes away when nothing is left to fix.
+    if (Object.keys(errors).length > 0) {
+      const now = validate(data);
+      const next: Errors = {};
+      for (const k of Object.keys(errors) as FieldKey[]) if (now[k]) next[k] = now[k];
+      setErrors(next);
+      if (Object.keys(next).length === 0 && status.kind === "error") setStatus({ kind: "idle" });
+    }
   }
 
   const done = status.kind === "sent" || status.kind === "fallback";
@@ -184,6 +194,7 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
   const previewRows: [string, React.ReactNode][] = [
     [dict.stage.previewTo, email],
     [dict.stage.previewFrom, from || empty],
+    [t.phoneLabel, draft.phone?.trim() || empty],
     [t.dateLabel, dateText || empty],
     [t.locationLabel, draft.event_location?.trim() || empty],
     [t.typeLabel, typeKey && t.types[typeKey] ? t.types[typeKey] : empty],
@@ -193,31 +204,12 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
     <div className="grid gap-x-12 gap-y-12 lg:grid-cols-12">
       <div className="lg:col-span-5">
         {aside}
-        {!done ? (
-          <aside aria-label={dict.stage.previewTitle} className="relative mt-12 hidden bg-chalk p-5 lg:block">
-            <span aria-hidden className="tape-piece -top-2.5 left-5 -rotate-3 !bg-[#121110] !opacity-90" />
-            <p className="font-stage text-[1.375rem] font-extrabold uppercase leading-none">{dict.stage.previewTitle}</p>
-            <dl className="mono mt-4 flex flex-col gap-1.5">
-              {previewRows.map(([k, v]) => (
-                <div className="grid grid-cols-[8.5rem_minmax(0,1fr)] gap-3" key={k}>
-                  <dt className="text-[rgba(18,17,16,0.62)]">{k}</dt>
-                  <dd className="min-w-0 break-words">{v}</dd>
-                </div>
-              ))}
-            </dl>
-            {draft.message?.trim() ? (
-              <p className="mt-4 line-clamp-4 border-t border-[rgba(18,17,16,0.25)] pt-3 text-[0.9375rem] leading-relaxed">
-                {draft.message.trim()}
-              </p>
-            ) : null}
-          </aside>
-        ) : null}
       </div>
 
       <div className="lg:col-span-7 [--focus:var(--chalk)]">
         {done ? (
           <div
-            className="flex min-h-[420px] flex-col items-start justify-center bg-deck p-6 text-chalk outline-none md:p-10"
+            className="flex min-h-[420px] flex-col items-start justify-center bg-deck-2 p-6 text-chalk outline-none md:p-10"
             ref={resultRef}
             role="status"
             tabIndex={-1}
@@ -249,7 +241,7 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
           </div>
         ) : (
           <form
-            className="relative bg-deck p-5 text-chalk sm:p-7 md:p-9"
+            className="relative bg-deck-2 p-5 text-chalk sm:p-7 md:p-9"
             noValidate
             onInput={onDraft}
             onSubmit={onSubmit}
@@ -297,7 +289,23 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
               )}
             </div>
 
-            <div className="mt-8 flex flex-col gap-5 border-t border-rule pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <aside aria-label={dict.stage.previewTitle} className="relative mt-10 bg-chalk p-4 text-[#121110] sm:p-5">
+              <span aria-hidden className="tape-piece -top-2.5 left-5 -rotate-3 !bg-orange" />
+              <p className="font-stage text-[1.375rem] font-extrabold uppercase leading-none">{dict.stage.previewTitle}</p>
+              <dl className="mono mt-4 flex flex-col gap-1.5">
+                {previewRows.map(([k, v]) => (
+                  <div className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] gap-3 sm:grid-cols-[10rem_minmax(0,1fr)]" key={k}>
+                    <dt className="text-[rgba(18,17,16,0.66)]">{k}</dt>
+                    <dd className="min-w-0 [overflow-wrap:anywhere]">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-4 whitespace-pre-line border-t border-[rgba(18,17,16,0.25)] pt-3 text-[0.9375rem] leading-relaxed [overflow-wrap:anywhere]">
+                {draft.message?.trim() ? draft.message.trim() : <>{t.messageLabel}: {empty}</>}
+              </p>
+            </aside>
+
+            <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="max-w-[46ch] text-[0.875rem] leading-relaxed text-chalk-2">
                 {t.privacyNote}{" "}
                 <Link className="link-u text-chalk" href={`/${locale}/legal/privacy`}>

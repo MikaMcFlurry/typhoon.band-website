@@ -109,9 +109,17 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
           {dict.media.title}
         </h2>
 
-        <ul className="mt-10 grid grid-cols-2 gap-2 md:mt-14 md:grid-cols-12 md:gap-3">
+        <ul className="mt-10 grid grid-cols-2 gap-3 md:mt-14 md:grid-cols-12 md:gap-4">
           {items.map((item, i) => (
-            <li className={`reveal ${tileClass(i, count)}`} key={item.id} style={{ ["--reveal-delay" as string]: `${(i % 4) * 50}ms` }}>
+            <li className={`reveal relative ${tileClass(i, count)}`} key={item.id} style={{ ["--reveal-delay" as string]: `${(i % 4) * 50}ms` }}>
+              {/* Contact sheet: each print is taped to the wall and numbered. */}
+              <span
+                aria-hidden
+                className={`tape-piece pointer-events-none -top-2 left-1/2 z-10 !h-4 !w-14 -translate-x-1/2 !bg-gaffer ${i % 2 ? "rotate-3" : "-rotate-2"}`}
+              />
+              <span aria-hidden className="mono-cap pointer-events-none absolute bottom-2 left-2 z-10 bg-deck px-1.5 py-0.5 text-chalk">
+                {String(i + 1).padStart(2, "0")}
+              </span>
               <button
                 aria-label={`${dict.media.open}: ${item.alt}`}
                 className="group relative block size-full overflow-hidden bg-deck-3 outline-offset-4 hover:outline hover:outline-2 hover:outline-chalk"

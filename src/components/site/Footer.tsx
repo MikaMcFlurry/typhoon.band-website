@@ -97,7 +97,7 @@ export function Footer({
       </div>
 
       <div className="border-t border-rule">
-        <div className="shell mono flex flex-col items-start justify-between gap-2 py-5 text-chalk-3 sm:flex-row sm:items-center">
+        <div className="shell flex flex-col items-start justify-between gap-2 py-5 text-[0.875rem] text-chalk-3 sm:flex-row sm:items-center">
           <p>{dict.footer.copyrightTemplate.replace("{year}", String(year))}</p>
           <a className="inline-flex min-h-11 items-center gap-2 hover:text-chalk" href="#top">
             {dict.footer.toTop}
