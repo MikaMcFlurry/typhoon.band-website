@@ -123,7 +123,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
   padding-bottom: var(--dock-h);
-  transition: padding-bottom 240ms var(--ease-out);
   caret-color: var(--tape-pink);
 }
 

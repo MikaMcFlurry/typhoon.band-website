@@ -6,16 +6,19 @@ Durable rules for Claude Code in the new `typhoon.band-website` repository.
 
 ## Absolute source of truth order
 
-Since the 2026 redesign (owner request, September 2026: "komplett neue,
-viel bessere Website"), the visual source of truth is the design system in
-`docs/design/DESIGN.md`. The Claude Design handoff in `/handoff` is kept as a
-historical reference for the elements the owner approved (see DESIGN.md).
+This branch (`claude/typhoon-website-impeccable`) carries **Version B**, an
+independent redesign made with the Impeccable design skill (owner request
+2026-09-25). Its visual source of truth is the **root `DESIGN.md`** (written
+from the built world) together with `PRODUCT.md` and the direction contract in
+`.impeccable/surfaces/src-app-locale-site-page-tsx.md`. Version A's
+`docs/design/DESIGN.md` (branch `claude/typhoon-website-redesign-7xjozt`) is
+an anti-reference here, not a template.
 
-1. Explicit owner instructions and `docs/design/DESIGN.md` (visuals, layout,
-   typography, components, responsive behaviour).
+1. Explicit owner instructions, root `DESIGN.md` and `PRODUCT.md` (visuals,
+   layout, typography, components, responsive behaviour, product truth).
 2. Real uploaded assets in the repository:
-   - hero image
-   - Typhoon logo
+   - hero image / band collage (shown whole as the band poster)
+   - Typhoon logo (gold signature PNG — never re-set in a font)
    - demo MP3s
    - gallery assets
    - band info card assets for Mika and Typhoon
@@ -25,17 +28,19 @@ historical reference for the elements the owner approved (see DESIGN.md).
    - Source behavior files:
      - `src/components/audio/AudioPlayerProvider.tsx`
      - `src/components/audio/Waveform.tsx`
-4. These project docs in `/docs` (redesign report:
-   `docs/redesign/2026-09-redesign.md`)
+4. These project docs in `/docs` (Version B note: `docs/redesign/VERSION-B.md`;
+   parity checklist: `docs/redesign/2026-09-redesign.md`)
 5. Claude Design handoff files (`/handoff`) — historical reference only.
 
 Do not use old failed frontend layouts as inspiration.
 
 ## Current goal
 
-Ship the redesigned Typhoon website (branch `claude/typhoon-website-redesign-7xjozt`)
-following `docs/design/DESIGN.md`, while the architecture stays ready for
-Supabase, Resend, Admin, Booking, media/audio and later shop.
+Ship Version B (branch `claude/typhoon-website-impeccable`) following the
+root `DESIGN.md`, as an alternative to Version A, while the architecture stays
+ready for Supabase, Resend, Admin, Booking, media/audio and later shop.
+Design changes go through the Impeccable skill (`.claude/skills/impeccable`):
+refinements inherit DESIGN.md; a new visual world needs a new direction round.
 
 ## Stack
 
@@ -48,7 +53,8 @@ Supabase, Resend, Admin, Booking, media/audio and later shop.
 
 ## Non-negotiable frontend rule
 
-`docs/design/DESIGN.md` controls:
+The root `DESIGN.md` controls (public site only; the admin keeps its own
+palette and fonts via the `.admin-root` wrapper):
 - player size
 - player card layout
 - spacing
@@ -67,6 +73,8 @@ The old Claude branch controls only:
 - seek/progress behavior
 
 Do not copy the old player card visual layout if it conflicts with DESIGN.md.
+Backend, admin, API, `src/lib/**`, `src/middleware.ts` and `supabase/**` are
+design-agnostic: a visual change never changes their behaviour.
 
 Content rules that stay: the repo fallback lists 8 members in the documented
 order (Typhoon, Mika, Schack, Hardy, Stefan, Tom, Buğra, Jürgen — never
@@ -104,7 +112,7 @@ Fix all errors.
 
 Always summarize:
 1. changed files
-2. design system (DESIGN.md) implementation status
+2. design system (root DESIGN.md, Version B) implementation status
 3. audio player behavior integration
 4. asset usage for hero, gallery and band info cards
 5. backend/Supabase/Resend foundation status

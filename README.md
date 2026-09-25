@@ -11,6 +11,14 @@ redesign**: a completely rebuilt public frontend on a new design system
 report — live-version analysis, feature parity, changes and open owner
 decisions — is in [`docs/redesign/2026-09-redesign.md`](docs/redesign/2026-09-redesign.md).
 
+The branch `claude/typhoon-website-impeccable` contains **Version B**, an
+independent alternative redesign made with the Impeccable design skill
+("Bühnenplan & Setlist": the evening seen from the stage). Its visual source
+of truth is the root [`DESIGN.md`](DESIGN.md) with [`PRODUCT.md`](PRODUCT.md);
+the comparison with Version A and the verification evidence are in
+[`docs/redesign/VERSION-B.md`](docs/redesign/VERSION-B.md). Backend, admin and
+API are identical to Version A.
+
 Architecture is ready for Supabase, Resend, Admin and Booking. The public
 site keeps rendering when no backend env vars are configured (static
 fallback content + graceful booking fallback).
@@ -50,26 +58,26 @@ src/
   middleware.ts                 # locale redirect (Accept-Language) + admin Supabase session refresh
   app/
     [locale]/
-      layout.tsx                # root layout: <html lang>, fonts (Archivo + Newsreader), metadata, DictProvider
+      layout.tsx                # root layout: <html lang>, fonts (Big Shoulders + Schibsted Grotesk + Martian Mono), metadata, DictProvider
       (site)/                   # public site (route group, URLs unchanged)
-        layout.tsx              # AudioPlayerProvider, Header, Footer, PlayerDock, ConsentBanner, MotionInit
-        page.tsx                # one-pager: Hero → Featured single → Shows → Band/Line-up → Music → Photos → Booking
+        layout.tsx              # AudioPlayerProvider, Header, Footer, PlayerDock, ConsentBanner, MotionInit, LiveLevel
+        page.tsx                # one-pager: Hero + Setlist → Shows (+ band poster) → Band/Stage plot → Photos → Booking
         legal/{imprint,privacy,cookies}/page.tsx  # Admin Markdown or curated fallback (src/content/legal.ts)
         not-found.tsx, [...rest]/page.tsx         # styled 404
       admin/                    # protected Admin (own chrome, noindex)
-        layout.tsx              # admin top bar; auth gating happens per route
+        layout.tsx              # admin top bar + own fonts (.admin-root); auth gating happens per route
         login/, change-password/, booking/, shows/, media/, music/, members/,
         settings/assets/, legal/, seo/, platform-links/, consent/
     api/booking/route.ts        # POST handler (same-origin JSON, rate limit, validation, Supabase + Resend)
     api/admin/auth/logout/      # POST handler — clears Supabase session cookies
     sitemap.ts, robots.ts, manifest.ts
   components/
-    audio/                      # AudioPlayerProvider, Waveform, FeaturedPlayer, PlayerDock, PlayTrackButton
+    audio/                      # AudioPlayerProvider, Waveform, Setlist, PlayerDock, PlayTrackButton, LiveLevel
     consent/                    # consent contract, ConsentBanner, ExternalMediaGate, settings button
     legal/                      # LegalShell (safe renderer), LegalPage (shared server view)
-    sections/                   # Hero, Shows, Band, Music, Gallery, Booking, BookingForm
+    sections/                   # Hero, Shows, Band, StagePlot, Gallery, Booking, BookingForm
     site/                       # Header, Footer, LocaleSwitcher, PlatformLinks, MotionInit
-    ui/                         # Icon set, CollapsibleList
+    ui/                         # Icon set
   content/legal.ts              # fallback legal texts DE/EN/TR (not legal advice)
   data/                         # static seed data (members, songs + covers, gallery + alt texts, site)
   i18n/                         # locale registry + dictionaries (de/en/tr)
@@ -91,7 +99,10 @@ supabase/
 public/
   assets/                       # hero, branding, members, band-cards, gallery, audio/demos
   og-image.jpg, icon.svg, icon-192.png, icon-512.png, apple-icon.png
-docs/design/DESIGN.md           # design system of the redesign (tokens, type, components, rules)
+DESIGN.md, PRODUCT.md           # Version B design system + product record (Impeccable)
+.impeccable/                    # Impeccable direction round + surface brief (dev only, never shipped)
+.claude/skills/impeccable/      # Impeccable design skill (v4.4.0, Apache-2.0) + agents in .claude/agents
+docs/design/DESIGN.md           # Version A design system (anti-reference for Version B)
 handoff/                        # historical Claude Design handoff (reference only since the redesign)
 ```
 

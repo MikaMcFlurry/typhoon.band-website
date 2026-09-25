@@ -131,10 +131,10 @@ export function ConsentBanner() {
           <div className="mt-1.5">{links}</div>
         </div>
         <div className="mt-3 grid flex-none grid-cols-2 gap-2 md:mt-0 md:w-[380px]">
-          <button className="btn-line btn-sm border-[#121110] px-2 text-[#121110] hover:bg-[#121110] hover:text-chalk" onClick={() => decide(false)} type="button">
+          <button className="btn-line btn-sm whitespace-normal border-[#121110] px-2 text-center text-[0.9375rem] text-[#121110] hover:bg-[#121110] hover:text-chalk sm:text-[1.0625rem]" onClick={() => decide(false)} type="button">
             {dict.cookies.decline}
           </button>
-          <button className="btn-line btn-sm border-[#121110] bg-[#121110] px-2 text-chalk hover:bg-transparent hover:text-[#121110]" onClick={() => decide(true)} type="button">
+          <button className="btn-line btn-sm whitespace-normal border-[#121110] bg-[#121110] px-2 text-center text-[0.9375rem] text-chalk hover:bg-transparent hover:text-[#121110] sm:text-[1.0625rem]" onClick={() => decide(true)} type="button">
             {dict.cookies.acceptShort}
           </button>
         </div>
