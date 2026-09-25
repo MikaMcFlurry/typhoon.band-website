@@ -56,7 +56,7 @@ export function Hero({
               src={signatureUrl}
               width={2099}
             />
-            <span className="mt-6 flex flex-col items-start gap-2 font-stage text-[clamp(2.5rem,0.9rem+7vw,6rem)] font-black uppercase leading-[0.92] md:mt-8">
+            <span className="mt-6 flex flex-col items-start gap-2 font-stage text-[clamp(2.5rem,0.9rem+7vw,6rem)] lg:text-[4.25rem] xl:text-[clamp(2.5rem,0.9rem+7vw,6rem)] font-black uppercase leading-[0.92] md:mt-8">
               {STRIPS.map((s, i) => (
                 <span
                   className={`lay ${s.tape} ${s.tilt} origin-left`}
