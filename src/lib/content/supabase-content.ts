@@ -188,15 +188,17 @@ export async function fetchShows(): Promise<Maybe<ShowRow[]>> {
       .order("starts_at", { ascending: true, nullsFirst: false })
       .order("sort_order", { ascending: true });
     if (error || !data) return null;
-    // The normaliser still expects `starts_at` as a string; substitute
-    // an empty string for TBA rows so the formatter falls back to "TBA".
+    // TBA rows keep `starts_at: null` + `is_tba` so they render publicly
+    // (the old mapping to "" made the home page drop them).
     return data.map((row) => ({
       id: row.id,
-      starts_at: row.starts_at ?? "",
+      starts_at: row.starts_at ?? null,
+      is_tba: row.is_tba,
       venue: row.venue,
       city: row.city,
       country: row.country,
       ticket_url: row.ticket_url,
+      event_type: row.event_type,
       is_visible: row.is_visible,
       sort_order: row.sort_order,
     }));

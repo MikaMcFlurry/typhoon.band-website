@@ -1,21 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import { useAudioPlayer } from "@/components/audio/AudioPlayerProvider";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  formatTime,
+  useAudioPlayer,
+  useAudioTime,
+} from "@/components/audio/AudioPlayerProvider";
+
+// Live waveform. Behaviour ported 1:1 from the old Claude branch:
+//   - deterministic idle shape per song id (xfnv1a seed → mulberry32)
+//   - live FFT amplitude from the shared AnalyserNode while this song plays
+//   - peak hold (×0.85 decay), smooth return to the idle shape on pause
+// Redesign additions: keyboard-operable seek slider (←/→ 5 s, Home/End),
+// reduced-motion support (static bars, no rAF loop) and played/unplayed
+// colouring through data attributes instead of class churn.
 
 type WaveformProps = {
   songId: string;
+  title: string;
   bars?: number;
   className?: string;
-  /** Tailwind height utility for the waveform container. */
+  /** Tailwind height utility for the container. */
   heightClass?: string;
-  /** When true, paused bars render at very low amplitude (compact look). */
-  flatWhenPaused?: boolean;
-  /** Click-to-seek callback. */
-  onSeek?: (ratio: number) => void;
+  /** Enables click/drag/keyboard seeking. */
+  seekable?: boolean;
+  /** Accessible label for the seek slider. */
+  label?: string;
 };
 
-/** Hash a string into a stable seed (xfnv1a). */
 function seedFromId(id: string) {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < id.length; i++) {
@@ -25,7 +37,6 @@ function seedFromId(id: string) {
   return h;
 }
 
-/** Tiny seeded PRNG (mulberry32). */
 function mulberry32(a: number) {
   return function next() {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -36,29 +47,35 @@ function mulberry32(a: number) {
   };
 }
 
-/**
- * Live waveform visualiser. Visual styling matches the Claude Design handoff
- * (`.waveform .wave-bar` in handoff/assets/typhoon-shared.css):
- *   - 3px-wide bars, 2px gap
- *   - unplayed = bronze (#6f4a1f), played = champagne gold (#e8c982)
- * Behaviour matches the old Claude branch AudioPlayerProvider/Waveform:
- *   - deterministic idle shape per song id
- *   - live FFT-driven amplitude when this song is the active player
- *   - smooth scale-Y transition back to idle when paused
- */
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return reduced;
+}
+
 export function Waveform({
   songId,
+  title,
   bars = 64,
   className = "",
-  heightClass = "h-9",
-  flatWhenPaused = false,
-  onSeek,
+  heightClass = "h-10",
+  seekable = false,
+  label,
 }: WaveformProps) {
-  const { currentId, isPlaying, progress, getAnalyser } = useAudioPlayer();
+  const { currentId, isPlaying, getAnalyser, seek, duration, toggle } =
+    useAudioPlayer();
+  const { progress, position } = useAudioTime();
   const isCurrent = currentId === songId;
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
   const barRefs = useRef<HTMLSpanElement[]>([]);
   const peaksRef = useRef<number[]>([]);
+  const draggingRef = useRef(false);
 
   const idleHeights = useMemo(() => {
     const rng = mulberry32(seedFromId(songId));
@@ -67,20 +84,18 @@ export function Waveform({
       const envelope =
         0.5 + 0.4 * Math.sin(Math.PI * t) + 0.18 * Math.sin(Math.PI * t * 3);
       const jitter = 0.55 + 0.85 * rng();
-      const v = envelope * jitter;
-      return Math.min(1, Math.max(0.16, v));
+      return Math.min(1, Math.max(0.16, envelope * jitter));
     });
   }, [songId, bars]);
 
+  // Live analyser loop (only for the active, playing song).
   useEffect(() => {
-    if (!isCurrent || !isPlaying) return;
+    if (!isCurrent || !isPlaying || reducedMotion) return;
     const analyser = getAnalyser();
     if (!analyser) return;
-
     const data = new Uint8Array(analyser.frequencyBinCount);
     const usableBins = Math.floor(data.length * 0.72);
     peaksRef.current = new Array(bars).fill(0);
-
     let raf = 0;
     const tick = () => {
       analyser.getByteFrequencyData(data);
@@ -102,54 +117,104 @@ export function Waveform({
     };
     tick();
     return () => cancelAnimationFrame(raf);
-  }, [isCurrent, isPlaying, getAnalyser, bars]);
+  }, [isCurrent, isPlaying, getAnalyser, bars, reducedMotion]);
 
+  // Return to the idle shape whenever not animating.
   useEffect(() => {
-    if (isCurrent && isPlaying) return;
+    if (isCurrent && isPlaying && !reducedMotion) return;
     const refs = barRefs.current;
     for (let i = 0; i < bars; i++) {
-      const target = flatWhenPaused
-        ? 0.32 + 0.18 * Math.sin(i * 0.45)
-        : idleHeights[i];
       const node = refs[i];
-      if (node) node.style.transform = `scaleY(${target.toFixed(3)})`;
+      if (node) node.style.transform = `scaleY(${idleHeights[i].toFixed(3)})`;
     }
-  }, [isCurrent, isPlaying, idleHeights, bars, flatWhenPaused]);
+  }, [isCurrent, isPlaying, idleHeights, bars, reducedMotion]);
 
   const playedTo = Math.floor((isCurrent ? progress : 0) * bars);
 
-  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (!onSeek) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-    onSeek(ratio);
+  function ratioFromEvent(clientX: number, el: HTMLElement) {
+    const r = el.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (clientX - r.left) / r.width));
   }
+
+  function seekTo(ratio: number) {
+    if (!isCurrent) {
+      // Clicking a waveform of an inactive song starts it (the old player
+      // ignored the click, which felt broken).
+      toggle(songId);
+      return;
+    }
+    seek(songId, ratio);
+  }
+
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    if (!seekable) return;
+    draggingRef.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    seekTo(ratioFromEvent(e.clientX, e.currentTarget));
+  }
+  function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (!seekable || !draggingRef.current || !isCurrent) return;
+    seek(songId, ratioFromEvent(e.clientX, e.currentTarget));
+  }
+  function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    draggingRef.current = false;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  }
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (!seekable || !isCurrent || !duration) return;
+    const step = 5 / duration;
+    let next: number | null = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowUp") next = progress + step;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = progress - step;
+    if (e.key === "PageUp") next = progress + step * 6;
+    if (e.key === "PageDown") next = progress - step * 6;
+    if (e.key === "Home") next = 0;
+    if (e.key === "End") next = 0.999;
+    if (next === null) return;
+    e.preventDefault();
+    seek(songId, Math.max(0, Math.min(1, next)));
+  }
+
+  const sliderProps = seekable
+    ? {
+        role: "slider" as const,
+        tabIndex: isCurrent ? 0 : -1,
+        "aria-label": label ?? title,
+        "aria-valuemin": 0,
+        "aria-valuemax": Math.round(isCurrent ? duration : 0),
+        "aria-valuenow": Math.round(isCurrent ? position : 0),
+        "aria-valuetext": `${formatTime(isCurrent ? position : 0)} / ${formatTime(isCurrent ? duration : 0)}`,
+        "aria-disabled": !isCurrent,
+        onKeyDown,
+        onPointerDown,
+        onPointerMove,
+        onPointerUp,
+        onPointerCancel: onPointerUp,
+      }
+    : { "aria-hidden": true as const };
 
   return (
     <div
-      aria-hidden
-      className={`relative flex min-w-0 items-center gap-[2px] overflow-hidden ${heightClass} ${
-        onSeek ? "cursor-pointer" : ""
+      className={`relative flex min-w-0 touch-none select-none items-center gap-[2px] ${heightClass} ${
+        seekable ? "cursor-pointer" : ""
       } ${className}`}
-      onClick={onSeek ? handleClick : undefined}
-      ref={containerRef}
+      {...sliderProps}
     >
-      {idleHeights.map((_, i) => (
+      {idleHeights.map((h, i) => (
         <span
-          className={`origin-center w-[1px] flex-1 max-w-[3px] rounded-[1px] ${
-            i < playedTo
-              ? "bg-[color:var(--gold-soft)]"
-              : "bg-[color:var(--bronze)]"
-          }`}
+          className="wave-bar"
+          data-played={i < playedTo ? "true" : "false"}
           key={i}
           ref={(el) => {
             if (el) barRefs.current[i] = el;
           }}
           style={{
-            height: "100%",
-            transform: `scaleY(${idleHeights[i].toFixed(3)})`,
+            transform: `scaleY(${h.toFixed(3)})`,
             transition:
-              isCurrent && isPlaying
+              isCurrent && isPlaying && !reducedMotion
                 ? "background-color 200ms ease"
                 : "transform 360ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease",
           }}

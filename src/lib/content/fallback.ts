@@ -5,7 +5,6 @@
 
 import { gallery as galleryFallback } from "@/data/gallery";
 import { members as membersFallback } from "@/data/members";
-import { upcomingShows } from "@/data/shows";
 import { site as siteFallback } from "@/data/site";
 import { songs as songsFallback, featuredSong } from "@/data/songs";
 import { getDict } from "@/i18n/dictionaries";
@@ -96,17 +95,12 @@ export function buildGalleryFallback(): GalleryItem[] {
   }));
 }
 
-export function buildShowsFallback(locale: Locale): ShowItem[] {
-  const dict = getDict(locale);
-  return upcomingShows.map((s, i) => ({
-    id: s.id,
-    title: dict.shows.placeholderTitles[i] ?? s.venue,
-    region: dict.shows.placeholderRegion[i] ?? s.city,
-    time: dict.shows.placeholderTime[i] ?? s.time,
-    startsAt: null,
-    ticketUrl: null,
-    sortOrder: i + 1,
-  }));
+export function buildShowsFallback(_locale: Locale): ShowItem[] {
+  // No real dates exist in the repo and we never invent events. The UI
+  // renders an honest "new dates are being planned" state instead of the
+  // old TBA placeholder cards.
+  void _locale;
+  return [];
 }
 
 export function buildLegalPageFallback(

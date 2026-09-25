@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  type PlaylistEntry,
-  useAudioPlayer,
-} from "@/components/audio/AudioPlayerProvider";
+import { type Track, useAudioPlayer } from "@/components/audio/AudioPlayerProvider";
 
-// Tells the AudioPlayerProvider which tracks form the active playlist so
-// `next()` / `previous()` know what to skip to. Mounted once per page.
-export function PlaylistRegistrar({ playlist }: { playlist: PlaylistEntry[] }) {
+// Tells the AudioPlayerProvider which tracks form the playlist so next(),
+// previous(), auto-advance, the dock and the Media Session know what to play.
+export function PlaylistRegistrar({ playlist }: { playlist: Track[] }) {
   const { setPlaylist } = useAudioPlayer();
   useEffect(() => {
     setPlaylist(playlist);

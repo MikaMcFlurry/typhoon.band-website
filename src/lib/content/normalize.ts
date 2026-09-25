@@ -243,14 +243,32 @@ export function normaliseGallery(
 
 export type ShowRow = {
   id: string;
-  starts_at: string;
+  /** ISO timestamp or null for TBA rows. */
+  starts_at: string | null;
+  is_tba?: boolean | null;
   venue: string;
   city: string | null;
   country: string | null;
   ticket_url: string | null;
+  event_type?: string | null;
   is_visible: boolean | null;
   sort_order: number | null;
 };
+
+// The admin stores the wall-clock date/time the band typed as if it were
+// UTC (`${date}T${time || "12:00"}:00.000Z`, see lib/validation/show.ts).
+// Reading it back in UTC therefore yields exactly what was entered, and
+// "12:00" is the admin's "no time given" placeholder.
+const NO_TIME_PLACEHOLDER = "12:00";
+
+function wallClock(iso: string | null): { date: string | null; time: string | null } {
+  if (!iso) return { date: null, time: null };
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return { date: null, time: null };
+  const stamp = d.toISOString();
+  const time = stamp.slice(11, 16);
+  return { date: stamp.slice(0, 10), time: time === NO_TIME_PLACEHOLDER ? null : time };
+}
 
 export function normaliseShows(
   rows: ShowRow[],
@@ -260,21 +278,33 @@ export function normaliseShows(
   return rows
     .filter((r) => r.is_visible !== false)
     .map((row, i) => {
-      const date = new Date(row.starts_at);
-      const day = Number.isFinite(date.getTime())
-        ? date.toLocaleDateString("de-DE", { day: "2-digit", month: "short" })
-        : "TBA";
+      const { date, time } = wallClock(row.starts_at);
+      const isTba = Boolean(row.is_tba) || !date;
+      const region = [row.city, row.country].filter(Boolean).join(", ");
       return {
         id: row.id,
         title: row.venue,
-        region: [row.city, row.country].filter(Boolean).join(", ") || "—",
-        time: day,
-        startsAt: row.starts_at,
+        region: region || "—",
+        time: time ?? "",
+        startsAt: row.starts_at || null,
         ticketUrl: pickStringOrNull(row.ticket_url),
         sortOrder: row.sort_order ?? i + 1,
+        venue: row.venue,
+        city: pickStringOrNull(row.city),
+        country: pickStringOrNull(row.country),
+        date: isTba ? null : date,
+        startTime: isTba ? null : time,
+        isTba,
+        eventType: pickStringOrNull(row.event_type ?? null),
       };
     })
-    .sort((a, b) => a.sortOrder - b.sortOrder);
+    .sort((a, b) => {
+      // Dated shows chronologically, TBA after them, sort_order as tiebreaker.
+      if (a.date && b.date && a.date !== b.date) return a.date < b.date ? -1 : 1;
+      if (a.date && !b.date) return -1;
+      if (!a.date && b.date) return 1;
+      return a.sortOrder - b.sortOrder;
+    });
 }
 
 export type LegalRow = {

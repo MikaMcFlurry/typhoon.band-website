@@ -1,6 +1,34 @@
 import type { Locale } from "@/i18n/locales";
 
+// All public UI copy for DE / EN / TR. Band facts (member names, bios,
+// headline, band text) are the owner's wording from the live site and
+// docs/03-content-facts.md — do not paraphrase them without the owner.
+//
+// Keys under `hero`, `about`, `members`, `shows.placeholder*`, `legal`
+// and `brand` are also read by src/lib/content/fallback.ts and the admin.
+
+export type EventTypeKey =
+  | "festival"
+  | "club"
+  | "cityfest"
+  | "corporate"
+  | "private"
+  | "other";
+
 export type Dict = {
+  meta: {
+    title: string;
+    description: string;
+    ogAlt: string;
+  };
+  a11y: {
+    skip: string;
+    mainNav: string;
+    langNav: string;
+    openMenu: string;
+    closeMenu: string;
+    home: string;
+  };
   nav: {
     home: string;
     band: string;
@@ -17,20 +45,40 @@ export type Dict = {
     description: string;
     ctaListen: string;
     ctaBook: string;
+    playFeatured: string;
+    nextShow: string;
+    scrollHint: string;
   };
   brand: {
     genreLine: string;
+    genres: string[];
+  };
+  music: {
+    title: string;
+    intro: string;
+    featuredLabel: string;
+    tracklist: string;
+    trackCount: string;
+    nowPlaying: string;
+    paused: string;
+    loading: string;
+    error: string;
+    noDownload: string;
   };
   about: {
     kicker: string;
     eyebrow: string;
     headline: string;
     body: string;
+    lead: string;
     cta: string;
     ctaBook: string;
+    facts: { label: string; value: string }[];
   };
   members: {
     kicker: string;
+    title: string;
+    photoSoon: string;
     instrument: Record<string, string>;
     bio: Record<string, string>;
   };
@@ -40,27 +88,54 @@ export type Dict = {
   };
   shows: {
     kicker: string;
+    title: string;
+    intro: string;
     link: string;
+    tickets: string;
+    moreInfo: string;
+    tba: string;
+    doors: string;
+    emptyTitle: string;
+    emptyBody: string;
+    emptyCta: string;
+    past: string;
     placeholderTitles: string[];
     placeholderRegion: string[];
     placeholderTime: string[];
+    eventTypes: Record<string, string>;
   };
   media: {
     kicker: string;
+    title: string;
     open: string;
     close: string;
     prev: string;
     next: string;
+    counter: string;
   };
   booking: {
     kicker: string;
+    title: string;
+    intro: string;
+    factsTitle: string;
+    facts: { label: string; value: string }[];
+    direct: string;
+    reply: string;
     nameLabel: string;
     emailLabel: string;
     phoneLabel: string;
     dateLabel: string;
     locationLabel: string;
+    locationHint: string;
     typeLabel: string;
+    typePlaceholder: string;
+    types: Record<EventTypeKey, string>;
     messageLabel: string;
+    messageHint: string;
+    required: string;
+    optional: string;
+    privacyNote: string;
+    privacyLink: string;
     submit: string;
     submitting: string;
     requiredErr: string;
@@ -68,25 +143,52 @@ export type Dict = {
     backendNotice: string;
     submitFallback: string;
     submitOk: string;
+    submitOkTitle: string;
+    submitAnother: string;
     submitError: string;
+    errors: {
+      name: string;
+      email: string;
+      event_location: string;
+      event_type: string;
+      message: string;
+      event_date: string;
+      phone: string;
+      rate: string;
+    };
   };
   footer: {
     contact: string;
     follow: string;
+    listen: string;
     legal: string;
     imprint: string;
     privacy: string;
     cookies: string;
+    consentSettings: string;
     blurb: string;
     copyrightTemplate: string;
+    toTop: string;
+    admin: string;
   };
   cookies: {
     title: string;
     body: string;
     accept: string;
     decline: string;
+    save: string;
+    necessary: string;
+    necessaryBody: string;
+    external: string;
+    externalBody: string;
     privacyLink: string;
     cookiesLink: string;
+  };
+  gate: {
+    title: string;
+    body: string;
+    load: string;
+    always: string;
   };
   legal: {
     backToHome: string;
@@ -94,17 +196,30 @@ export type Dict = {
     privacyTitle: string;
     cookiesTitle: string;
     draftNote: string;
+    updated: string;
   };
   player: {
     play: string;
     pause: string;
+    playTrack: string;
+    pauseTrack: string;
     prev: string;
     next: string;
+    volume: string;
     volumeUp: string;
     volumeDown: string;
     mute: string;
     unmute: string;
     more: string;
+    close: string;
+    seek: string;
+    by: string;
+    dock: string;
+  };
+  notFound: {
+    title: string;
+    body: string;
+    cta: string;
   };
 };
 
@@ -172,12 +287,26 @@ const buildMemberMaps = (locale: Locale) => ({
 });
 
 const de: Dict = {
+  meta: {
+    title: "Typhoon · Bluesrock, Funk & Soul mit türkischen Texten",
+    description:
+      "Typhoon verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock. Demos anhören, Konzerte finden, Band buchen.",
+    ogAlt: "Typhoon: acht Musiker in einer Sepia-Collage mit goldenem Schriftzug",
+  },
+  a11y: {
+    skip: "Zum Inhalt springen",
+    mainNav: "Hauptnavigation",
+    langNav: "Sprache wählen",
+    openMenu: "Menü öffnen",
+    closeMenu: "Menü schließen",
+    home: "Typhoon Startseite",
+  },
   nav: {
-    home: "Home",
+    home: "Start",
     band: "Band",
-    music: "Music",
-    shows: "Termine",
-    media: "Media",
+    music: "Musik",
+    shows: "Live",
+    media: "Bilder",
     booking: "Booking",
     contact: "Kontakt",
   },
@@ -188,10 +317,27 @@ const de: Dict = {
     description:
       "Typhoon verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock – kraftvoll, warm und live voller Energie.",
     ctaListen: "Songs anhören",
-    ctaBook: "Booking Anfrage",
+    ctaBook: "Booking anfragen",
+    playFeatured: "{title} anhören",
+    nextShow: "Nächstes Konzert",
+    scrollHint: "Weiter zur Musik",
   },
   brand: {
     genreLine: "BLUESROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
+    genres: ["Bluesrock", "Funk", "Soul", "Jazz", "Southern Rock"],
+  },
+  music: {
+    title: "Hör rein",
+    intro:
+      "Demos mit türkischen Texten, Blues-Riffs und einem Bläsersatz, der nach vorne drückt. Die Wiedergabe läuft weiter, während du scrollst.",
+    featuredLabel: "Aktuelle Single",
+    tracklist: "Alle Demos",
+    trackCount: "{count} Demos",
+    nowPlaying: "Läuft gerade",
+    paused: "Pausiert",
+    loading: "Lädt …",
+    error: "Dieser Song konnte nicht geladen werden.",
+    noDownload: "Nur zum Anhören",
   },
   about: {
     kicker: "Über Typhoon",
@@ -199,11 +345,20 @@ const de: Dict = {
     headline: "Amerikanisches Feeling. Europäische Seele. Türkische Texte.",
     body:
       "Typhoon sprengt Genregrenzen, ohne die eigene Handschrift zu verlieren: markante Blues-Riffs, funkige Grooves, soulige Melodien, jazzige Finessen und türkischsprachige Texte. Eine erfahrene Band, die live sofort zündet.",
-    cta: "Mehr über die Band",
-    ctaBook: "Booking Anfrage",
+    lead:
+      "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.",
+    cta: "Die Besetzung",
+    ctaBook: "Booking anfragen",
+    facts: [
+      { label: "Besetzung", value: "{count} Musiker mit Bläsersatz" },
+      { label: "Texte", value: "Türkisch" },
+      { label: "Songs", value: "Eigene Kompositionen" },
+    ],
   },
   members: {
     kicker: "Band Mitglieder",
+    title: "Die Besetzung",
+    photoSoon: "Foto folgt",
     ...buildMemberMaps("de"),
   },
   demos: {
@@ -212,70 +367,142 @@ const de: Dict = {
   },
   shows: {
     kicker: "Termine",
+    title: "Live",
+    intro: "Die nächsten Konzerte. Tickets und Details direkt beim Veranstalter.",
     link: "Alle Termine ansehen →",
+    tickets: "Tickets",
+    moreInfo: "Details",
+    tba: "Datum folgt",
+    doors: "Beginn",
+    emptyTitle: "Neue Termine sind in Planung.",
+    emptyBody:
+      "Festival, Club, Stadtfest oder Firmenevent: Holt Typhoon auf eure Bühne.",
+    emptyCta: "Booking anfragen",
+    past: "Vergangene Konzerte",
     placeholderTitles: [
       "Neue Termine in Vorbereitung",
       "Festival-Saison",
       "Club-Tour",
       "Privat- & Firmenevents",
     ],
-    placeholderRegion: [
-      "Deutschland",
-      "Süddeutschland",
-      "DE / AT",
-      "Anfrage",
-    ],
+    placeholderRegion: ["Deutschland", "Süddeutschland", "DE / AT", "Anfrage"],
     placeholderTime: ["Demnächst", "Demnächst", "Demnächst", "Booking offen"],
+    eventTypes: {
+      festival: "Festival",
+      club: "Clubkonzert",
+      concert: "Konzert",
+      cityfest: "Stadtfest",
+      corporate: "Firmenevent",
+      private: "Private Feier",
+      wedding: "Hochzeit",
+      other: "Konzert",
+    },
   },
   media: {
     kicker: "Media",
+    title: "Bilder",
     open: "Bild öffnen",
     close: "Schließen",
-    prev: "Zurück",
-    next: "Weiter",
+    prev: "Vorheriges Bild",
+    next: "Nächstes Bild",
+    counter: "Bild {index} von {total}",
   },
   booking: {
     kicker: "Booking",
-    nameLabel: "Name *",
-    emailLabel: "E-Mail *",
-    phoneLabel: "Telefon (optional)",
-    dateLabel: "Veranstaltungsdatum",
-    locationLabel: "Ort *",
-    typeLabel: "Art der Veranstaltung *",
-    messageLabel: "Nachricht *",
-    submit: "Booking anfragen",
-    submitting: "Wird gesendet…",
-    requiredErr: "Bitte fülle alle Pflichtfelder aus.",
+    title: "Typhoon buchen",
+    intro:
+      "Erzählt uns kurz von eurem Event. Wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
+    factsTitle: "Für Veranstalter",
+    facts: [
+      { label: "Besetzung", value: "{count} Musiker: Gesang, Bläsersatz, Gitarren, Bass, Schlagzeug" },
+      { label: "Programm", value: "Eigene Songs mit türkischen Texten" },
+      { label: "Stil", value: "Bluesrock, Funk, Soul, Jazz, Southern Rock" },
+      { label: "Anlässe", value: "Festival, Club, Stadtfest, Firmen- und Privatevents" },
+    ],
+    direct: "Direkt erreichbar",
+    reply: "Antwort in der Regel innerhalb von 48 Stunden.",
+    nameLabel: "Name",
+    emailLabel: "E-Mail",
+    phoneLabel: "Telefon",
+    dateLabel: "Datum der Veranstaltung",
+    locationLabel: "Ort",
+    locationHint: "Stadt und, falls bekannt, Location",
+    typeLabel: "Art der Veranstaltung",
+    typePlaceholder: "Bitte wählen",
+    types: {
+      festival: "Festival",
+      club: "Club / Konzert",
+      cityfest: "Stadtfest",
+      corporate: "Firmenevent",
+      private: "Private Feier / Hochzeit",
+      other: "Sonstiges",
+    },
+    messageLabel: "Nachricht",
+    messageHint: "Zeitrahmen, Publikum, Technik vor Ort, Budget – alles hilft.",
+    required: "Pflichtfeld",
+    optional: "optional",
+    privacyNote:
+      "Wir nutzen deine Angaben nur zur Bearbeitung der Anfrage. Details in der",
+    privacyLink: "Datenschutzerklärung",
+    submit: "Anfrage senden",
+    submitting: "Wird gesendet …",
+    requiredErr: "Bitte fülle die markierten Felder aus.",
     networkErr:
-      "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+      "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut oder schreib uns direkt.",
     backendNotice:
       "Anfragen gehen direkt an booking@typhoon.band. Antwort innerhalb von 48 Stunden.",
     submitFallback:
-      "Booking ist vorbereitet, aber der Versand ist noch nicht vollständig angebunden.",
-    submitOk:
-      "Danke für deine Anfrage. Wir melden uns so schnell wie möglich.",
+      "Der Online-Versand ist gerade nicht verfügbar. Bitte schreib uns direkt an booking@typhoon.band.",
+    submitOk: "Danke für deine Anfrage. Wir melden uns so schnell wie möglich.",
+    submitOkTitle: "Anfrage ist angekommen",
+    submitAnother: "Weitere Anfrage senden",
     submitError:
-      "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+      "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut oder schreib uns direkt.",
+    errors: {
+      name: "Bitte gib deinen Namen an.",
+      email: "Bitte gib eine gültige E-Mail-Adresse an.",
+      event_location: "Bitte gib den Ort an.",
+      event_type: "Bitte wähle die Art der Veranstaltung.",
+      message: "Bitte schreib uns ein paar Zeilen mehr (mindestens 10 Zeichen).",
+      event_date: "Bitte wähle ein gültiges Datum.",
+      phone: "Die Telefonnummer ist zu lang.",
+      rate: "Zu viele Anfragen in kurzer Zeit. Bitte versuche es in ein paar Minuten erneut.",
+    },
   },
   footer: {
     contact: "Kontakt",
     follow: "Folge uns",
-    legal: "Legal",
+    listen: "Hören & folgen",
+    legal: "Rechtliches",
     imprint: "Impressum",
     privacy: "Datenschutz",
     cookies: "Cookies",
+    consentSettings: "Datenschutz-Einstellungen",
     blurb:
       "Typhoon verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock.",
     copyrightTemplate: "© {year} Typhoon. Alle Rechte vorbehalten.",
+    toTop: "Nach oben",
+    admin: "Band-Login",
   },
   cookies: {
-    title: "Cookies & Privatsphäre",
+    title: "Privatsphäre",
     body:
-      "Diese Website verwendet nur technisch notwendige Cookies. Es findet kein Tracking statt.",
-    accept: "Verstanden",
-    decline: "Nicht jetzt",
+      "Diese Website setzt keine Tracking- oder Werbe-Cookies. Externe Inhalte wie Videos oder Streaming-Player laden wir nur, wenn du zustimmst.",
+    accept: "Externe Medien erlauben",
+    decline: "Nur notwendige",
+    save: "Auswahl speichern",
+    necessary: "Notwendig",
+    necessaryBody: "Speichert nur diese Auswahl in deinem Browser.",
+    external: "Externe Medien",
+    externalBody: "Videos und Player von YouTube, Spotify & Co. nach Zustimmung laden.",
     privacyLink: "Datenschutz",
     cookiesLink: "Cookies",
+  },
+  gate: {
+    title: "Externer Inhalt",
+    body: "Beim Laden werden Daten an {provider} übertragen.",
+    load: "Einmal laden",
+    always: "Immer erlauben",
   },
   legal: {
     backToHome: "Zur Startseite",
@@ -283,27 +510,54 @@ const de: Dict = {
     privacyTitle: "Datenschutzerklärung",
     cookiesTitle: "Cookie-Hinweise",
     draftNote: "Initialer Stand — wird laufend ergänzt.",
+    updated: "Stand",
   },
   player: {
     play: "Abspielen",
     pause: "Pause",
-    prev: "Vorheriger Track",
-    next: "Nächster Track",
+    playTrack: "{title} abspielen",
+    pauseTrack: "{title} pausieren",
+    prev: "Vorheriger Song",
+    next: "Nächster Song",
+    volume: "Lautstärke",
     volumeUp: "Lauter",
     volumeDown: "Leiser",
-    mute: "Stumm",
+    mute: "Stumm schalten",
     unmute: "Ton an",
     more: "Mehr",
+    close: "Player schließen",
+    seek: "Position in {title}",
+    by: "Typhoon",
+    dock: "Audioplayer",
+  },
+  notFound: {
+    title: "Diese Seite gibt es nicht.",
+    body: "Vielleicht hilft ein Neustart auf der Startseite. Die Musik läuft dort.",
+    cta: "Zur Startseite",
   },
 };
 
 const en: Dict = {
+  meta: {
+    title: "Typhoon · Blues rock, funk & soul with Turkish lyrics",
+    description:
+      "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock. Listen to the demos, find a show, book the band.",
+    ogAlt: "Typhoon: eight musicians in a sepia collage with a gold signature logo",
+  },
+  a11y: {
+    skip: "Skip to content",
+    mainNav: "Main navigation",
+    langNav: "Choose language",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+    home: "Typhoon home",
+  },
   nav: {
     home: "Home",
     band: "Band",
     music: "Music",
-    shows: "Shows",
-    media: "Media",
+    shows: "Live",
+    media: "Photos",
     booking: "Booking",
     contact: "Contact",
   },
@@ -315,9 +569,26 @@ const en: Dict = {
       "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock — powerful, warm, full of live energy.",
     ctaListen: "Listen to songs",
     ctaBook: "Booking request",
+    playFeatured: "Play {title}",
+    nextShow: "Next show",
+    scrollHint: "Continue to the music",
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
+    genres: ["Blues rock", "Funk", "Soul", "Jazz", "Southern rock"],
+  },
+  music: {
+    title: "Listen",
+    intro:
+      "Demos with Turkish lyrics, blues riffs and a horn section that pushes forward. Playback keeps going while you scroll.",
+    featuredLabel: "Current single",
+    tracklist: "All demos",
+    trackCount: "{count} demos",
+    nowPlaying: "Now playing",
+    paused: "Paused",
+    loading: "Loading …",
+    error: "This song could not be loaded.",
+    noDownload: "Streaming only",
   },
   about: {
     kicker: "About Typhoon",
@@ -325,11 +596,20 @@ const en: Dict = {
     headline: "American feeling. European soul. Turkish lyrics.",
     body:
       "Typhoon breaks genre boundaries without losing their handwriting: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
-    cta: "More about the band",
+    lead:
+      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.",
+    cta: "Meet the line-up",
     ctaBook: "Booking request",
+    facts: [
+      { label: "Line-up", value: "{count} musicians incl. horn section" },
+      { label: "Lyrics", value: "Turkish" },
+      { label: "Songs", value: "Original compositions" },
+    ],
   },
   members: {
     kicker: "Band Members",
+    title: "The line-up",
+    photoSoon: "Photo coming soon",
     ...buildMemberMaps("en"),
   },
   demos: {
@@ -338,7 +618,17 @@ const en: Dict = {
   },
   shows: {
     kicker: "Shows",
+    title: "Live",
+    intro: "Upcoming concerts. Tickets and details come straight from the promoter.",
     link: "All shows →",
+    tickets: "Tickets",
+    moreInfo: "Details",
+    tba: "Date to be announced",
+    doors: "Starts",
+    emptyTitle: "New dates are being planned.",
+    emptyBody: "Festival, club, city festival or corporate event: bring Typhoon to your stage.",
+    emptyCta: "Booking request",
+    past: "Past shows",
     placeholderTitles: [
       "New dates in preparation",
       "Festival season",
@@ -347,55 +637,121 @@ const en: Dict = {
     ],
     placeholderRegion: ["Germany", "Southern Germany", "DE / AT", "On request"],
     placeholderTime: ["Soon", "Soon", "Soon", "Booking open"],
+    eventTypes: {
+      festival: "Festival",
+      club: "Club show",
+      concert: "Concert",
+      cityfest: "City festival",
+      corporate: "Corporate event",
+      private: "Private event",
+      wedding: "Wedding",
+      other: "Concert",
+    },
   },
   media: {
     kicker: "Media",
+    title: "Photos",
     open: "Open image",
     close: "Close",
-    prev: "Previous",
-    next: "Next",
+    prev: "Previous image",
+    next: "Next image",
+    counter: "Image {index} of {total}",
   },
   booking: {
     kicker: "Booking",
-    nameLabel: "Name *",
-    emailLabel: "Email *",
-    phoneLabel: "Phone (optional)",
+    title: "Book Typhoon",
+    intro:
+      "Tell us a little about your event. We'll reply personally with availability and terms.",
+    factsTitle: "For promoters",
+    facts: [
+      { label: "Line-up", value: "{count} musicians: vocals, horns, guitars, bass, drums" },
+      { label: "Set", value: "Original songs with Turkish lyrics" },
+      { label: "Style", value: "Blues rock, funk, soul, jazz, southern rock" },
+      { label: "Occasions", value: "Festivals, clubs, city festivals, corporate and private events" },
+    ],
+    direct: "Reach us directly",
+    reply: "We usually reply within 48 hours.",
+    nameLabel: "Name",
+    emailLabel: "Email",
+    phoneLabel: "Phone",
     dateLabel: "Event date",
-    locationLabel: "Location *",
-    typeLabel: "Type of event *",
-    messageLabel: "Message *",
-    submit: "Send booking request",
-    submitting: "Sending…",
-    requiredErr: "Please fill in all required fields.",
+    locationLabel: "Location",
+    locationHint: "City and venue, if known",
+    typeLabel: "Type of event",
+    typePlaceholder: "Please choose",
+    types: {
+      festival: "Festival",
+      club: "Club / concert",
+      cityfest: "City festival",
+      corporate: "Corporate event",
+      private: "Private party / wedding",
+      other: "Other",
+    },
+    messageLabel: "Message",
+    messageHint: "Timing, audience, on-site tech, budget: every detail helps.",
+    required: "required",
+    optional: "optional",
+    privacyNote: "We only use your details to handle this request. See our",
+    privacyLink: "privacy policy",
+    submit: "Send request",
+    submitting: "Sending …",
+    requiredErr: "Please fill in the highlighted fields.",
     networkErr:
-      "We couldn't send your request. Please try again in a moment.",
+      "We couldn't send your request. Please try again later or email us directly.",
     backendNotice:
       "Requests go straight to booking@typhoon.band. Reply within 48 hours.",
     submitFallback:
-      "Booking is ready, but delivery is not fully wired up yet.",
+      "Online sending is unavailable right now. Please email us at booking@typhoon.band.",
     submitOk: "Thanks for your request. We'll get back to you as soon as possible.",
+    submitOkTitle: "Request received",
+    submitAnother: "Send another request",
     submitError:
-      "We couldn't send your request. Please try again in a moment.",
+      "We couldn't send your request. Please try again later or email us directly.",
+    errors: {
+      name: "Please enter your name.",
+      email: "Please enter a valid email address.",
+      event_location: "Please enter the location.",
+      event_type: "Please choose the type of event.",
+      message: "Please write a few more lines (at least 10 characters).",
+      event_date: "Please choose a valid date.",
+      phone: "The phone number is too long.",
+      rate: "Too many requests in a short time. Please try again in a few minutes.",
+    },
   },
   footer: {
     contact: "Contact",
     follow: "Follow us",
+    listen: "Listen & follow",
     legal: "Legal",
     imprint: "Imprint",
     privacy: "Privacy",
     cookies: "Cookies",
+    consentSettings: "Privacy settings",
     blurb:
       "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock.",
     copyrightTemplate: "© {year} Typhoon. All rights reserved.",
+    toTop: "Back to top",
+    admin: "Band login",
   },
   cookies: {
-    title: "Cookies & privacy",
+    title: "Privacy",
     body:
-      "This site only uses technically required cookies. No tracking is in place.",
-    accept: "Got it",
-    decline: "Not now",
+      "This site sets no tracking or advertising cookies. External content such as videos or streaming players only loads with your consent.",
+    accept: "Allow external media",
+    decline: "Necessary only",
+    save: "Save choice",
+    necessary: "Necessary",
+    necessaryBody: "Only stores this choice in your browser.",
+    external: "External media",
+    externalBody: "Load videos and players from YouTube, Spotify & co. after consent.",
     privacyLink: "Privacy",
     cookiesLink: "Cookies",
+  },
+  gate: {
+    title: "External content",
+    body: "Loading it sends data to {provider}.",
+    load: "Load once",
+    always: "Always allow",
   },
   legal: {
     backToHome: "Back to home",
@@ -403,27 +759,54 @@ const en: Dict = {
     privacyTitle: "Privacy policy",
     cookiesTitle: "Cookie notice",
     draftNote: "Initial draft — extended over time.",
+    updated: "Last updated",
   },
   player: {
     play: "Play",
     pause: "Pause",
-    prev: "Previous track",
-    next: "Next track",
+    playTrack: "Play {title}",
+    pauseTrack: "Pause {title}",
+    prev: "Previous song",
+    next: "Next song",
+    volume: "Volume",
     volumeUp: "Volume up",
     volumeDown: "Volume down",
     mute: "Mute",
     unmute: "Unmute",
     more: "More",
+    close: "Close player",
+    seek: "Position in {title}",
+    by: "Typhoon",
+    dock: "Audio player",
+  },
+  notFound: {
+    title: "This page doesn't exist.",
+    body: "Head back to the home page. The music is playing there.",
+    cta: "Back to home",
   },
 };
 
 const tr: Dict = {
+  meta: {
+    title: "Typhoon · Türkçe sözlerle blues rock, funk ve soul",
+    description:
+      "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir. Demoları dinleyin, konserleri bulun, grubu davet edin.",
+    ogAlt: "Typhoon: altın imzalı sepya bir kolajda sekiz müzisyen",
+  },
+  a11y: {
+    skip: "İçeriğe geç",
+    mainNav: "Ana menü",
+    langNav: "Dil seçin",
+    openMenu: "Menüyü aç",
+    closeMenu: "Menüyü kapat",
+    home: "Typhoon ana sayfa",
+  },
   nav: {
     home: "Ana Sayfa",
     band: "Grup",
     music: "Müzik",
-    shows: "Tarihler",
-    media: "Medya",
+    shows: "Konserler",
+    media: "Fotoğraflar",
     booking: "Booking",
     contact: "İletişim",
   },
@@ -435,9 +818,26 @@ const tr: Dict = {
       "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede dolu enerjik.",
     ctaListen: "Şarkıları dinle",
     ctaBook: "Booking talebi",
+    playFeatured: "{title} dinle",
+    nextShow: "Sıradaki konser",
+    scrollHint: "Müziğe geç",
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
+    genres: ["Blues rock", "Funk", "Soul", "Jazz", "Southern rock"],
+  },
+  music: {
+    title: "Dinle",
+    intro:
+      "Türkçe sözler, blues riff'leri ve öne çıkan nefesli partileriyle demolar. Sayfada gezinirken müzik çalmaya devam eder.",
+    featuredLabel: "Güncel single",
+    tracklist: "Tüm demolar",
+    trackCount: "{count} demo",
+    nowPlaying: "Şimdi çalıyor",
+    paused: "Duraklatıldı",
+    loading: "Yükleniyor …",
+    error: "Bu şarkı yüklenemedi.",
+    noDownload: "Yalnızca dinleme",
   },
   about: {
     kicker: "Typhoon Hakkında",
@@ -445,11 +845,20 @@ const tr: Dict = {
     headline: "Amerikan tını. Avrupalı ruh. Türkçe sözler.",
     body:
       "Typhoon, kendi imzasını kaybetmeden tür sınırlarını aşar: vurucu blues riff'leri, funky groove'lar, ruhlu melodiler, jazz incelikleri ve Türkçe sözler. Sahneye çıktığı an alev alan tecrübeli bir grup.",
-    cta: "Grup hakkında daha fazla",
+    lead:
+      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.",
+    cta: "Kadroyu tanıyın",
     ctaBook: "Booking talebi",
+    facts: [
+      { label: "Kadro", value: "Nefesli grubuyla {count} müzisyen" },
+      { label: "Sözler", value: "Türkçe" },
+      { label: "Şarkılar", value: "Kendi besteleri" },
+    ],
   },
   members: {
     kicker: "Grup Üyeleri",
+    title: "Kadro",
+    photoSoon: "Fotoğraf yakında",
     ...buildMemberMaps("tr"),
   },
   demos: {
@@ -458,7 +867,17 @@ const tr: Dict = {
   },
   shows: {
     kicker: "Tarihler",
+    title: "Canlı",
+    intro: "Sıradaki konserler. Bilet ve detaylar doğrudan organizatörde.",
     link: "Tüm tarihler →",
+    tickets: "Bilet",
+    moreInfo: "Detaylar",
+    tba: "Tarih yakında",
+    doors: "Başlangıç",
+    emptyTitle: "Yeni tarihler planlanıyor.",
+    emptyBody: "Festival, kulüp, şehir şenliği ya da kurumsal etkinlik: Typhoon'u sahnenize davet edin.",
+    emptyCta: "Booking talebi",
+    past: "Geçmiş konserler",
     placeholderTitles: [
       "Yeni tarihler hazırlanıyor",
       "Festival sezonu",
@@ -467,56 +886,121 @@ const tr: Dict = {
     ],
     placeholderRegion: ["Almanya", "Güney Almanya", "DE / AT", "Talep üzerine"],
     placeholderTime: ["Yakında", "Yakında", "Yakında", "Booking açık"],
+    eventTypes: {
+      festival: "Festival",
+      club: "Kulüp konseri",
+      concert: "Konser",
+      cityfest: "Şehir şenliği",
+      corporate: "Kurumsal etkinlik",
+      private: "Özel etkinlik",
+      wedding: "Düğün",
+      other: "Konser",
+    },
   },
   media: {
     kicker: "Medya",
+    title: "Fotoğraflar",
     open: "Görseli aç",
     close: "Kapat",
-    prev: "Önceki",
-    next: "Sonraki",
+    prev: "Önceki görsel",
+    next: "Sonraki görsel",
+    counter: "Görsel {index} / {total}",
   },
   booking: {
     kicker: "Booking",
-    nameLabel: "İsim *",
-    emailLabel: "E-posta *",
-    phoneLabel: "Telefon (isteğe bağlı)",
+    title: "Typhoon'u davet edin",
+    intro:
+      "Etkinliğinizi kısaca anlatın. Uygunluk ve koşullarla size bizzat dönüş yapalım.",
+    factsTitle: "Organizatörler için",
+    facts: [
+      { label: "Kadro", value: "{count} müzisyen: vokal, nefesliler, gitarlar, bas, davul" },
+      { label: "Program", value: "Türkçe sözlü kendi şarkıları" },
+      { label: "Tarz", value: "Blues rock, funk, soul, jazz, southern rock" },
+      { label: "Etkinlikler", value: "Festival, kulüp, şehir şenliği, kurumsal ve özel etkinlikler" },
+    ],
+    direct: "Doğrudan ulaşın",
+    reply: "Genellikle 48 saat içinde yanıt veriyoruz.",
+    nameLabel: "İsim",
+    emailLabel: "E-posta",
+    phoneLabel: "Telefon",
     dateLabel: "Etkinlik tarihi",
-    locationLabel: "Yer *",
-    typeLabel: "Etkinlik türü *",
-    messageLabel: "Mesaj *",
-    submit: "Booking talebi gönder",
-    submitting: "Gönderiliyor…",
-    requiredErr: "Lütfen tüm zorunlu alanları doldurun.",
+    locationLabel: "Yer",
+    locationHint: "Şehir ve biliniyorsa mekân",
+    typeLabel: "Etkinlik türü",
+    typePlaceholder: "Lütfen seçin",
+    types: {
+      festival: "Festival",
+      club: "Kulüp / konser",
+      cityfest: "Şehir şenliği",
+      corporate: "Kurumsal etkinlik",
+      private: "Özel parti / düğün",
+      other: "Diğer",
+    },
+    messageLabel: "Mesaj",
+    messageHint: "Zaman, izleyici, teknik imkânlar, bütçe: her detay işimize yarar.",
+    required: "zorunlu",
+    optional: "isteğe bağlı",
+    privacyNote: "Bilgilerinizi yalnızca bu talep için kullanıyoruz. Ayrıntılar:",
+    privacyLink: "Gizlilik politikası",
+    submit: "Talebi gönder",
+    submitting: "Gönderiliyor …",
+    requiredErr: "Lütfen işaretli alanları doldurun.",
     networkErr:
-      "Talep gönderilemedi. Lütfen biraz sonra tekrar deneyin.",
+      "Talep gönderilemedi. Lütfen daha sonra tekrar deneyin ya da bize doğrudan yazın.",
     backendNotice:
       "Talepler doğrudan booking@typhoon.band adresine ulaşır. Yanıt 48 saat içinde.",
     submitFallback:
-      "Booking hazır, ancak gönderim henüz tamamen bağlanmadı.",
-    submitOk:
-      "Talebiniz için teşekkürler. En kısa sürede size dönüş yapacağız.",
+      "Çevrimiçi gönderim şu anda kullanılamıyor. Lütfen booking@typhoon.band adresine yazın.",
+    submitOk: "Talebiniz için teşekkürler. En kısa sürede size dönüş yapacağız.",
+    submitOkTitle: "Talebiniz ulaştı",
+    submitAnother: "Yeni talep gönder",
     submitError:
-      "Talep gönderilemedi. Lütfen biraz sonra tekrar deneyin.",
+      "Talep gönderilemedi. Lütfen daha sonra tekrar deneyin ya da bize doğrudan yazın.",
+    errors: {
+      name: "Lütfen adınızı girin.",
+      email: "Lütfen geçerli bir e-posta adresi girin.",
+      event_location: "Lütfen yeri girin.",
+      event_type: "Lütfen etkinlik türünü seçin.",
+      message: "Lütfen birkaç satır daha yazın (en az 10 karakter).",
+      event_date: "Lütfen geçerli bir tarih seçin.",
+      phone: "Telefon numarası çok uzun.",
+      rate: "Kısa sürede çok fazla talep. Lütfen birkaç dakika sonra tekrar deneyin.",
+    },
   },
   footer: {
     contact: "İletişim",
     follow: "Bizi takip edin",
+    listen: "Dinle & takip et",
     legal: "Hukuki",
     imprint: "Künye",
     privacy: "Gizlilik",
     cookies: "Çerezler",
+    consentSettings: "Gizlilik ayarları",
     blurb:
       "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir.",
     copyrightTemplate: "© {year} Typhoon. Tüm hakları saklıdır.",
+    toTop: "Başa dön",
+    admin: "Grup girişi",
   },
   cookies: {
-    title: "Çerezler & gizlilik",
+    title: "Gizlilik",
     body:
-      "Bu site yalnızca teknik olarak gerekli çerezleri kullanır. Hiçbir izleme yapılmaz.",
-    accept: "Anladım",
-    decline: "Şimdi değil",
+      "Bu site izleme ya da reklam çerezi kullanmaz. Video veya müzik oynatıcısı gibi harici içerikler yalnızca onayınızla yüklenir.",
+    accept: "Harici medyaya izin ver",
+    decline: "Yalnızca gerekli",
+    save: "Seçimi kaydet",
+    necessary: "Gerekli",
+    necessaryBody: "Yalnızca bu seçimi tarayıcınızda saklar.",
+    external: "Harici medya",
+    externalBody: "YouTube, Spotify vb. video ve oynatıcıları onaydan sonra yükle.",
     privacyLink: "Gizlilik",
     cookiesLink: "Çerezler",
+  },
+  gate: {
+    title: "Harici içerik",
+    body: "Yüklendiğinde veriler {provider} sağlayıcısına aktarılır.",
+    load: "Bir kez yükle",
+    always: "Her zaman izin ver",
   },
   legal: {
     backToHome: "Ana sayfaya dön",
@@ -524,17 +1008,30 @@ const tr: Dict = {
     privacyTitle: "Gizlilik politikası",
     cookiesTitle: "Çerez bildirimi",
     draftNote: "İlk taslak — zaman içinde genişletilecektir.",
+    updated: "Güncelleme",
   },
   player: {
     play: "Oynat",
     pause: "Duraklat",
-    prev: "Önceki parça",
-    next: "Sonraki parça",
+    playTrack: "{title} oynat",
+    pauseTrack: "{title} duraklat",
+    prev: "Önceki şarkı",
+    next: "Sonraki şarkı",
+    volume: "Ses düzeyi",
     volumeUp: "Sesi aç",
     volumeDown: "Sesi kıs",
     mute: "Sessize al",
     unmute: "Sesi aç",
     more: "Daha fazla",
+    close: "Oynatıcıyı kapat",
+    seek: "{title} içindeki konum",
+    by: "Typhoon",
+    dock: "Müzik çalar",
+  },
+  notFound: {
+    title: "Bu sayfa bulunamadı.",
+    body: "Ana sayfaya dönün. Müzik orada çalıyor.",
+    cta: "Ana sayfaya dön",
   },
 };
 
@@ -542,4 +1039,11 @@ export const dictionaries: Record<Locale, Dict> = { de, en, tr };
 
 export function getDict(locale: Locale): Dict {
   return dictionaries[locale];
+}
+
+/** Replace `{key}` placeholders. */
+export function fill(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_, k: string) =>
+    k in values ? String(values[k]) : `{${k}}`,
+  );
 }

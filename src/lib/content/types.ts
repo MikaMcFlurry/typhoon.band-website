@@ -63,12 +63,24 @@ export type GalleryItem = {
 
 export type ShowItem = {
   id: string;
+  /** Venue (kept for backwards compatibility). */
   title: string;
+  /** "City, Country" or "—". */
   region: string;
+  /** Start time "HH:MM" or "" when unknown. */
   time: string;
   startsAt: string | null;
   ticketUrl: string | null;
   sortOrder: number;
+  venue: string;
+  city: string | null;
+  country: string | null;
+  /** Wall-clock date "YYYY-MM-DD" as entered in the admin; null for TBA. */
+  date: string | null;
+  /** Wall-clock start "HH:MM"; null when not given. */
+  startTime: string | null;
+  isTba: boolean;
+  eventType: string | null;
 };
 
 export type LegalPageType = "imprint" | "privacy" | "cookies";

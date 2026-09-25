@@ -1,17 +1,105 @@
+import type { Metadata, Viewport } from "next";
+import { Archivo, Newsreader } from "next/font/google";
 import { notFound } from "next/navigation";
-import { AudioPlayerProvider } from "@/components/audio/AudioPlayerProvider";
 import { DictProvider } from "@/components/i18n/DictProvider";
-import { CookieConsent } from "@/components/layout/CookieConsent";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
 import { getDict } from "@/i18n/dictionaries";
-import { isLocale, LOCALES } from "@/i18n/locales";
+import { isLocale, LOCALES, OG_LOCALE } from "@/i18n/locales";
+import { siteUrl } from "@/lib/site-url";
+import "../globals.css";
+
+// Root layout lives in the locale segment so <html lang> always matches the
+// rendered language (the old root layout hard-coded lang="de").
+
+const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin", "latin-ext"],
+  axes: ["opsz"],
+  style: ["normal"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
 
-export default async function LocaleLayout({
+export const viewport: Viewport = {
+  themeColor: "#0e0a07",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = getDict(locale);
+  const base = siteUrl();
+  return {
+    metadataBase: base,
+    title: {
+      default: dict.meta.title,
+      template: "%s · Typhoon",
+    },
+    description: dict.meta.description,
+    applicationName: "Typhoon",
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        de: "/de",
+        en: "/en",
+        tr: "/tr",
+        "x-default": "/de",
+      },
+    },
+    openGraph: {
+      type: "website",
+      siteName: "Typhoon",
+      title: dict.meta.title,
+      description: dict.meta.description,
+      locale: OG_LOCALE[locale],
+      alternateLocale: LOCALES.filter((l) => l !== locale).map(
+        (l) => OG_LOCALE[l],
+      ),
+      url: `/${locale}`,
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: dict.meta.ogAlt,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: dict.meta.title,
+      description: dict.meta.description,
+      images: ["/og-image.jpg"],
+    },
+    icons: {
+      icon: [
+        { url: "/icon.svg", type: "image/svg+xml" },
+        { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      ],
+      apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+    },
+    formatDetection: { telephone: false },
+  };
+}
+
+export default async function LocaleRootLayout({
   children,
   params,
 }: {
@@ -23,13 +111,16 @@ export default async function LocaleLayout({
   const dict = getDict(locale);
 
   return (
-    <DictProvider dict={dict} locale={locale}>
-      <AudioPlayerProvider>
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <CookieConsent />
-      </AudioPlayerProvider>
-    </DictProvider>
+    <html
+      className={`${archivo.variable} ${newsreader.variable}`}
+      lang={locale}
+      suppressHydrationWarning
+    >
+      <body className="font-sans">
+        <DictProvider dict={dict} locale={locale}>
+          {children}
+        </DictProvider>
+      </body>
+    </html>
   );
 }
