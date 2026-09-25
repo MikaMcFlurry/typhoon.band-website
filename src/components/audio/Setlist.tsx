@@ -68,7 +68,7 @@ function Row({
         </span>
         <span className="min-w-0">
           <span
-            className={`block break-words font-stage text-[1.625rem] font-extrabold uppercase leading-[1.02] sm:text-[1.875rem] ${
+            className={`block font-stage [overflow-wrap:normal] text-[1.625rem] font-extrabold uppercase leading-[1.02] sm:text-[1.875rem] ${
               isCurrent ? "" : "group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4"
             }`}
           >

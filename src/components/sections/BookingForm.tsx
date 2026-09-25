@@ -292,9 +292,9 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
             <aside aria-label={dict.stage.previewTitle} className="relative mt-10 bg-chalk p-4 text-[#121110] sm:p-5">
               <span aria-hidden className="tape-piece -top-2.5 left-5 -rotate-3 !bg-orange" />
               <p className="font-stage text-[1.375rem] font-extrabold uppercase leading-none">{dict.stage.previewTitle}</p>
-              <dl className="mono mt-4 flex flex-col gap-1.5">
+              <dl className="mono mt-4 flex flex-col gap-2.5 sm:gap-1.5">
                 {previewRows.map(([k, v]) => (
-                  <div className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] gap-3 sm:grid-cols-[10rem_minmax(0,1fr)]" key={k}>
+                  <div className="grid grid-cols-1 gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,1fr)]" key={k}>
                     <dt className="text-[rgba(18,17,16,0.66)]">{k}</dt>
                     <dd className="min-w-0 [overflow-wrap:anywhere]">{v}</dd>
                   </div>

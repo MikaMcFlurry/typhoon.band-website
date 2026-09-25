@@ -45,7 +45,7 @@ export function Hero({
       id="home"
     >
       <div className="shell grid gap-x-10 gap-y-14 pb-20 pt-6 md:pb-28 md:pt-10 lg:grid-cols-12 lg:items-center xl:min-h-[calc(100svh-var(--header-h))] xl:pb-16">
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-6 xl:col-span-7">
           <h1 id="hero-title">
             <Image
               alt="Typhoon"
@@ -90,20 +90,21 @@ export function Hero({
           </div>
         </div>
 
-        <div className="relative lg:col-span-5">
-          {/* Stage photo plate (real colour live photo); the setlist is taped
-              over its lower-left corner. */}
-          <figure className="relative -mx-4 aspect-[16/10] overflow-hidden bg-deck-3 sm:mx-0 lg:ml-auto lg:w-[84%] lg:aspect-[4/3]">
+        <div className="relative lg:col-span-6 lg:pt-[40%] xl:col-span-5 xl:pt-[44%]">
+          {/* Stage photo plate (real colour live photo) carries the right
+              columns; the setlist is taped over its lower-left quadrant so
+              the face and the keys stay clear. */}
+          <figure className="relative -mx-4 aspect-[16/10] overflow-hidden bg-deck-3 sm:mx-0 lg:absolute lg:right-0 lg:top-0 lg:mx-0 lg:aspect-auto lg:h-[calc(100%-5rem)] lg:w-[70%] xl:w-[74%]">
             <Image
               alt={dict.hero.photoAlt}
-              className="object-cover object-[72%_35%]"
+              className="object-cover object-[72%_35%] lg:object-[74%_center]"
               fill
               priority
-              sizes="(min-width: 1024px) 36vw, 100vw"
+              sizes="(min-width: 1024px) 30vw, 100vw"
               src={STAGE_PHOTO}
             />
           </figure>
-          <div className="relative z-10 -mt-14 sm:-mt-20 lg:-mt-[34%] lg:w-[92%] lg:rotate-[1deg]">
+          <div className="relative z-10 -mt-14 sm:-mt-20 lg:mt-0 lg:w-[88%] lg:rotate-[1deg] xl:w-[82%]">
             <Setlist featuredId={featured?.id ?? null} footer={setlistFooter} tracks={tracks} />
           </div>
         </div>
