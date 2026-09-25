@@ -30,13 +30,11 @@ export type Dict = {
     home: string;
   };
   nav: {
-    home: string;
     band: string;
     music: string;
     shows: string;
     media: string;
     booking: string;
-    contact: string;
   };
   hero: {
     line1: string;
@@ -46,8 +44,6 @@ export type Dict = {
     ctaListen: string;
     ctaBook: string;
     playFeatured: string;
-    nextShow: string;
-    scrollHint: string;
   };
   brand: {
     genreLine: string;
@@ -69,7 +65,6 @@ export type Dict = {
     alsoOn: string;
   };
   about: {
-    kicker: string;
     eyebrow: string;
     headline: string;
     body: string;
@@ -81,26 +76,17 @@ export type Dict = {
     facts: { label: string; value: string }[];
   };
   members: {
-    kicker: string;
     title: string;
     showAll: string;
     showLess: string;
     instrument: Record<string, string>;
     bio: Record<string, string>;
   };
-  demos: {
-    kicker: string;
-    featuredTag: string;
-  };
   shows: {
-    kicker: string;
     title: string;
     intro: string;
-    link: string;
     tickets: string;
-    moreInfo: string;
     tba: string;
-    doors: string;
     emptyTitle: string;
     emptyBody: string;
     emptyCta: string;
@@ -111,7 +97,6 @@ export type Dict = {
     eventTypes: Record<string, string>;
   };
   media: {
-    kicker: string;
     title: string;
     open: string;
     close: string;
@@ -120,7 +105,6 @@ export type Dict = {
     counter: string;
   };
   booking: {
-    kicker: string;
     title: string;
     intro: string;
     factsTitle: string;
@@ -146,7 +130,6 @@ export type Dict = {
     submitting: string;
     requiredErr: string;
     networkErr: string;
-    backendNotice: string;
     submitFallback: string;
     submitOk: string;
     submitOkTitle: string;
@@ -175,12 +158,10 @@ export type Dict = {
     blurb: string;
     copyrightTemplate: string;
     toTop: string;
-    admin: string;
   };
   cookies: {
     title: string;
     body: string;
-    accept: string;
     acceptShort: string;
     decline: string;
     save: string;
@@ -214,11 +195,8 @@ export type Dict = {
     prev: string;
     next: string;
     volume: string;
-    volumeUp: string;
-    volumeDown: string;
     mute: string;
     unmute: string;
-    more: string;
     close: string;
     seek: string;
     by: string;
@@ -310,13 +288,11 @@ const de: Dict = {
     home: "Typhoon Startseite",
   },
   nav: {
-    home: "Start",
     band: "Band",
     music: "Musik",
     shows: "Termine",
     media: "Bilder",
     booking: "Booking",
-    contact: "Kontakt",
   },
   hero: {
     line1: "SMOOTH.",
@@ -327,8 +303,6 @@ const de: Dict = {
     ctaListen: "Songs anhören",
     ctaBook: "Booking anfragen",
     playFeatured: "{title} anhören",
-    nextShow: "Nächstes Konzert",
-    scrollHint: "Weiter zur Musik",
   },
   brand: {
     genreLine: "BLUESROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -351,7 +325,6 @@ const de: Dict = {
     alsoOn: "Auch zu hören auf",
   },
   about: {
-    kicker: "Über Typhoon",
     eyebrow: "Typhoon",
     headline: "Amerikanisches Feeling. Europäische Seele. Türkische Texte.",
     body:
@@ -369,25 +342,16 @@ const de: Dict = {
     ],
   },
   members: {
-    kicker: "Band Mitglieder",
     title: "Die Besetzung",
     showAll: "Alle Musiker zeigen",
     showLess: "Weniger zeigen",
     ...buildMemberMaps("de"),
   },
-  demos: {
-    kicker: "Demos",
-    featuredTag: "Aktueller Demo · Single",
-  },
   shows: {
-    kicker: "Termine",
     title: "Termine",
     intro: "Die nächsten Konzerte. Tickets und Details direkt beim Veranstalter.",
-    link: "Alle Termine ansehen →",
     tickets: "Tickets",
-    moreInfo: "Details",
     tba: "Datum folgt",
-    doors: "Beginn",
     emptyTitle: "Neue Termine sind in Planung.",
     emptyBody:
       "Festival, Club, Stadtfest oder Firmenevent: Holt Typhoon auf eure Bühne.",
@@ -413,7 +377,6 @@ const de: Dict = {
     },
   },
   media: {
-    kicker: "Media",
     title: "Bilder",
     open: "Bild öffnen",
     close: "Schließen",
@@ -422,7 +385,6 @@ const de: Dict = {
     counter: "Bild {index} von {total}",
   },
   booking: {
-    kicker: "Booking",
     title: "Typhoon buchen",
     intro:
       "Erzählt uns kurz von eurem Event. Wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
@@ -464,8 +426,6 @@ const de: Dict = {
     requiredErr: "Bitte fülle die markierten Felder aus.",
     networkErr:
       "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut oder schreib uns direkt.",
-    backendNotice:
-      "Anfragen gehen direkt an booking@typhoon.band. Antwort innerhalb von 48 Stunden.",
     submitFallback:
       "Der Online-Versand ist gerade nicht verfügbar. Bitte schreib uns direkt an booking@typhoon.band.",
     submitOk: "Danke für deine Anfrage. Wir melden uns so schnell wie möglich.",
@@ -497,13 +457,11 @@ const de: Dict = {
       "Typhoon verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock.",
     copyrightTemplate: "© {year} Typhoon. Alle Rechte vorbehalten.",
     toTop: "Nach oben",
-    admin: "Band-Login",
   },
   cookies: {
     title: "Privatsphäre",
     body:
       "Diese Website setzt keine Tracking- oder Werbe-Cookies. Externe Inhalte wie Videos oder Streaming-Player laden wir nur, wenn du zustimmst.",
-    accept: "Externe Medien erlauben",
     acceptShort: "Alle erlauben",
     decline: "Nur notwendige",
     save: "Auswahl speichern",
@@ -537,11 +495,8 @@ const de: Dict = {
     prev: "Vorheriger Song",
     next: "Nächster Song",
     volume: "Lautstärke",
-    volumeUp: "Lauter",
-    volumeDown: "Leiser",
     mute: "Stumm schalten",
     unmute: "Ton an",
-    more: "Mehr",
     close: "Player schließen",
     seek: "Position in {title}",
     by: "Typhoon",
@@ -570,13 +525,11 @@ const en: Dict = {
     home: "Typhoon home",
   },
   nav: {
-    home: "Home",
     band: "Band",
     music: "Music",
     shows: "Shows",
     media: "Photos",
     booking: "Booking",
-    contact: "Contact",
   },
   hero: {
     line1: "SMOOTH.",
@@ -587,8 +540,6 @@ const en: Dict = {
     ctaListen: "Listen to songs",
     ctaBook: "Booking request",
     playFeatured: "Play {title}",
-    nextShow: "Next show",
-    scrollHint: "Continue to the music",
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -611,7 +562,6 @@ const en: Dict = {
     alsoOn: "Also on",
   },
   about: {
-    kicker: "About Typhoon",
     eyebrow: "Typhoon",
     headline: "American feeling. European soul. Turkish lyrics.",
     body:
@@ -629,25 +579,16 @@ const en: Dict = {
     ],
   },
   members: {
-    kicker: "Band Members",
     title: "The line-up",
     showAll: "Show all musicians",
     showLess: "Show fewer",
     ...buildMemberMaps("en"),
   },
-  demos: {
-    kicker: "Demos",
-    featuredTag: "Current demo · Single",
-  },
   shows: {
-    kicker: "Shows",
     title: "Shows",
     intro: "Upcoming concerts. Tickets and details come straight from the promoter.",
-    link: "All shows →",
     tickets: "Tickets",
-    moreInfo: "Details",
     tba: "Date to be announced",
-    doors: "Starts",
     emptyTitle: "New dates are being planned.",
     emptyBody: "Festival, club, city festival or corporate event: bring Typhoon to your stage.",
     emptyCta: "Booking request",
@@ -672,7 +613,6 @@ const en: Dict = {
     },
   },
   media: {
-    kicker: "Media",
     title: "Photos",
     open: "Open image",
     close: "Close",
@@ -681,7 +621,6 @@ const en: Dict = {
     counter: "Image {index} of {total}",
   },
   booking: {
-    kicker: "Booking",
     title: "Book Typhoon",
     intro:
       "Tell us a little about your event. We'll reply personally with availability and terms.",
@@ -722,8 +661,6 @@ const en: Dict = {
     requiredErr: "Please fill in the highlighted fields.",
     networkErr:
       "We couldn't send your request. Please try again later or email us directly.",
-    backendNotice:
-      "Requests go straight to booking@typhoon.band. Reply within 48 hours.",
     submitFallback:
       "Online sending is unavailable right now. Please email us at booking@typhoon.band.",
     submitOk: "Thanks for your request. We'll get back to you as soon as possible.",
@@ -755,13 +692,11 @@ const en: Dict = {
       "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock.",
     copyrightTemplate: "© {year} Typhoon. All rights reserved.",
     toTop: "Back to top",
-    admin: "Band login",
   },
   cookies: {
     title: "Privacy",
     body:
       "This site sets no tracking or advertising cookies. External content such as videos or streaming players only loads with your consent.",
-    accept: "Allow external media",
     acceptShort: "Allow all",
     decline: "Necessary only",
     save: "Save choice",
@@ -795,11 +730,8 @@ const en: Dict = {
     prev: "Previous song",
     next: "Next song",
     volume: "Volume",
-    volumeUp: "Volume up",
-    volumeDown: "Volume down",
     mute: "Mute",
     unmute: "Unmute",
-    more: "More",
     close: "Close player",
     seek: "Position in {title}",
     by: "Typhoon",
@@ -828,13 +760,11 @@ const tr: Dict = {
     home: "Typhoon ana sayfa",
   },
   nav: {
-    home: "Ana Sayfa",
     band: "Grup",
     music: "Müzik",
     shows: "Konserler",
     media: "Fotoğraflar",
     booking: "Booking",
-    contact: "İletişim",
   },
   hero: {
     line1: "SMOOTH.",
@@ -845,8 +775,6 @@ const tr: Dict = {
     ctaListen: "Şarkıları dinle",
     ctaBook: "Booking talebi",
     playFeatured: "{title} dinle",
-    nextShow: "Sıradaki konser",
-    scrollHint: "Müziğe geç",
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -869,7 +797,6 @@ const tr: Dict = {
     alsoOn: "Ayrıca şurada",
   },
   about: {
-    kicker: "Typhoon Hakkında",
     eyebrow: "Typhoon",
     headline: "Amerikan tını. Avrupalı ruh. Türkçe sözler.",
     body:
@@ -887,25 +814,16 @@ const tr: Dict = {
     ],
   },
   members: {
-    kicker: "Grup Üyeleri",
     title: "Kadro",
     showAll: "Tüm müzisyenleri göster",
     showLess: "Daha az göster",
     ...buildMemberMaps("tr"),
   },
-  demos: {
-    kicker: "Demolar",
-    featuredTag: "Güncel demo · Single",
-  },
   shows: {
-    kicker: "Tarihler",
     title: "Konserler",
     intro: "Sıradaki konserler. Bilet ve detaylar doğrudan organizatörde.",
-    link: "Tüm tarihler →",
     tickets: "Bilet",
-    moreInfo: "Detaylar",
     tba: "Tarih yakında",
-    doors: "Başlangıç",
     emptyTitle: "Yeni tarihler planlanıyor.",
     emptyBody: "Festival, kulüp, şehir şenliği ya da kurumsal etkinlik: Typhoon'u sahnenize davet edin.",
     emptyCta: "Booking talebi",
@@ -930,7 +848,6 @@ const tr: Dict = {
     },
   },
   media: {
-    kicker: "Medya",
     title: "Fotoğraflar",
     open: "Görseli aç",
     close: "Kapat",
@@ -939,7 +856,6 @@ const tr: Dict = {
     counter: "Görsel {index} / {total}",
   },
   booking: {
-    kicker: "Booking",
     title: "Typhoon'u davet edin",
     intro:
       "Etkinliğinizi kısaca anlatın. Uygunluk ve koşullarla size bizzat dönüş yapalım.",
@@ -980,8 +896,6 @@ const tr: Dict = {
     requiredErr: "Lütfen işaretli alanları doldurun.",
     networkErr:
       "Talep gönderilemedi. Lütfen daha sonra tekrar deneyin ya da bize doğrudan yazın.",
-    backendNotice:
-      "Talepler doğrudan booking@typhoon.band adresine ulaşır. Yanıt 48 saat içinde.",
     submitFallback:
       "Çevrimiçi gönderim şu anda kullanılamıyor. Lütfen booking@typhoon.band adresine yazın.",
     submitOk: "Talebiniz için teşekkürler. En kısa sürede size dönüş yapacağız.",
@@ -1013,13 +927,11 @@ const tr: Dict = {
       "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir.",
     copyrightTemplate: "© {year} Typhoon. Tüm hakları saklıdır.",
     toTop: "Başa dön",
-    admin: "Grup girişi",
   },
   cookies: {
     title: "Gizlilik",
     body:
       "Bu site izleme ya da reklam çerezi kullanmaz. Video veya müzik oynatıcısı gibi harici içerikler yalnızca onayınızla yüklenir.",
-    accept: "Harici medyaya izin ver",
     acceptShort: "Tümüne izin ver",
     decline: "Yalnızca gerekli",
     save: "Seçimi kaydet",
@@ -1053,11 +965,8 @@ const tr: Dict = {
     prev: "Önceki şarkı",
     next: "Sonraki şarkı",
     volume: "Ses düzeyi",
-    volumeUp: "Sesi aç",
-    volumeDown: "Sesi kıs",
     mute: "Sessize al",
     unmute: "Sesi aç",
-    more: "Daha fazla",
     close: "Oynatıcıyı kapat",
     seek: "{title} içindeki konum",
     by: "Typhoon",
