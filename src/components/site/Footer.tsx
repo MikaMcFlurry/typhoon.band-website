@@ -22,12 +22,12 @@ export function Footer({
 }) {
   const year = new Date().getFullYear();
   const linkClass =
-    "inline-flex min-h-11 items-center gap-3 text-paper-2 transition-colors hover:text-gold-hi";
+    "inline-flex min-h-11 items-center gap-3 text-left text-paper-2 transition-colors hover:text-gold-hi";
 
   return (
     <footer className="border-t border-line bg-ink-2" id="contact">
       <div className="container-x grid gap-12 py-16 md:grid-cols-12 md:py-20">
-        <div className="md:col-span-5">
+        <div className="md:col-span-4 lg:col-span-5">
           <Image
             alt="Typhoon"
             className="h-auto w-[220px] md:w-[260px]"
@@ -41,18 +41,18 @@ export function Footer({
           </p>
         </div>
 
-        <div className="md:col-span-3">
+        <div className="md:col-span-4 lg:col-span-3">
           <h2 className="label">{dict.footer.contact}</h2>
           <ul className="mt-4 flex flex-col">
             <li>
-              <a className={linkClass} href={`mailto:${email}`}>
-                <Icon className="text-gold" name="mail" size={18} />
+              <a className={`${linkClass} whitespace-nowrap`} href={`mailto:${email}`}>
+                <Icon className="flex-none text-gold" name="mail" size={18} />
                 {email}
               </a>
             </li>
             <li>
-              <a className={linkClass} href={`tel:${phone.replace(/\s+/g, "")}`}>
-                <Icon className="text-gold" name="phone" size={18} />
+              <a className={`${linkClass} whitespace-nowrap`} href={`tel:${phone.replace(/\s+/g, "")}`}>
+                <Icon className="flex-none text-gold" name="phone" size={18} />
                 {phone}
               </a>
             </li>
@@ -65,7 +65,7 @@ export function Footer({
           ) : null}
         </div>
 
-        <div className="md:col-span-4 md:pl-8">
+        <div className="md:col-span-4 lg:pl-8">
           <h2 className="label">{dict.footer.legal}</h2>
           <ul className="mt-4 flex flex-col">
             <li>

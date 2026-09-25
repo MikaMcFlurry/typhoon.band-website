@@ -13,7 +13,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: path === "" ? ("weekly" as const) : ("yearly" as const),
       priority: path === "" ? 1 : 0.3,
       alternates: {
-        languages: Object.fromEntries(LOCALES.map((l) => [l, absoluteUrl(`/${l}${path}`)])),
+        languages: {
+          ...Object.fromEntries(LOCALES.map((l) => [l, absoluteUrl(`/${l}${path}`)])),
+          "x-default": absoluteUrl(`/de${path}`),
+        },
       },
     })),
   );

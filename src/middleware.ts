@@ -5,6 +5,8 @@ import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/locales";
 // 1. Locale routing. Every page lives under /de, /en or /tr. Requests without
 //    a locale prefix are redirected to the best match from Accept-Language
 //    (no cookie is set, so no consent is needed).
+//    Public locale paths get an `x-typhoon-locale` request header for the
+//    global 404 page.
 // 2. Admin session refresh. For /<locale>/admin/* the Supabase auth cookies
 //    are refreshed here (the documented @supabase/ssr pattern). Server
 //    Components cannot write cookies, so without this admins were logged
@@ -67,7 +69,11 @@ export async function middleware(request: NextRequest) {
 
   if (isLocale(first)) {
     if (segments[2] === "admin") return refreshAdminSession(request);
-    return NextResponse.next();
+    // Lets the global 404 page (which gets no route params) answer in the
+    // visitor's language.
+    const headers = new Headers(request.headers);
+    headers.set("x-typhoon-locale", first);
+    return NextResponse.next({ request: { headers } });
   }
 
   const locale = pickLocale(request.headers.get("accept-language"));

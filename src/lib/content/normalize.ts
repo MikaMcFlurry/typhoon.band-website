@@ -150,12 +150,14 @@ export function normaliseMembers(
     // only applies when Supabase has no photo for this slug.
     const hasSupabasePhoto =
       typeof sb.photo_url === "string" && sb.photo_url.trim().length > 0;
+    const photoUrl = pickString(sb.photo_url, fb.photoUrl);
     result.push({
       id: fb.id,
       name: pickString(sb.translation?.name, fb.name),
       role: pickString(sb.translation?.role, fb.role),
       bio: pickString(sb.translation?.bio_md, fb.bio),
-      photoUrl: pickString(sb.photo_url, fb.photoUrl),
+      photoUrl,
+      photoPosition: photoUrl === fb.photoUrl ? fb.photoPosition : undefined,
       isPlaceholder: hasSupabasePhoto ? false : fb.isPlaceholder,
       sortOrder: sb.sort_order ?? fb.sortOrder,
     });
@@ -214,10 +216,14 @@ export function normaliseSongs(
         ? fallbacks.find((s) => songKey(s.title) === songKey(row.title))
         : undefined;
       const fallback = fallbacks.find((s) => s.id === row.slug) ?? byTitle;
+      const audioUrl = pickString(row.audio_url, fallback?.audioUrl ?? "");
       return {
         id: row.slug,
         title: byTitle ? byTitle.title : pickString(row.title, fallback?.title ?? row.slug),
-        audioUrl: pickString(row.audio_url, fallback?.audioUrl ?? ""),
+        audioUrl,
+        // Only reuse the repo duration for the very same file; uploads are
+        // measured by src/lib/content/song-durations.ts.
+        durationSeconds: fallback && fallback.audioUrl === audioUrl ? fallback.durationSeconds : null,
         coverImageUrl:
           pickStringOrNull(row.cover_image_url) ??
           fallback?.coverImageUrl ??

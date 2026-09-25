@@ -104,9 +104,15 @@ The booking flow is the most important production function.
   inline validation, focus to first error, success/fallback states, privacy
   note). Copy in DE/EN/TR via dictionaries.
 - API: `POST /api/booking` (`src/app/api/booking/route.ts`):
-  same-origin + `application/json` only, best-effort per-IP rate limit
-  (5 per 10 min per instance), honeypot `hp_field` and a 2.5 s time trap
-  (both answer with a fake success), messages in the visitor's language.
+  same-origin only, best-effort per-IP rate limit (5 per 10 min per
+  instance), honeypot `hp_field` and a 2.5 s time trap (both answer with a
+  fake success), messages in the visitor's language. The time trap uses
+  `elapsed_ms`, measured by the form with `performance.now()`, so a wrong
+  device clock can never drop a real request.
+- Works without JavaScript: the form is a real `method="post"` form with
+  native validation until it hydrates. A form-encoded POST gets a 303
+  redirect to `/<locale>/booking/<sent|fallback|invalid|error|rate-limited>`
+  (static, `noindex`) instead of JSON. Personal data never ends up in a URL.
 - Validation: `src/lib/validation/booking.ts` — required `name`, `email`,
   `event_location`, `event_type`, `message` (≥ 10 chars); optional `phone`,
   `event_date` (must be a real calendar date). Event-type keys from the
@@ -134,6 +140,8 @@ The booking flow is the most important production function.
 
 // rate limited (429) / foreign origin (403) / wrong content type (415)
 { ok: false, status: "rate_limited" | "error" | "validation", message: string }
+
+// plain form POST (no JavaScript): 303 → /<locale>/booking/<status slug>
 
 // hard failure — every configured channel failed (502)
 { ok: false, status: "error",      message: string }
@@ -182,6 +190,14 @@ DB rows that hold the asset URL. Missing URLs fall back to the static asset.
   legal pages), Media Session API (lock screen / hardware keys), loading and
   error states, waveforms auto-fit the available width, keyboard-operable
   seek slider, reduced-motion support, durations shown before playback.
+- Durations are read on the server, never by downloading audio in the
+  browser: repo demos carry `durationSeconds` in `src/data/songs.ts`;
+  uploaded MP3s are measured once from a 16 KB byte range
+  (`src/lib/audio/mp3-duration.ts`, Xing/VBRI/CBR) and cached for 30 days
+  (`src/lib/content/song-durations.ts`, Supabase Storage URLs only).
+- Touch: vertical swipes over a waveform scroll the page; only a tap or a
+  horizontal drag seeks. One polite live region (in the dock) announces
+  "{title} – {state}".
 - No download button, no native browser controls, no external embeds.
 
 ## Environment variables
@@ -229,9 +245,16 @@ WEBSITE_FROM_EMAIL                # must be a Resend-verified domain
    psql -f supabase/migrations/0004_admin_password_flow.sql
    psql -f supabase/migrations/0005_booking_show_workflow.sql
    psql -f supabase/policies/0005_booking_show_workflow.sql
+   psql -f supabase/migrations/0006_legal_seo_consent_platforms.sql
+   psql -f supabase/policies/0006_legal_seo_consent_platforms.sql
+   psql -f supabase/policies/0006_phase05_member_full_read.sql
+   psql -f supabase/migrations/0007_security_hardening.sql
    ```
    The same SQL can be pasted into the Supabase SQL editor. Every
-   statement is idempotent so reruns are safe.
+   statement is idempotent so reruns are safe. `0007` (storage listing
+   off, bucket limits, hardened helpers) is optional but recommended; its
+   changes are also folded into `0003` and `policies/0001_rls.sql`, so
+   re-running those files no longer undoes the hardening.
 4. Verify Row Level Security is **enabled** on every public table and
    that no `select`/`insert` policy is exposed for `booking_requests` or
    `admin_profiles`. The bundled policies enforce this; do not loosen
@@ -465,14 +488,21 @@ repo assets and never reaches Storage.
 - `/[locale]/admin/seo` — per `(path, locale)` Title/Description/OG image
   overrides for `/` and the legal routes. Defaults come from the
   dictionaries (`meta.*`) and `/og-image.jpg` (1200×630).
-- Built-in SEO: per-locale `<html lang>`, canonical + hreflang alternates,
-  Open Graph/Twitter cards, `sitemap.xml`, `robots.txt` (admin/api
-  disallowed, admin also `noindex`), web manifest, JSON-LD `MusicGroup`
-  with members and `MusicEvent` for upcoming dated shows.
+- Built-in SEO: per-locale `<html lang>`, canonical + hreflang alternates
+  (incl. `x-default`, also in the sitemap), full Open Graph/Twitter cards
+  on every page (`src/lib/seo.ts` — Next merges `openGraph` shallowly),
+  per-page descriptions for the legal pages, `sitemap.xml`, `robots.txt`
+  (admin/api disallowed, admin also `noindex`), web manifest, JSON-LD
+  `MusicGroup` with members and `MusicEvent` for upcoming dated shows.
+- 404: unknown URLs render `src/app/global-not-found.tsx` on the server
+  (`experimental.globalNotFound`), localized via the `x-typhoon-locale`
+  header the middleware sets, with the site header and footer.
 - `/[locale]/admin/platform-links` — Spotify, YouTube, Instagram, Facebook,
   SoundCloud, Bandcamp. Active rows appear automatically in the footer and
   as "Also on" links in the music section; none → the blocks are hidden.
-- Consent: first visit shows a small non-blocking notice; the footer button
+- Consent: first visit shows a small non-blocking notice (early in the DOM,
+  Esc minimises it to a pill, its height is reserved via
+  `scroll-padding-bottom` together with the player dock); the footer button
   "Datenschutz-Einstellungen" reopens it as a dialog (focus trap, Esc).
   Stored only in `localStorage` (`typhoon.consent.v1`; the old key
   `typhoon.cookie-consent` is honoured). The public site sets no cookies.
@@ -489,7 +519,14 @@ keep working), enforces bucket size/MIME limits (50 MB MP3, 10 MB
 JPG/PNG/WebP) and makes the RLS helper functions `SECURITY DEFINER` with an
 empty `search_path`. It was verified against a local Postgres 16 with all
 earlier migrations applied. Apply it in the Supabase SQL editor after a
-backup.
+backup. The same changes are folded into `0003_storage_buckets.sql` and
+`policies/0001_rls.sql`, so re-running those files cannot undo them.
+
+Booking data retention: archiving a request in Admin is a soft delete;
+archived requests can be **deleted permanently** (owner/admin, with a
+confirmation checkbox) — for erasure requests (Art. 17 GDPR) or once a
+request is no longer needed. A show converted from the request survives
+(`ON DELETE SET NULL`).
 
 ## Deferred / next batches
 

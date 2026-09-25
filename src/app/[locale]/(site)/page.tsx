@@ -6,11 +6,12 @@ import { Booking } from "@/components/sections/Booking";
 import { Gallery } from "@/components/sections/Gallery";
 import { Hero } from "@/components/sections/Hero";
 import { Music } from "@/components/sections/Music";
-import { Shows, splitShows } from "@/components/sections/Shows";
+import { countryCode, Shows, splitShows } from "@/components/sections/Shows";
 import { PlatformLinks } from "@/components/site/PlatformLinks";
 import { getDict } from "@/i18n/dictionaries";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/locales";
 import { getPublicPageContent, getSeoEntry } from "@/lib/content";
+import { languageAlternates, openGraphBase } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site-url";
 
 // Rendered on the server and cached for a minute. Admin actions call
@@ -35,12 +36,14 @@ export async function generateMetadata({
   return {
     title: { absolute: title },
     description,
+    alternates: { canonical: `/${locale}`, languages: languageAlternates() },
     openGraph: {
+      ...openGraphBase(locale),
       title,
       description,
       images: [{ url: image, width: 1200, height: 630, alt: dict.meta.ogAlt }],
     },
-    twitter: { title, description, images: [image] },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
@@ -59,6 +62,7 @@ export default async function HomePage({
     title: s.title,
     src: s.audioUrl,
     cover: s.coverImageUrl || FALLBACK_COVER,
+    duration: s.durationSeconds,
   }));
   const featuredSong = content.songs.find((s) => s.isFeatured) ?? content.songs[0];
   const featured = featuredSong ? tracks.find((t) => t.id === featuredSong.id) ?? null : null;
@@ -77,7 +81,7 @@ export default async function HomePage({
         startDate: s.startTime ? `${s.date}T${s.startTime}` : (s.date as string),
         venue: s.venue,
         city: s.city,
-        country: s.country,
+        country: countryCode(s.country) ?? s.country,
         url: s.ticketUrl,
       })),
   });

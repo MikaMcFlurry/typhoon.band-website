@@ -6,6 +6,7 @@ import { getDict } from "@/i18n/dictionaries";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/locales";
 import { getLegalPage, getSeoEntry, getSiteSettings } from "@/lib/content";
 import type { LegalPageType } from "@/lib/content/types";
+import { languageAlternates, openGraphBase } from "@/lib/seo";
 
 // Shared server implementation of /[locale]/legal/{imprint,privacy,cookies}.
 // Admin → Legal (Supabase, published) wins; otherwise the curated fallback.
@@ -23,18 +24,25 @@ function resolveLocale(raw: string): Locale {
 export async function legalMetadata(type: LegalPageType, rawLocale: string): Promise<Metadata> {
   const locale = resolveLocale(rawLocale);
   const entry = await getSeoEntry(PATHS[type], locale);
+  const dict = getDict(locale);
+  const title = entry.title || dict.legal[`${type}Title`];
+  const description = entry.description || dict.legal[`${type}Description`];
+  const image = entry.ogImageUrl || "/og-image.jpg";
+  const fullTitle = `${title} · Typhoon`;
   return {
-    title: entry.title ?? undefined,
-    description: entry.description ?? undefined,
+    title,
+    description,
     alternates: {
       canonical: `/${locale}${PATHS[type]}`,
-      languages: {
-        de: `/de${PATHS[type]}`,
-        en: `/en${PATHS[type]}`,
-        tr: `/tr${PATHS[type]}`,
-      },
+      languages: languageAlternates(PATHS[type]),
     },
-    openGraph: entry.ogImageUrl ? { images: [{ url: entry.ogImageUrl }] } : undefined,
+    openGraph: {
+      ...openGraphBase(locale, PATHS[type]),
+      title: fullTitle,
+      description,
+      images: [{ url: image, width: 1200, height: 630, alt: dict.meta.ogAlt }],
+    },
+    twitter: { card: "summary_large_image", title: fullTitle, description, images: [image] },
   };
 }
 

@@ -135,6 +135,13 @@ export type Dict = {
     submitOkTitle: string;
     submitAnother: string;
     submitError: string;
+    result: {
+      invalidTitle: string;
+      invalidBody: string;
+      errorTitle: string;
+      rateTitle: string;
+      back: string;
+    };
     errors: {
       name: string;
       email: string;
@@ -184,6 +191,9 @@ export type Dict = {
     imprintTitle: string;
     privacyTitle: string;
     cookiesTitle: string;
+    imprintDescription: string;
+    privacyDescription: string;
+    cookiesDescription: string;
     draftNote: string;
     updated: string;
   };
@@ -224,7 +234,7 @@ const memberBios: Record<string, Record<Locale, string>> = {
   typhoon: {
     de: "Frontmann, türkischsprachige Texte und direkte Energie im Zentrum der Band.",
     en: "Frontman — Turkish-language lyrics and the live energy at the heart of the band.",
-    tr: "Sahnenin önünde Türkçe sözler ve grubun merkezindeki canlı enerji.",
+    tr: "Grubun solisti: Türkçe sözler ve grubun merkezindeki dolaysız enerji.",
   },
   mika: {
     de: "Junger Posaunen-Sound, rauer Live-Charakter und warme Brass-Linien.",
@@ -234,7 +244,7 @@ const memberBios: Record<string, Record<Locale, string>> = {
   schack: {
     de: "Erfahrung, warme Linien und ein souliger Ton für die Bläsersektion.",
     en: "Experience, warm phrasing and a soulful tone driving the brass section.",
-    tr: "Tecrübe, sıcak frazeler ve nefesli grubuna soul katan bir saksofon tonu.",
+    tr: "Tecrübe, sıcak cümleler ve nefesli bölüme soul katan bir saksofon tonu.",
   },
   hardy: {
     de: "Markante Brass-Stimme zwischen Funk, Bluesrock und Bühnen-Druck.",
@@ -244,7 +254,7 @@ const memberBios: Record<string, Record<Locale, string>> = {
   stefan: {
     de: "Groovendes Fundament, präziser Druck und warme Tiefe.",
     en: "Grooving foundation, precise punch and warm low end.",
-    tr: "Groove temeli, isabetli vuruş ve sıcak alt bant.",
+    tr: "Groove'un temeli, isabetli vuruşlar ve sıcak, derin bir bas.",
   },
   tom: {
     de: "Treibender Puls, Live-Energie und rhythmische Stabilität.",
@@ -259,7 +269,7 @@ const memberBios: Record<string, Record<Locale, string>> = {
   jurgen: {
     de: "Gitarrensound zwischen Rhythmus, Wärme und rockiger Kante.",
     en: "Guitar tone balancing rhythm, warmth and a rock edge.",
-    tr: "Ritim, sıcaklık ve rock kenarını birleştiren gitar tonu.",
+    tr: "Ritmi, sıcaklığı ve rock sertliğini birleştiren gitar tonu.",
   },
 };
 
@@ -354,7 +364,7 @@ const de: Dict = {
     tba: "Datum folgt",
     emptyTitle: "Neue Termine sind in Planung.",
     emptyBody:
-      "Festival, Club, Stadtfest oder Firmenevent: Holt Typhoon auf eure Bühne.",
+      "Festival, Club, Stadtfest oder Firmenevent: Hol Typhoon auf deine Bühne.",
     emptyCta: "Booking anfragen",
     past: "Vergangene Konzerte",
     placeholderTitles: [
@@ -387,14 +397,12 @@ const de: Dict = {
   booking: {
     title: "Typhoon buchen",
     intro:
-      "Erzählt uns kurz von eurem Event. Wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
+      "Erzähl uns kurz von deinem Event. Wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
     factsTitle: "Für Veranstalter",
     facts: [
       { label: "Besetzung", value: "{count} Musiker mit Gesang, Bläsersatz und Rhythmusgruppe" },
-      { label: "Programm", value: "Eigene Songs mit türkischen Texten" },
       { label: "Stil", value: "Bluesrock, Funk, Soul, Jazz, Southern Rock" },
       { label: "Anlässe", value: "Festival, Club, Stadtfest, Firmen- und Privatevents" },
-      { label: "Basis", value: "Hechingen, Baden-Württemberg – gerne auch weiter weg" },
     ],
     direct: "Direkt erreichbar",
     reply: "Antwort in der Regel innerhalb von 48 Stunden.",
@@ -411,7 +419,7 @@ const de: Dict = {
       club: "Club / Konzert",
       cityfest: "Stadtfest",
       corporate: "Firmenevent",
-      private: "Private Feier / Hochzeit",
+      private: "Private Feier",
       other: "Sonstiges",
     },
     messageLabel: "Nachricht",
@@ -433,6 +441,14 @@ const de: Dict = {
     submitAnother: "Weitere Anfrage senden",
     submitError:
       "Die Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut oder schreib uns direkt.",
+    result: {
+      invalidTitle: "Bitte prüfe deine Angaben",
+      invalidBody:
+        "Wir brauchen Name, E-Mail, Ort, Art der Veranstaltung und eine kurze Nachricht (mindestens 10 Zeichen). Geh zurück zum Formular oder schreib uns direkt.",
+      errorTitle: "Das hat nicht geklappt",
+      rateTitle: "Kurz durchatmen",
+      back: "Zurück zum Formular",
+    },
     errors: {
       name: "Bitte gib deinen Namen an.",
       email: "Bitte gib eine gültige E-Mail-Adresse an.",
@@ -484,6 +500,12 @@ const de: Dict = {
     imprintTitle: "Impressum",
     privacyTitle: "Datenschutzerklärung",
     cookiesTitle: "Cookie-Hinweise",
+    imprintDescription:
+      "Impressum der Band Typhoon: Anbieterkennzeichnung und Kontakt.",
+    privacyDescription:
+      "Datenschutzerklärung von typhoon.band: welche Daten beim Besuch der Website und bei Booking-Anfragen verarbeitet werden und welche Rechte bestehen.",
+    cookiesDescription:
+      "Cookie-Hinweis von typhoon.band: keine Tracking- oder Werbe-Cookies, nur die gespeicherte Datenschutz-Auswahl.",
     draftNote: "Initialer Stand — wird laufend ergänzt.",
     updated: "Stand",
   },
@@ -536,9 +558,9 @@ const en: Dict = {
     line2: "EXCEPTIONAL.",
     line3: "FUNK.",
     description:
-      "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock — powerful, warm, full of live energy.",
+      "Typhoon blends Turkish lyrics with blues rock, funk, soul, jazz and southern rock — powerful, warm and full of live energy.",
     ctaListen: "Listen to songs",
-    ctaBook: "Booking request",
+    ctaBook: "Request a booking",
     playFeatured: "Play {title}",
   },
   brand: {
@@ -548,7 +570,7 @@ const en: Dict = {
   music: {
     title: "Listen",
     intro:
-      "Demos with Turkish lyrics, blues riffs and a horn section that pushes forward. Playback keeps going while you scroll.",
+      "Demos with Turkish lyrics, blues riffs and a horn section that really drives. Playback keeps going while you scroll.",
     featuredLabel: "Current single",
     tracklist: "All demos",
     trackCount: "{count} demos",
@@ -565,13 +587,13 @@ const en: Dict = {
     eyebrow: "Typhoon",
     headline: "American feeling. European soul. Turkish lyrics.",
     body:
-      "Typhoon breaks genre boundaries without losing their handwriting: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
+      "Typhoon breaks through genre boundaries without losing its signature sound: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that catches fire the moment it hits the stage.",
     lead:
-      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of eight experienced musicians with more than 30 years of stage experience, built on vocals, a horn section and a grooving rhythm section.\n\nIn their own Kanzlei Studio in Hechingen, the band works out its arrangements with great attention to detail and modern equipment. The result is a complete package of craftsmanship and genuine joy of playing.",
+      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of eight experienced musicians with more than 30 years of stage experience, built on vocals, a horn section and a grooving rhythm section.\n\nIn their own Kanzlei Studio in Hechingen, the band works out its arrangements with great attention to detail and modern equipment. The result is a complete package of craftsmanship and genuine love of playing.",
     more: "More about Typhoon",
     imageAlt: "Typhoon singing live on stage",
     cta: "Meet the line-up",
-    ctaBook: "Booking request",
+    ctaBook: "Request a booking",
     facts: [
       { label: "Line-up", value: "{count} musicians incl. horn section" },
       { label: "Lyrics", value: "Turkish, original songs" },
@@ -590,8 +612,8 @@ const en: Dict = {
     tickets: "Tickets",
     tba: "Date to be announced",
     emptyTitle: "New dates are being planned.",
-    emptyBody: "Festival, club, city festival or corporate event: bring Typhoon to your stage.",
-    emptyCta: "Booking request",
+    emptyBody: "Festival, club, town festival or corporate event: bring Typhoon to your stage.",
+    emptyCta: "Request a booking",
     past: "Past shows",
     placeholderTitles: [
       "New dates in preparation",
@@ -605,7 +627,7 @@ const en: Dict = {
       festival: "Festival",
       club: "Club show",
       concert: "Concert",
-      cityfest: "City festival",
+      cityfest: "Town festival",
       corporate: "Corporate event",
       private: "Private event",
       wedding: "Wedding",
@@ -627,10 +649,8 @@ const en: Dict = {
     factsTitle: "For promoters",
     facts: [
       { label: "Line-up", value: "{count} musicians: vocals, horn section, rhythm section" },
-      { label: "Set", value: "Original songs with Turkish lyrics" },
       { label: "Style", value: "Blues rock, funk, soul, jazz, southern rock" },
-      { label: "Occasions", value: "Festivals, clubs, city festivals, corporate and private events" },
-      { label: "Based in", value: "Hechingen, Baden-Württemberg, Germany; happy to travel" },
+      { label: "Occasions", value: "Festivals, clubs, town festivals, corporate and private events" },
     ],
     direct: "Reach us directly",
     reply: "We usually reply within 48 hours.",
@@ -645,9 +665,9 @@ const en: Dict = {
     types: {
       festival: "Festival",
       club: "Club / concert",
-      cityfest: "City festival",
+      cityfest: "Town festival",
       corporate: "Corporate event",
-      private: "Private party / wedding",
+      private: "Private event",
       other: "Other",
     },
     messageLabel: "Message",
@@ -668,6 +688,14 @@ const en: Dict = {
     submitAnother: "Send another request",
     submitError:
       "We couldn't send your request. Please try again later or email us directly.",
+    result: {
+      invalidTitle: "Please check your details",
+      invalidBody:
+        "We need your name, email, location, type of event and a short message (at least 10 characters). Go back to the form or write to us directly.",
+      errorTitle: "Something went wrong",
+      rateTitle: "Too many requests",
+      back: "Back to the form",
+    },
     errors: {
       name: "Please enter your name.",
       email: "Please enter a valid email address.",
@@ -704,7 +732,7 @@ const en: Dict = {
     necessary: "Necessary",
     necessaryBody: "Only stores this choice in your browser.",
     external: "External media",
-    externalBody: "Load videos and players from YouTube, Spotify & co. after consent.",
+    externalBody: "Videos and players from YouTube, Spotify and others only load with your consent.",
     privacyLink: "Privacy",
     cookiesLink: "Cookies",
   },
@@ -719,6 +747,12 @@ const en: Dict = {
     imprintTitle: "Imprint",
     privacyTitle: "Privacy policy",
     cookiesTitle: "Cookie notice",
+    imprintDescription:
+      "Legal notice of the band Typhoon: provider identification and contact.",
+    privacyDescription:
+      "Privacy policy of typhoon.band: which data is processed when you visit the website or send a booking request, and your rights.",
+    cookiesDescription:
+      "Cookie notice of typhoon.band: no tracking or advertising cookies, only your saved privacy choice.",
     draftNote: "Initial draft — extended over time.",
     updated: "Last updated",
   },
@@ -771,10 +805,10 @@ const tr: Dict = {
     line2: "OLAĞANÜSTÜ.",
     line3: "FUNK.",
     description:
-      "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede dolu enerjik.",
+      "Typhoon, Türkçe sözleri blues rock, funk, soul, caz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede enerji dolu.",
     ctaListen: "Şarkıları dinle",
     ctaBook: "Booking talebi",
-    playFeatured: "{title} dinle",
+    playFeatured: "{title} şarkısını dinle",
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -798,11 +832,11 @@ const tr: Dict = {
   },
   about: {
     eyebrow: "Typhoon",
-    headline: "Amerikan tını. Avrupalı ruh. Türkçe sözler.",
+    headline: "Amerikan tınısı. Avrupa ruhu. Türkçe sözler.",
     body:
-      "Typhoon, kendi imzasını kaybetmeden tür sınırlarını aşar: vurucu blues riff'leri, funky groove'lar, ruhlu melodiler, jazz incelikleri ve Türkçe sözler. Sahneye çıktığı an alev alan tecrübeli bir grup.",
+      "Typhoon, kendi imzasını kaybetmeden tür sınırlarını aşar: vurucu blues riff'leri, funky groove'lar, soul dolu melodiler, jazz incelikleri ve Türkçe sözler. Sahneye çıktığı an alev alan tecrübeli bir grup.",
     lead:
-      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.\n\nMerkezde, 30 yılı aşkın sahne tecrübesine sahip sekiz deneyimli müzisyenden oluşan uyumlu bir kolektif var; vokal, nefesli grubu ve groove dolu bir ritim grubu.\n\nGrup, Hechingen'deki kendi Kanzlei Studio'sunda düzenlemelerini büyük bir özen ve modern teknikle hazırlar. Sonuç: ustalık ve içten çalma keyfinin bir araya geldiği eksiksiz bir paket.",
+      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, soul dolu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.\n\nMerkezde, 30 yılı aşkın sahne tecrübesine sahip sekiz deneyimli müzisyenden oluşan uyumlu bir kolektif var; vokal, nefesli grubu ve groove dolu bir ritim grubu.\n\nGrup, Hechingen'deki kendi Kanzlei Studio'sunda düzenlemelerini büyük bir özen ve modern teknikle hazırlar. Sonuç: ustalık ve içten çalma keyfinin bir araya geldiği eksiksiz bir paket.",
     more: "Typhoon hakkında daha fazla",
     imageAlt: "Typhoon sahnede canlı söylüyor",
     cta: "Kadroyu tanıyın",
@@ -862,10 +896,8 @@ const tr: Dict = {
     factsTitle: "Organizatörler için",
     facts: [
       { label: "Kadro", value: "{count} müzisyen: vokal, nefesli grubu, ritim grubu" },
-      { label: "Program", value: "Türkçe sözlü kendi şarkıları" },
       { label: "Tarz", value: "Blues rock, funk, soul, jazz, southern rock" },
       { label: "Etkinlikler", value: "Festival, kulüp, şehir şenliği, kurumsal ve özel etkinlikler" },
-      { label: "Merkez", value: "Hechingen, Baden-Württemberg, Almanya; uzak yerlere de gelir" },
     ],
     direct: "Doğrudan ulaşın",
     reply: "Genellikle 48 saat içinde yanıt veriyoruz.",
@@ -882,7 +914,7 @@ const tr: Dict = {
       club: "Kulüp / konser",
       cityfest: "Şehir şenliği",
       corporate: "Kurumsal etkinlik",
-      private: "Özel parti / düğün",
+      private: "Özel etkinlik",
       other: "Diğer",
     },
     messageLabel: "Mesaj",
@@ -903,6 +935,14 @@ const tr: Dict = {
     submitAnother: "Yeni talep gönder",
     submitError:
       "Talep gönderilemedi. Lütfen daha sonra tekrar deneyin ya da bize doğrudan yazın.",
+    result: {
+      invalidTitle: "Lütfen bilgilerinizi kontrol edin",
+      invalidBody:
+        "Adınız, e-posta adresiniz, yer, etkinlik türü ve kısa bir mesaj (en az 10 karakter) gerekli. Forma geri dönün ya da bize doğrudan yazın.",
+      errorTitle: "Bir sorun oluştu",
+      rateTitle: "Çok fazla talep",
+      back: "Forma geri dön",
+    },
     errors: {
       name: "Lütfen adınızı girin.",
       email: "Lütfen geçerli bir e-posta adresi girin.",
@@ -918,7 +958,7 @@ const tr: Dict = {
     contact: "İletişim",
     follow: "Bizi takip edin",
     listen: "Dinle & takip et",
-    legal: "Hukuki",
+    legal: "Yasal",
     imprint: "Künye",
     privacy: "Gizlilik",
     cookies: "Çerezler",
@@ -939,7 +979,7 @@ const tr: Dict = {
     necessary: "Gerekli",
     necessaryBody: "Yalnızca bu seçimi tarayıcınızda saklar.",
     external: "Harici medya",
-    externalBody: "YouTube, Spotify vb. video ve oynatıcıları onaydan sonra yükle.",
+    externalBody: "YouTube, Spotify vb. video ve oynatıcılar yalnızca onayınızla yüklenir.",
     privacyLink: "Gizlilik",
     cookiesLink: "Çerezler",
   },
@@ -954,21 +994,27 @@ const tr: Dict = {
     imprintTitle: "Künye",
     privacyTitle: "Gizlilik politikası",
     cookiesTitle: "Çerez bildirimi",
+    imprintDescription:
+      "Typhoon grubunun künyesi: hizmet sağlayıcı bilgileri ve iletişim.",
+    privacyDescription:
+      "typhoon.band gizlilik politikası: siteyi ziyaret ettiğinizde ve booking talebi gönderdiğinizde hangi verilerin işlendiği ve haklarınız.",
+    cookiesDescription:
+      "typhoon.band çerez bildirimi: izleme veya reklam çerezi yok, yalnızca kaydedilen gizlilik seçiminiz.",
     draftNote: "İlk taslak — zaman içinde genişletilecektir.",
     updated: "Güncelleme",
   },
   player: {
     play: "Oynat",
     pause: "Duraklat",
-    playTrack: "{title} oynat",
-    pauseTrack: "{title} duraklat",
+    playTrack: "{title} şarkısını çal",
+    pauseTrack: "{title} şarkısını duraklat",
     prev: "Önceki şarkı",
     next: "Sonraki şarkı",
     volume: "Ses düzeyi",
     mute: "Sessize al",
     unmute: "Sesi aç",
     close: "Oynatıcıyı kapat",
-    seek: "{title} içindeki konum",
+    seek: "{title} şarkısında konum",
     by: "Typhoon",
     dock: "Müzik çalar",
   },

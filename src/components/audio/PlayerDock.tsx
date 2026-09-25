@@ -7,6 +7,7 @@ import {
   useAudioPlayer,
   useAudioTime,
 } from "@/components/audio/AudioPlayerProvider";
+import { usePercentFormat } from "@/components/audio/usePercentFormat";
 import { Waveform } from "@/components/audio/Waveform";
 import { useDict } from "@/components/i18n/DictProvider";
 import { Icon } from "@/components/ui/Icon";
@@ -19,7 +20,8 @@ import { fill } from "@/i18n/dictionaries";
 const DOCK_HEIGHT = 76;
 
 export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
-  const { dict } = useDict();
+  const { dict, locale } = useDict();
+  const percent = usePercentFormat(locale);
   const {
     currentTrack,
     isPlaying,
@@ -61,7 +63,26 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
   const volumePct = Math.round((muted ? 0 : volume) * 100);
   const canSkip = playlist.length > 1;
 
+  // Closing the dock must not drop keyboard focus to <body>: move it to the
+  // play button of the same song on the page, else to <main>.
+  const close = () => {
+    const id = currentTrack?.id;
+    const target =
+      (id
+        ? Array.from(document.querySelectorAll<HTMLElement>("[data-track-play]")).find(
+            (el) => el.dataset.trackPlay === id && el.getClientRects().length > 0,
+          )
+        : undefined) ?? document.getElementById("main");
+    target?.focus({ preventScroll: true });
+    stop();
+  };
+
   return (
+    <>
+    {/* The only live region of the player: names the song and its state. */}
+    <p className="sr-only" role="status">
+      {visible ? `${title} – ${status}` : ""}
+    </p>
     <section
       aria-hidden={!visible}
       aria-label={dict.player.dock}
@@ -98,10 +119,11 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
               {title}
             </p>
             <p
-              aria-live="polite"
               className={`truncate text-[0.8125rem] ${hasError ? "text-[color:var(--danger)]" : "text-paper-3"}`}
             >
-              {dict.player.by} · {status}
+              <span className="hidden xs:inline">{dict.player.by} · </span>
+              {status}
+              <span className="tabular md:hidden"> · {formatTime(position)}</span>
             </p>
           </div>
         </div>
@@ -159,7 +181,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
           </span>
         </div>
 
-        <div className="hidden flex-none items-center gap-2 lg:flex">
+        <div className="hidden flex-none items-center gap-2 md:flex">
           <button
             aria-label={muted ? dict.player.unmute : dict.player.mute}
             aria-pressed={muted}
@@ -171,8 +193,8 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
           </button>
           <input
             aria-label={dict.player.volume}
-            aria-valuetext={`${volumePct} %`}
-            className="range"
+            aria-valuetext={percent.format(muted ? 0 : volume)}
+            className="range hidden lg:block"
             max={1}
             min={0}
             onChange={(e) => setVolume(Number(e.target.value))}
@@ -186,12 +208,13 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
         <button
           aria-label={dict.player.close}
           className="icon-btn flex-none"
-          onClick={stop}
+          onClick={close}
           type="button"
         >
           <Icon name="close" size={18} />
         </button>
       </div>
     </section>
+    </>
   );
 }

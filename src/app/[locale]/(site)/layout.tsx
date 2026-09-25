@@ -34,6 +34,8 @@ export default async function SiteLayout({
       <a className="skip-link" href="#main">
         {dict.a11y.skip}
       </a>
+      {/* Early in the DOM so keyboard users reach the privacy notice first. */}
+      <ConsentBanner />
       <Header bookingEmail={settings.contactBookingEmail} phone={settings.contactPhone} />
       <main id="main" tabIndex={-1} className="outline-none">
         {children}
@@ -46,7 +48,6 @@ export default async function SiteLayout({
         platformLinks={platformLinks}
       />
       <PlayerDock fallbackCover="/assets/hero/hero-collage.jpeg" />
-      <ConsentBanner />
       <MotionInit />
     </AudioPlayerProvider>
   );

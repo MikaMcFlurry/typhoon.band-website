@@ -14,6 +14,9 @@ import {
 // Redesign additions: keyboard-operable seek slider (←/→ 5 s, Home/End),
 // reduced-motion support (static bars, no rAF loop) and played/unplayed
 // colouring through data attributes instead of class churn.
+// Touch: vertical swipes scroll the page (touch-action: pan-y); only a tap
+// or a horizontal drag seeks, so scrolling past a waveform never starts or
+// moves playback.
 
 type WaveformProps = {
   songId: string;
@@ -96,6 +99,7 @@ export function Waveform({
   }, [barsProp]);
   const peaksRef = useRef<number[]>([]);
   const draggingRef = useRef(false);
+  const touchRef = useRef<{ id: number; x: number; y: number; drag: boolean; moved: boolean } | null>(null);
 
   const idleHeights = useMemo(() => {
     const rng = mulberry32(seedFromId(songId));
@@ -168,15 +172,46 @@ export function Waveform({
 
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (!seekable) return;
+    if (e.pointerType === "touch") {
+      // Decide on move/up whether this is a tap, a seek drag or a scroll.
+      touchRef.current = { id: e.pointerId, x: e.clientX, y: e.clientY, drag: false, moved: false };
+      return;
+    }
+    if (e.button !== 0) return;
     draggingRef.current = true;
     e.currentTarget.setPointerCapture(e.pointerId);
     seekTo(ratioFromEvent(e.clientX, e.currentTarget));
   }
   function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (!seekable || !draggingRef.current || !isCurrent) return;
+    if (!seekable) return;
+    const t = touchRef.current;
+    if (t && t.id === e.pointerId) {
+      const dx = e.clientX - t.x;
+      const dy = e.clientY - t.y;
+      if (!t.drag) {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) t.moved = true;
+        if (Math.abs(dy) > Math.abs(dx)) return;
+        if (Math.abs(dx) > 8 && isCurrent) {
+          t.drag = true;
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }
+      }
+      if (t.drag && isCurrent) seek(songId, ratioFromEvent(e.clientX, e.currentTarget));
+      return;
+    }
+    if (!draggingRef.current || !isCurrent) return;
     seek(songId, ratioFromEvent(e.clientX, e.currentTarget));
   }
   function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    const t = touchRef.current;
+    if (t && t.id === e.pointerId) {
+      touchRef.current = null;
+      // A tap (no real movement) seeks or starts the song; pointercancel
+      // means the browser took the gesture for scrolling.
+      if (e.type === "pointerup" && !t.moved && !t.drag) {
+        seekTo(ratioFromEvent(e.clientX, e.currentTarget));
+      }
+    }
     draggingRef.current = false;
     if (e.currentTarget.hasPointerCapture(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId);
@@ -218,7 +253,7 @@ export function Waveform({
 
   return (
     <div
-      className={`relative flex min-w-0 touch-none select-none items-center gap-[2px] ${heightClass} ${
+      className={`relative flex min-w-0 touch-pan-y select-none items-center gap-[2px] ${heightClass} ${
         seekable ? "cursor-pointer" : ""
       } ${className}`}
       ref={containerRef}

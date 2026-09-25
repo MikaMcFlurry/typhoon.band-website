@@ -16,6 +16,15 @@ export type GalleryImage = { id: string; src: string; alt: string };
 // spans both columns. Desktop (12 cols): one large tile + four small ones,
 // then rows of three; a remainder is spread over rows of two so no image
 // is ever left alone in a row.
+// `sizes` derived from the same layout, so wide tiles get sharp images.
+function tileSizes(i: number, count: number) {
+  const cls = tileClass(i, count);
+  const mobile = /(^|\s)col-span-2(\s|$)/.test(cls) ? "100vw" : "50vw";
+  const span = Number(/md:col-span-(\d+)/.exec(cls)?.[1] ?? 6);
+  const desktop = `${Math.ceil((span / 12) * 100)}vw`;
+  return `(min-width: 1440px) ${Math.ceil((span / 12) * 1320)}px, (min-width: 768px) ${desktop}, ${mobile}`;
+}
+
 function tileClass(i: number, count: number) {
   const mobileLastAlone = i > 0 && (count - 1) % 2 === 1 && i === count - 1;
   const mobile = i === 0 || mobileLastAlone ? "col-span-2" : "";
@@ -124,7 +133,7 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
                   alt=""
                   className="object-cover sepia-img transition-[filter] duration-500 group-hover:[filter:none]"
                   fill
-                  sizes={i === 0 ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
+                  sizes={tileSizes(i, count)}
                   src={item.src}
                 />
               </button>

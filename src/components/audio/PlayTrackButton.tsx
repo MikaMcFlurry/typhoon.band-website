@@ -22,8 +22,8 @@ export function PlayTrackButton({
   const playing = currentId === id && isPlaying;
   return (
     <button
-      aria-pressed={playing}
       className={`btn btn-primary ${className}`}
+      data-track-play={id}
       onClick={() => toggle(id, src)}
       type="button"
     >

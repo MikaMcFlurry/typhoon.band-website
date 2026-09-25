@@ -1,29 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Newsreader } from "next/font/google";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { DictProvider } from "@/components/i18n/DictProvider";
 import { getDict } from "@/i18n/dictionaries";
-import { isLocale, LOCALES, OG_LOCALE } from "@/i18n/locales";
+import { isLocale, LOCALES } from "@/i18n/locales";
+import { languageAlternates, openGraphBase } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
+import { archivo, newsreader } from "../fonts";
 import "../globals.css";
 
 // Root layout lives in the locale segment so <html lang> always matches the
 // rendered language (the old root layout hard-coded lang="de").
-
-const archivo = Archivo({
-  subsets: ["latin", "latin-ext"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-
-const newsreader = Newsreader({
-  subsets: ["latin", "latin-ext"],
-  axes: ["opsz"],
-  style: ["normal"],
-  variable: "--font-newsreader",
-  display: "swap",
-});
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
@@ -56,23 +43,12 @@ export async function generateMetadata({
     applicationName: "Typhoon",
     alternates: {
       canonical: `/${locale}`,
-      languages: {
-        de: "/de",
-        en: "/en",
-        tr: "/tr",
-        "x-default": "/de",
-      },
+      languages: languageAlternates(),
     },
     openGraph: {
-      type: "website",
-      siteName: "Typhoon",
+      ...openGraphBase(locale),
       title: dict.meta.title,
       description: dict.meta.description,
-      locale: OG_LOCALE[locale],
-      alternateLocale: LOCALES.filter((l) => l !== locale).map(
-        (l) => OG_LOCALE[l],
-      ),
-      url: `/${locale}`,
       images: [
         {
           url: "/og-image.jpg",
@@ -117,6 +93,11 @@ export default async function LocaleRootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans">
+        {/* Marks JS support before first paint: only then do collapsed
+            lists hide their extra items (no-JS visitors see everything). */}
+        <Script id="js-flag" strategy="beforeInteractive">
+          {"document.documentElement.setAttribute('data-js','')"}
+        </Script>
         <DictProvider dict={dict} locale={locale}>
           {children}
         </DictProvider>

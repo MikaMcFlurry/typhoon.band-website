@@ -31,8 +31,6 @@ export function Hero({
   signatureUrl: string;
   featured: { id: string; title: string; src: string } | null;
 }) {
-  const genres = dict.brand.genres;
-
   return (
     <section
       aria-labelledby="hero-title"
@@ -41,7 +39,7 @@ export function Hero({
     >
       <div className="container-x grid items-center gap-y-6 pb-20 lg:min-h-[min(86svh,900px)] lg:grid-cols-12 lg:gap-x-10 lg:pb-28">
         {/* Image + signature */}
-        <div className="relative order-1 -mx-4 sm:-mx-6 lg:order-2 lg:col-span-6 lg:mx-0 xl:col-span-7">
+        <div className="relative order-1 -mx-4 sm:-mx-6 md:mx-auto md:w-full md:max-w-[600px] lg:order-2 lg:col-span-6 lg:mx-0 lg:max-w-none xl:col-span-7">
           <div
             className="hero-image grain relative mx-auto aspect-[1/0.86] w-full lg:ml-auto"
             style={{
@@ -54,9 +52,11 @@ export function Hero({
             <Image
               alt={dict.meta.ogAlt}
               className="object-cover object-[50%_42%]"
+              fetchPriority="high"
               fill
               priority
-              sizes="(min-width: 1024px) 58vw, 100vw"
+              quality={70}
+              sizes="(min-width: 1024px) 58vw, (min-width: 768px) 600px, 100vw"
               src={imageUrl}
               style={{ filter: "sepia(0.28) saturate(0.9) contrast(1.06) brightness(0.9)" }}
             />
@@ -65,16 +65,19 @@ export function Hero({
             alt=""
             aria-hidden
             className="pointer-events-none absolute bottom-[-9%] right-[4%] z-30 w-[82%] -rotate-[4deg] drop-shadow-[0_10px_24px_rgba(0,0,0,0.75)] sm:w-[70%] lg:bottom-[-11%] lg:right-[6%] lg:w-[78%]"
+            // Decorative: load with the hero, but never ahead of the collage
+            // (React would otherwise preload it at the same priority).
+            fetchPriority="low"
             height={724}
-            priority
-            sizes="(min-width: 1024px) 44vw, 80vw"
+            loading="eager"
+            sizes="(min-width: 1024px) 44vw, (min-width: 768px) 480px, 80vw"
             src={signatureUrl}
             width={2099}
           />
         </div>
 
         {/* Text */}
-        <div className="order-2 pt-14 sm:pt-16 lg:order-1 lg:col-span-6 lg:pt-0 xl:col-span-5">
+        <div className="order-2 pt-12 sm:pt-16 lg:order-1 lg:col-span-6 lg:pt-0 xl:col-span-5">
           <h1
             className="font-display text-[clamp(2.75rem,1rem+4.6vw,5.25rem)] font-medium leading-[0.98] tracking-[-0.022em] text-paper"
             id="hero-title"
@@ -85,16 +88,7 @@ export function Hero({
             <span className="block text-gold">{titleCase(dict.hero.line3, locale)}</span>
           </h1>
 
-          <p className="mt-6 flex flex-wrap gap-x-3 gap-y-1 text-[0.875rem] font-semibold uppercase tracking-[0.08em] text-gold-hi">
-            {genres.map((g, i) => (
-              <span className="inline-flex items-center gap-3" key={g}>
-                {i > 0 ? <span aria-hidden className="size-1 rounded-full bg-gold-lo" /> : null}
-                {g}
-              </span>
-            ))}
-          </p>
-
-          <p className="lede mt-5">{dict.hero.description}</p>
+          <p className="lede mt-6">{dict.hero.description}</p>
 
           <div className="mt-8 flex flex-wrap gap-3">
             {featured ? (

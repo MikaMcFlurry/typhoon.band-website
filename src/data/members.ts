@@ -3,6 +3,8 @@ export type BandMember = {
   name: string;
   role: string;
   photo: string;
+  /** CSS object-position for photos that are not portrait crops. */
+  photoPosition?: string;
   /** Short editorial bio per docs/typhoon-design-fix-v5.md §5. */
   bio: string;
   /** Mark members where the photo is a stand-in until a real shot ships. */
@@ -18,6 +20,8 @@ export const members: BandMember[] = [
     name: "Typhoon",
     role: "Gesang",
     photo: "/assets/band-cards/typhoon-band-card.jpg",
+    // Landscape stage shot: keep the singer's face in the 4:5 card.
+    photoPosition: "85% 50%",
     bio: "Frontmann, türkischsprachige Texte und direkte Energie im Zentrum der Band.",
     sortOrder: 1,
   },

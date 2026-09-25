@@ -1,7 +1,10 @@
 // POST /api/booking — booking request handler.
 //
 // Contract (Phase 01, hardened in the redesign):
-//   1. Same-origin JSON only; basic per-IP rate limit; honeypot + time trap.
+//   1. Same-origin only; basic per-IP rate limit; honeypot + time trap.
+//      JSON from the enhanced form; a plain form POST (no JavaScript, or a
+//      submit before hydration) is accepted too and answered with a 303
+//      redirect to /<locale>/booking/<status> instead of JSON.
 //   2. Server-validate input (lib/validation/booking.ts).
 //   3. If Supabase service role is configured → insert into booking_requests.
 //   4. If Resend is configured → mail to BOOKING_EMAIL, Reply-To = sender.
@@ -12,6 +15,7 @@
 //   7. "sent" only when at least one configured channel actually succeeded.
 
 import { NextResponse } from "next/server";
+import type { BookingStatusSlug } from "@/lib/booking-status";
 import { getDict } from "@/i18n/dictionaries";
 import { isLocale, type Locale } from "@/i18n/locales";
 import {
@@ -65,6 +69,27 @@ function sameOrigin(request: Request): boolean {
   }
 }
 
+type Kind = "sent" | "fallback" | "validation" | "error" | "rate_limited";
+
+const SLUG: Record<Kind, BookingStatusSlug> = {
+  sent: "sent",
+  fallback: "fallback",
+  validation: "invalid",
+  error: "error",
+  rate_limited: "rate-limited",
+};
+
+function formRedirect(request: Request, locale: Locale, kind: Kind) {
+  return NextResponse.redirect(new URL(`/${locale}/booking/${SLUG[kind]}`, request.url), 303);
+}
+
+async function readForm(request: Request): Promise<Record<string, string>> {
+  const form = await request.formData();
+  const out: Record<string, string> = {};
+  for (const [k, v] of form.entries()) if (typeof v === "string") out[k] = v;
+  return out;
+}
+
 function localeOf(payload: unknown): Locale {
   if (payload && typeof payload === "object") {
     const l = (payload as Record<string, unknown>).locale;
@@ -74,60 +99,62 @@ function localeOf(payload: unknown): Locale {
 }
 
 export async function POST(request: Request) {
-  if (!sameOrigin(request)) {
-    return NextResponse.json(
-      { ok: false, status: "error", message: getDict("de").booking.submitError },
-      { status: 403 },
-    );
-  }
-  if (!(request.headers.get("content-type") ?? "").includes("application/json")) {
-    return NextResponse.json(
-      { ok: false, status: "validation", message: getDict("de").booking.submitError },
-      { status: 415 },
-    );
-  }
+  const contentType = request.headers.get("content-type") ?? "";
+  const isForm =
+    contentType.includes("application/x-www-form-urlencoded") ||
+    contentType.includes("multipart/form-data");
+  const isJson = contentType.includes("application/json");
 
-  let payload: unknown;
-  try {
-    payload = await request.json();
-  } catch {
-    return NextResponse.json(
-      { ok: false, status: "validation", message: getDict("de").booking.submitError },
-      { status: 400 },
-    );
+  let payload: unknown = null;
+  if (isJson || isForm) {
+    try {
+      payload = isForm ? await readForm(request) : await request.json();
+    } catch {
+      payload = null;
+    }
   }
-
   const locale = localeOf(payload);
   const t = getDict(locale).booking;
-  const now = Date.now();
 
-  if (rateLimited(clientKey(request), now)) {
+  // One place that answers both clients: JSON for the enhanced form, a
+  // redirect to a status page for a plain form POST.
+  const reply = (
+    kind: Kind,
+    message: string,
+    init: { status?: number; field?: string; headers?: Record<string, string> } = {},
+  ) => {
+    if (isForm) return formRedirect(request, locale, kind);
+    const ok = kind === "sent" || kind === "fallback";
     return NextResponse.json(
-      { ok: false, status: "rate_limited", message: t.errors.rate },
-      { status: 429, headers: { "Retry-After": "600" } },
+      { ok, status: kind, message, ...(init.field ? { field: init.field } : {}) },
+      { status: init.status ?? 200, headers: init.headers },
     );
+  };
+
+  if (!sameOrigin(request)) return reply("error", t.submitError, { status: 403 });
+  if (!isJson && !isForm) return reply("validation", t.submitError, { status: 415 });
+  if (payload === null) return reply("validation", t.submitError, { status: 400 });
+
+  if (rateLimited(clientKey(request), Date.now())) {
+    return reply("rate_limited", t.errors.rate, { status: 429, headers: { "Retry-After": "600" } });
   }
 
   // Time trap: humans need more than a couple of seconds to fill the form.
-  const startedAt = Number((payload as Record<string, unknown>)?.started_at);
-  const tooFast = Number.isFinite(startedAt) && startedAt > 0 && now - startedAt < MIN_FILL_MS;
+  // The client measures the time itself (performance.now), so a wrong
+  // device clock can never drop a real request. No value (plain form POST
+  // without JavaScript) means no check.
+  const elapsed = Number((payload as Record<string, unknown>).elapsed_ms);
+  const tooFast = Number.isFinite(elapsed) && elapsed >= 0 && elapsed < MIN_FILL_MS;
 
   const result = validateBooking(payload);
   if (!result.ok) {
     // Honeypot hits get a fake success so bots can't probe the check.
-    if (result.field === "hp_field") {
-      return NextResponse.json({ ok: true, status: "sent", message: t.submitOk });
-    }
+    if (result.field === "hp_field") return reply("sent", t.submitOk);
     const message =
       result.field === "_global" ? t.submitError : t.errors[result.field];
-    return NextResponse.json(
-      { ok: false, status: "validation", field: result.field, message },
-      { status: 400 },
-    );
+    return reply("validation", message, { status: 400, field: result.field });
   }
-  if (tooFast) {
-    return NextResponse.json({ ok: true, status: "sent", message: t.submitOk });
-  }
+  if (tooFast) return reply("sent", t.submitOk);
 
   const env = readServerEnv();
   const userAgent = request.headers.get("user-agent")?.slice(0, 400) ?? undefined;
@@ -138,7 +165,7 @@ export async function POST(request: Request) {
   ]);
 
   if (!stored.attempted && !mailed.attempted) {
-    return NextResponse.json({ ok: true, status: "fallback", message: t.submitFallback });
+    return reply("fallback", t.submitFallback);
   }
 
   if (stored.attempted && !stored.ok) {
@@ -150,13 +177,10 @@ export async function POST(request: Request) {
 
   // Report success only if a configured channel really got the request.
   if (!stored.ok && !mailed.ok) {
-    return NextResponse.json(
-      { ok: false, status: "error", message: t.submitError },
-      { status: 502 },
-    );
+    return reply("error", t.submitError, { status: 502 });
   }
 
-  return NextResponse.json({ ok: true, status: "sent", message: t.submitOk });
+  return reply("sent", t.submitOk);
 }
 
 type Outcome = { attempted: boolean; ok: boolean; reason?: string };

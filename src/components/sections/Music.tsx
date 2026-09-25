@@ -23,35 +23,39 @@ export type MusicTrack = {
   title: string;
   src: string;
   cover: string;
+  /** Seconds, read on the server; null if unknown. */
+  duration: number | null;
 };
 
 function TrackRow({
   track,
   index,
-  className = "",
+  ...rest
 }: {
   track: MusicTrack;
   index: number;
-  /** Set by CollapsibleList to hide rows until expanded. */
-  className?: string;
+  /** Set by CollapsibleList on rows that stay collapsed until expanded. */
+  "data-extra"?: string;
 }) {
   const { dict } = useDict();
   const { currentId, isPlaying, isLoading, hasError, duration, toggle } =
     useAudioPlayer();
   const { position } = useAudioTime();
   const rowRef = useRef<HTMLLIElement | null>(null);
-  const metaDuration = useTrackDuration(track.src, rowRef);
+  // Durations come from the server; probe only if it could not read one.
+  const metaDuration = useTrackDuration(track.duration == null ? track.src : "", rowRef);
   const isCurrent = currentId === track.id;
   const playing = isCurrent && isPlaying;
-  const shownDuration = isCurrent && duration ? duration : metaDuration;
+  const shownDuration = isCurrent && duration ? duration : (track.duration ?? metaDuration);
   const number = String(index + 1).padStart(2, "0");
 
   return (
     <li
+      {...rest}
       ref={rowRef}
       className={`group relative grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-3 border-b border-line px-2 py-4 transition-colors md:px-3 md:grid-cols-[2.5rem_auto_minmax(0,14rem)_1fr_4.5rem_auto] md:gap-x-6 md:py-5 ${
         isCurrent ? "bg-ink-3/60" : "hover:bg-ink-3/40"
-      } ${className}`}
+      }`}
     >
       <span
         aria-hidden
@@ -67,11 +71,12 @@ function TrackRow({
       </div>
 
       <div className="min-w-0">
-        <h3 className={`truncate font-display text-[1.25rem] leading-tight md:text-[1.375rem] ${isCurrent ? "text-gold-hi" : "text-paper"}`}>
+        <h3 className={`line-clamp-2 font-display md:truncate text-[1.25rem] leading-tight md:text-[1.375rem] ${isCurrent ? "text-gold-hi" : "text-paper"}`}>
           <span className="sr-only">{number}. </span>
           {track.title}
         </h3>
-        <p className="mt-0.5 text-[0.875rem] text-paper-3" aria-live={isCurrent ? "polite" : undefined}>
+        {/* Visual status only; the player dock owns the single live region. */}
+        <p className="mt-0.5 text-[0.875rem] text-paper-3">
           {isCurrent && hasError
             ? dict.music.error
             : isCurrent
@@ -81,12 +86,19 @@ function TrackRow({
                   ? dict.music.nowPlaying
                   : dict.music.paused
               : dict.player.by}
+          {shownDuration ? (
+            <span className="tabular md:hidden">
+              {" · "}
+              {isCurrent ? `${formatTime(position)} / ` : ""}
+              {formatTime(shownDuration)}
+            </span>
+          ) : null}
         </p>
       </div>
 
-      <div className={`col-span-3 min-w-0 md:col-span-1 ${isCurrent ? "" : "hidden md:block"}`}>
+      <div className="col-span-3 min-w-0 md:col-span-1">
         <Waveform
-          heightClass="h-10 md:h-9"
+          heightClass={isCurrent ? "h-10 md:h-9" : "h-6 md:h-9"}
           label={fill(dict.player.seek, { title: track.title })}
           seekable
           songId={track.id}
@@ -104,6 +116,7 @@ function TrackRow({
             ? fill(dict.player.pauseTrack, { title: track.title })
             : fill(dict.player.playTrack, { title: track.title })
         }
+        data-track-play={track.id}
         className={`col-start-3 row-start-1 inline-flex size-11 flex-none items-center justify-center rounded-full border transition-colors md:col-start-auto md:row-start-auto ${
           playing
             ? "border-gold bg-gold text-on-gold"

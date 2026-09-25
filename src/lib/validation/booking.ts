@@ -42,7 +42,7 @@ export const EVENT_TYPE_LABEL_DE: Record<string, string> = {
   club: "Club / Konzert",
   cityfest: "Stadtfest",
   corporate: "Firmenevent",
-  private: "Private Feier / Hochzeit",
+  private: "Private Feier",
   other: "Sonstiges",
 };
 
@@ -84,7 +84,10 @@ export function validateBooking(raw: unknown): ValidationResult {
   const event_date = trim(r.event_date, 40);
   const event_location = trim(r.event_location, 200);
   const typeRaw = trim(r.event_type, 200);
-  const event_type = EVENT_TYPE_LABEL_DE[typeRaw] ?? typeRaw;
+  // Own keys only: "__proto__" & co. must never resolve to Object.prototype.
+  const event_type = Object.hasOwn(EVENT_TYPE_LABEL_DE, typeRaw)
+    ? EVENT_TYPE_LABEL_DE[typeRaw]
+    : typeRaw;
   const localeRaw = trim(r.locale, 8);
   const locale: Locale = isLocale(localeRaw) ? localeRaw : "de";
 

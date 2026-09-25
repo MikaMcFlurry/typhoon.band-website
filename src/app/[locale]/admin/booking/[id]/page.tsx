@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 import { requireAdminWithPasswordOk } from "@/lib/admin/auth";
+import { isAdminLike } from "@/lib/admin/roles";
 import {
   BOOKING_STATUSES,
   getBookingRequest,
@@ -15,6 +16,7 @@ import {
   archiveBookingAction,
   changeBookingStatusAction,
   convertBookingToShowAction,
+  deleteBookingPermanentlyAction,
   restoreBookingAction,
 } from "./actions";
 
@@ -99,6 +101,7 @@ export default async function AdminBookingDetailPage({
 
   const row = detail.row;
   const isArchived = row.deleted_at !== null;
+  const canErase = isAdminLike(current.profile);
   const isConverted = Boolean(row.converted_show_id);
 
   let convertedShow: AdminShowRow | null = null;
@@ -244,11 +247,34 @@ export default async function AdminBookingDetailPage({
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="id" value={row.id} />
                 <button type="submit" className="btn btn-secondary">
-                  {isConverted ? "Anfrage archivieren" : "Anfrage löschen"}
+                  Anfrage archivieren
                 </button>
               </form>
             )}
           </div>
+
+          {isArchived && canErase ? (
+            <div className="panel p-4">
+              <h3 className="kicker">Endgültig löschen</h3>
+              <p className="mt-2 text-xs text-[color:var(--muted-cream)]">
+                Entfernt die Anfrage mit allen personenbezogenen Daten dauerhaft
+                aus der Datenbank (z. B. auf Löschwunsch nach Art. 17 DSGVO
+                oder wenn sie nicht mehr gebraucht wird). Eine daraus
+                erstellte Show bleibt bestehen. Nicht rückgängig zu machen.
+              </p>
+              <form action={deleteBookingPermanentlyAction} className="mt-3 flex flex-col gap-3">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="id" value={row.id} />
+                <label className="flex items-start gap-2 text-xs text-[color:var(--cream)]">
+                  <input className="mt-0.5" name="confirm" required type="checkbox" />
+                  Ich möchte diese Anfrage endgültig löschen.
+                </label>
+                <button type="submit" className="btn btn-secondary self-start">
+                  Endgültig löschen
+                </button>
+              </form>
+            </div>
+          ) : null}
 
           {isConverted ? (
             <div className="panel border-[color:var(--gold-soft)] p-4">

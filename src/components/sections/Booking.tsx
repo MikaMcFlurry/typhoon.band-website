@@ -38,9 +38,9 @@ export function Booking({
 
         <div className="reveal mt-10 md:mt-14">
           <h3 className="sr-only">{t.factsTitle}</h3>
-          <dl className="grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-2 lg:grid-cols-5 sm:[&>*:last-child]:col-span-2 lg:[&>*:last-child]:col-span-1">
+          <dl className="grid gap-px overflow-hidden rounded-md border border-line bg-line md:grid-cols-3">
             {t.facts.map((f) => (
-              <div className="bg-ink p-5" key={f.label}>
+              <div className="bg-ink px-5 py-4 md:p-5" key={f.label}>
                 <dt className="label">{f.label}</dt>
                 <dd className="mt-2 text-paper">{fill(f.value, { count: memberCount })}</dd>
               </div>

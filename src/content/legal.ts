@@ -144,7 +144,13 @@ function privacy(locale: Locale, f: Facts): LegalSection[] {
             "Supabase Inc. stores the request in our database (processor).",
             "Resend Inc. (USA) delivers the notification email to our booking address (processor).",
           ] },
-          "We delete requests once they are no longer needed to handle them, unless statutory retention obligations apply (for example after a booking contract).",
+          "We delete requests permanently once they are no longer needed to handle them, or when you ask us to, unless statutory retention obligations apply (for example after a booking contract).",
+        ],
+      },
+      {
+        heading: "Contact by email or phone",
+        blocks: [
+          "If you write to us by email or call us, we process your contact details and the content of your message to answer your enquiry (Art. 6(1)(b) GDPR for booking enquiries, otherwise Art. 6(1)(f) GDPR). We delete this data once the enquiry has been dealt with, unless statutory retention obligations apply.",
         ],
       },
       {
@@ -178,6 +184,12 @@ function privacy(locale: Locale, f: Facts): LegalSection[] {
           "You also have the right to lodge a complaint with a data protection supervisory authority, for example the Bavarian Data Protection Authority (BayLDA) in Ansbach.",
         ],
       },
+      {
+        heading: "Right to object (Art. 21 GDPR)",
+        blocks: [
+          `Where we process data on the basis of Art. 6(1)(f) GDPR (legitimate interests, e.g. server logs and the delivery of music and images), you have the right to object to this processing at any time on grounds relating to your particular situation. We will then stop the processing unless we can demonstrate compelling legitimate grounds that override your interests, or the processing serves the establishment, exercise or defence of legal claims. An informal message to ${f.email} is sufficient.`,
+        ],
+      },
     ];
   }
   if (locale === "tr") {
@@ -202,7 +214,13 @@ function privacy(locale: Locale, f: Facts): LegalSection[] {
             "Supabase Inc. talebi veritabanımızda saklar (veri işleyen).",
             "Resend Inc. (ABD) bildirim e-postasını booking adresimize iletir (veri işleyen).",
           ] },
-          "Talepleri, işlenmeleri için artık gerekli olmadığında ve yasal saklama yükümlülüğü bulunmadığında sileriz.",
+          "Talepleri, işlenmeleri için artık gerekli olmadığında veya siz talep ettiğinizde, yasal saklama yükümlülüğü bulunmadığı sürece kalıcı olarak sileriz.",
+        ],
+      },
+      {
+        heading: "E-posta veya telefonla iletişim",
+        blocks: [
+          "Bize e-posta yazdığınızda veya telefon ettiğinizde, talebinizi yanıtlamak için iletişim bilgilerinizi ve mesajınızın içeriğini işleriz (booking talepleri için GDPR Madde 6(1)(b), diğer durumlarda GDPR Madde 6(1)(f)). Talebiniz sonuçlandıktan sonra, yasal saklama yükümlülüğü bulunmadığı sürece bu verileri sileriz.",
         ],
       },
       {
@@ -236,6 +254,12 @@ function privacy(locale: Locale, f: Facts): LegalSection[] {
           "Ayrıca bir veri koruma denetim makamına, örneğin Ansbach'taki Bavyera Veri Koruma Denetim Dairesi'ne (BayLDA) şikâyette bulunma hakkınız vardır.",
         ],
       },
+      {
+        heading: "İtiraz hakkı (GDPR Madde 21)",
+        blocks: [
+          `Verileri GDPR Madde 6(1)(f) (meşru menfaat; örneğin sunucu kayıtları, müzik ve görsellerin sunulması) kapsamında işlediğimiz durumlarda, özel durumunuzdan kaynaklanan nedenlerle bu işlemeye her zaman itiraz etme hakkınız vardır. Bu durumda, menfaatlerinize üstün gelen zorlayıcı meşru gerekçeler ortaya koyamadığımız veya işleme hukuki taleplerin ileri sürülmesi, kullanılması ya da savunulması için gerekli olmadığı sürece işlemeyi durdururuz. ${f.email} adresine kısa bir mesaj yeterlidir.`,
+        ],
+      },
     ];
   }
   return [
@@ -259,7 +283,13 @@ function privacy(locale: Locale, f: Facts): LegalSection[] {
           "Supabase Inc. speichert die Anfrage in unserer Datenbank (Auftragsverarbeiter).",
           "Resend Inc. (USA) stellt die Benachrichtigungs-E-Mail an unsere Booking-Adresse zu (Auftragsverarbeiter).",
         ] },
-        "Wir löschen Anfragen, sobald sie für die Bearbeitung nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten bestehen (z. B. nach einem Booking-Vertrag).",
+        "Wir löschen Anfragen endgültig, sobald sie für die Bearbeitung nicht mehr erforderlich sind oder ihr die Löschung verlangt, soweit keine gesetzlichen Aufbewahrungspflichten bestehen (z. B. nach einem Booking-Vertrag).",
+      ],
+    },
+    {
+      heading: "Kontakt per E-Mail oder Telefon",
+      blocks: [
+        "Wenn ihr uns per E-Mail schreibt oder anruft, verarbeiten wir eure Kontaktdaten und den Inhalt eurer Nachricht, um die Anfrage zu beantworten (bei Booking-Anfragen Art. 6 Abs. 1 lit. b DSGVO, sonst Art. 6 Abs. 1 lit. f DSGVO). Wir löschen diese Daten, sobald die Anfrage erledigt ist, soweit keine gesetzlichen Aufbewahrungspflichten bestehen.",
       ],
     },
     {
@@ -291,6 +321,12 @@ function privacy(locale: Locale, f: Facts): LegalSection[] {
       blocks: [
         `Ihr habt das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) und könnt erteilte Einwilligungen jederzeit mit Wirkung für die Zukunft widerrufen. Kontakt: ${f.email}.`,
         "Außerdem habt ihr das Recht, euch bei einer Datenschutz-Aufsichtsbehörde zu beschweren, zum Beispiel beim Bayerischen Landesamt für Datenschutzaufsicht (BayLDA) in Ansbach.",
+      ],
+    },
+    {
+      heading: "Widerspruchsrecht (Art. 21 DSGVO)",
+      blocks: [
+        `Soweit wir Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO verarbeiten (berechtigtes Interesse, z. B. Server-Logs und die Auslieferung von Musik und Bildern), könnt ihr dieser Verarbeitung aus Gründen, die sich aus eurer besonderen Situation ergeben, jederzeit widersprechen. Wir verarbeiten die Daten dann nicht mehr, es sei denn, wir können zwingende schutzwürdige Gründe nachweisen, die eure Interessen überwiegen, oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen. Eine formlose Nachricht an ${f.email} genügt.`,
       ],
     },
   ];

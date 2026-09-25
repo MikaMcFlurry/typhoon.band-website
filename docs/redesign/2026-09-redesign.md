@@ -63,13 +63,14 @@ Band — mindestens alle aktuellen Funktionen, gerne besser umgesetzt."
 | 9 | About/band info (image + text) | editorial split, "Mehr über Typhoon" disclosure, band facts |
 | 10 | Members (8 cards with bios, Supabase merge) | cards with bios, 4 shown + reveal, no placeholder badge |
 | 11 | Gallery + lightbox | contact sheet for any image count, viewer with counter, captions, swipe, focus return |
-| 12 | Booking form + API (Supabase insert, Resend mail, honeypot) | labelled fields, event-type select, inline errors, success state, privacy note; API localized, rate-limited, time trap, correct success semantics |
-| 13 | Cookie banner (localStorage) | privacy notice + preferences dialog, reopen from footer, old choice honoured |
+| 12 | Booking form + API (Supabase insert, Resend mail, honeypot) | labelled fields, event-type select, inline errors, success state, privacy note; API localized, rate-limited, clock-independent time trap, correct success semantics; also works without JavaScript (POST + status pages) |
+| 13 | Cookie banner (localStorage) | privacy notice (reachable first by keyboard, Esc minimises) + preferences dialog, reopen from footer, old choice honoured |
 | 14 | Footer (contact, socials, legal) | contact as mailto/tel links, platform links from Admin (no dead `#` icons), privacy settings |
 | 15 | Legal pages (hard-coded) | Admin-editable (Phase 06) with updated fallback texts |
 | 16 | Admin (login, forced password change, booking inbox + convert, shows, media, music, members, assets) | unchanged features, own chrome (no public header), noindex, session refresh |
 | 17 | — | **new from Phase 06**: Admin legal pages, SEO entries, platform links, consent overview |
-| 18 | — | **new**: sitemap, robots, manifest, icons, OG image, hreflang, JSON-LD (MusicGroup + MusicEvent), styled 404, security headers |
+| 18 | — | **new**: sitemap, robots, manifest, icons, OG image, hreflang incl. x-default, JSON-LD (MusicGroup + MusicEvent), server-rendered localized 404, security headers |
+| 19 | — | **new**: Admin can permanently delete archived booking requests (GDPR erasure) |
 
 ## 4. Bugs of the live site fixed on the way
 
@@ -83,6 +84,10 @@ Band — mindestens alle aktuellen Funktionen, gerne besser umgesetzt."
 - Footer social icons were dead `#` links; phone was not a `tel:` link.
 - Header was transparent over content; anchors landed under the header.
 - Admin login page showed internal setup notes publicly.
+- Without JavaScript the booking form sent all personal data as a GET
+  query string and the request was lost.
+- The time trap compared the visitor's clock with the server clock.
+- Demo durations were read by downloading ~0.8 MB of MP3 per visit.
 - Legal texts cited TMG/RStV (replaced by DDG/MStV) and did not name Supabase/Resend.
 
 ## 5. Things found in the live database (no code change needed, owner to decide)
@@ -95,13 +100,22 @@ Band — mindestens alle aktuellen Funktionen, gerne besser umgesetzt."
 
 ## 6. Open owner decisions
 
-1. Confirm line-up slot 8 (Tan – Percussion vs. Jürgen – Gitarre) and update docs/03 accordingly.
-2. Confirm the facts newly shown from `docs/typhoon-info.md` of the typhoon.band repo: home base "Kanzlei Studio, Hechingen", "über 30 Jahre Bühnenerfahrung", "Antwort in der Regel innerhalb von 48 Stunden", "gerne auch weiter weg".
+1. Confirm line-up slot 8 (Tan – Percussion vs. Jürgen – Gitarre) and
+   Mika's display name ("Mika El Jackson" in the DB); update the DB or the
+   fallback + docs/03 so the site does not flip when Supabase is down.
+2. Confirm the facts newly shown from `docs/typhoon-info.md` of the
+   typhoon.band repo: home base "Kanzlei Studio, Hechingen", "über 30 Jahre
+   Bühnenerfahrung", "Antwort in der Regel innerhalb von 48 Stunden".
+   Removed until confirmed: "gerne auch weiter weg" (travel) and weddings
+   as a booking category.
 3. Have the legal texts reviewed (`src/content/legal.ts`, or publish your own in Admin → Legal). Not legal advice.
 4. Apply the optional `supabase/migrations/0007_security_hardening.sql` (stops public listing of storage files, enforces upload limits).
 5. Replace the low-resolution member photos (slots 3–8 are crops of the collage) and add song covers in Admin → Music.
 6. Add real platform links (Spotify, Instagram, …) in Admin → Platform links; they appear automatically.
-7. Role model: `editor` currently has owner rights (unchanged from live); decide whether to restrict.
+7. Role model: `editor` currently has owner rights (unchanged from live); decide whether to restrict. Permanent deletion of booking requests is already limited to owner/admin.
+8. Form of address: the site copy uses "du"; the German legal texts still
+   use "ihr" (kept deliberately until the legal review). Have a native
+   speaker proofread the Turkish copy.
 
 ## 7. Going live
 
@@ -111,7 +125,54 @@ Band — mindestens alle aktuellen Funktionen, gerne besser umgesetzt."
 
 ## 8. Tooling note
 
-`impeccable.style` could not be installed into the repo in this session (the
-environment's permission check blocked installing a third-party agent
-skill). Its public anti-pattern list was applied manually (see DESIGN.md,
-"Rules"). To install it yourself: `npx skills add pbakaus/impeccable`.
+`impeccable.style` could not be installed with `npx skills add` in this
+session (the environment's permission check blocked installing a
+third-party agent skill). After the owner asked for it explicitly, the
+upstream repository was reviewed and installed as a project skill on the
+separate branch `claude/typhoon-website-impeccable` (Version B, see
+`docs/redesign/IMPECCABLE-VERSION-BRIEF.md` there). Version A applies its
+public anti-pattern list manually (see DESIGN.md, "Rules").
+
+## 9. Independent review (after the first build)
+
+A separate multi-agent review (parity, security, accessibility, design,
+performance/SEO, content/i18n — each finding re-verified by a second
+agent) reported 60 findings; 57 were confirmed, 1 stayed uncertain (live
+DB member data, an owner decision) and 2 were partly refuted. All
+confirmed findings are fixed on this branch:
+
+| Severity | Findings | Fixed |
+|---|---|---|
+| P0 | 4 (one bug): content stayed invisible after client-side navigation back to the home page and for members 5–8 after "Alle Musiker zeigen" | ✔ reveal state in `data-revealed`, MutationObserver for new nodes, hidden elements observed instead of marked |
+| P1 | 10: booking time trap vs. device clock, touch swipe on waveforms started playback, consent notice and dock hid focused elements, privacy H1 overflowed at 320/390 px | ✔ |
+| P2 | 22: player controls on phones/tablets, no-JS booking GET, privacy retention vs. soft delete, menu dialog semantics, dock close focus, field contrast, forced colours, live regions, mobile demo rows, first viewport CTA, footer at 768 px, MP3 prefetch, mobile LCP, TR grammar, EN/TR event types and countries, Art. 21 GDPR | ✔ |
+| P3 | 21: anchors, `__proto__` validation, SQL re-run regression, 404 title + SSR, frontman crop, page length, grid orphans, truncation, repeated facts, no-JS lists, Open Graph, legal meta, x-default, venue wrapping, image cache TTL, gallery sizes, unbacked claims, TR/EN wording, du/ihr, percent format | ✔ (du/ihr in legal texts: owner decision 8) |
+
+Evidence (production build, Chromium via Playwright; scripts in the
+session scratchpad, results summarised here):
+
+- `npm run lint` ✔, `tsc --noEmit` ✔, `npm run build` ✔.
+- 42/42 targeted fix checks passed, among them: members 5–8 visible after
+  expand/collapse/expand; no invisible `.reveal` after home → Impressum →
+  back and legal → logo → home; without JavaScript all 8 members and 6
+  demos are visible, the form is `POST /api/booking` with native
+  validation and the 404 is server-rendered (status 404, localized
+  `<title>`, `lang`); notice reachable right after the skip link, Esc →
+  pill; menu dialog has its close button inside, background inert, focus
+  restored; no MP3 request before play; vertical swipe over a waveform
+  scrolls (no playback), tap plays; one live region "Karanfil – Läuft
+  gerade"; featured player shows prev/mute/time at 390 px; closing the
+  dock focuses the song's play button; no horizontal overflow on home,
+  TR, privacy, imprint, booking status and 404 at 320 and 390 px; hero
+  play CTA above the fold at 768×1024; lineup without orphan at 768 px.
+- Regression: DE/EN/TR journeys (hero play → dock, Media Session title,
+  lightbox counter, form validation focus, mobile menu) without console
+  errors; ghost playback after a language switch 0 → exactly 1 on replay;
+  0 px overflow at 320/768/1024/1920 px.
+- Booking API (local, no Supabase/Resend configured): JSON with
+  `elapsed_ms` 5000 → fallback; 800 → fake success; legacy `started_at`
+  ignored; `__proto__` stored as plain text; form POST → 303 to
+  `/tr/booking/fallback`, invalid → `/en/booking/invalid`, foreign origin →
+  `/de/booking/error`; `text/plain` → 415.
+- Page height (collapsed): 6706 px at 1440 (was 7083), 9387 px at 390
+  (was 9764).

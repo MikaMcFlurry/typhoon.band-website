@@ -11,18 +11,23 @@ import {
 import { useDict } from "@/components/i18n/DictProvider";
 
 // Privacy notice + preferences.
-//   - First visit: a small, non-blocking notice (content stays usable).
+//   - First visit: a small, non-blocking notice (content stays usable). It
+//     comes early in the DOM (right after the skip link) so keyboard users
+//     reach it first; Esc minimises it to a small pill; its height is
+//     published as --notice-h so focus scrolling keeps elements above it.
 //   - "Privacy settings" in the footer reopens it as a modal dialog with a
 //     focus trap, Esc and Cancel.
 // Nothing is tracked. The only stored item is this choice (localStorage).
 
-type Mode = "hidden" | "notice" | "dialog";
+type Mode = "hidden" | "notice" | "minimised" | "dialog";
 
 export function ConsentBanner() {
   const { dict, locale } = useDict();
   const [mode, setMode] = useState<Mode>("hidden");
   const [external, setExternal] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const noticeRef = useRef<HTMLElement | null>(null);
+  const pillRef = useRef<HTMLButtonElement | null>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -41,7 +46,7 @@ export function ConsentBanner() {
       const current = readConsent();
       if (current.decided) {
         setExternal(current.choice.external_media);
-        setMode((m) => (m === "notice" ? "hidden" : m));
+        setMode((m) => (m === "notice" || m === "minimised" ? "hidden" : m));
       }
     };
     window.addEventListener(CONSENT_OPEN_EVENT, onOpen);
@@ -65,6 +70,39 @@ export function ConsentBanner() {
     },
     [close],
   );
+
+  // Notice: reserve its height for focus scrolling (scroll-padding-bottom
+  // in globals.css) and let Esc minimise it.
+  useEffect(() => {
+    const root = document.documentElement;
+    const node = mode === "notice" ? noticeRef.current : mode === "minimised" ? pillRef.current : null;
+    if (!node) {
+      root.style.removeProperty("--notice-h");
+      return;
+    }
+    const update = () => root.style.setProperty("--notice-h", `${Math.ceil(node.getBoundingClientRect().height) + 8}px`);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(node);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--notice-h");
+    };
+  }, [mode]);
+
+  useEffect(() => {
+    if (mode !== "notice") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      // A modal (menu, lightbox) handles its own Esc.
+      if (document.querySelector('[aria-modal="true"]:not([inert])')) return;
+      const inside = noticeRef.current?.contains(document.activeElement);
+      setMode("minimised");
+      if (inside) requestAnimationFrame(() => pillRef.current?.focus());
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [mode]);
 
   // Dialog mode: focus trap + Esc.
   useEffect(() => {
@@ -114,11 +152,27 @@ export function ConsentBanner() {
     </p>
   );
 
+  if (mode === "minimised") {
+    return (
+      <button
+        aria-label={dict.cookies.title}
+        className="btn btn-secondary btn-sm fixed left-2 z-[60] bg-ink-3 shadow-[0_12px_30px_rgba(0,0,0,0.5)] sm:left-6"
+        onClick={() => setMode("notice")}
+        ref={pillRef}
+        style={{ bottom: "calc(var(--dock-h) + 8px)" }}
+        type="button"
+      >
+        {dict.cookies.title}
+      </button>
+    );
+  }
+
   if (mode === "notice") {
     return (
       <section
         aria-label={dict.cookies.title}
-        className="fixed inset-x-2 z-[60] rounded-md border border-line-2 bg-ink-3 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:inset-x-auto sm:right-6 sm:w-[400px] sm:p-5"
+        className="fixed inset-x-2 z-[60] max-h-[45svh] overflow-y-auto overscroll-contain rounded-md border border-line-2 bg-ink-3 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:inset-x-auto sm:right-6 sm:w-[400px] sm:p-5"
+        ref={noticeRef}
         style={{ bottom: "calc(var(--dock-h) + 8px)" }}
       >
         <h2 className="font-display text-[1.125rem] leading-tight text-paper sm:text-[1.25rem]">
@@ -214,7 +268,7 @@ function Switch({
     >
       <span
         aria-hidden
-        className={`inline-block size-5 rounded-full transition-transform ${
+        className={`switch-knob inline-block size-5 rounded-full transition-transform ${
           checked ? "translate-x-[22px] bg-on-gold" : "translate-x-[3px] bg-paper-2"
         }`}
       />

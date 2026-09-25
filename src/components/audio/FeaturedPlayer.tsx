@@ -7,6 +7,7 @@ import {
   useAudioPlayer,
   useAudioTime,
 } from "@/components/audio/AudioPlayerProvider";
+import { usePercentFormat } from "@/components/audio/usePercentFormat";
 import { useTrackDuration } from "@/components/audio/useTrackDuration";
 import { Waveform } from "@/components/audio/Waveform";
 import { useDict } from "@/components/i18n/DictProvider";
@@ -20,9 +21,10 @@ import { fill } from "@/i18n/dictionaries";
 export function FeaturedPlayer({
   song,
 }: {
-  song: { id: string; title: string; src: string; cover: string };
+  song: { id: string; title: string; src: string; cover: string; duration: number | null };
 }) {
-  const { dict } = useDict();
+  const { dict, locale } = useDict();
+  const percent = usePercentFormat(locale);
   const {
     currentId,
     isPlaying,
@@ -40,10 +42,11 @@ export function FeaturedPlayer({
   } = useAudioPlayer();
   const { position } = useAudioTime();
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const metaDuration = useTrackDuration(song.src, cardRef);
+  // Durations come from the server; probe only if it could not read one.
+  const metaDuration = useTrackDuration(song.duration == null ? song.src : "", cardRef);
   const isCurrent = currentId === song.id;
   const playing = isCurrent && isPlaying;
-  const shownDuration = isCurrent && duration ? duration : metaDuration;
+  const shownDuration = isCurrent && duration ? duration : (song.duration ?? metaDuration);
   const volumePct = Math.round((muted ? 0 : volume) * 100);
   const canSkip = playlist.length > 1;
 
@@ -88,7 +91,9 @@ export function FeaturedPlayer({
           </a>
         </div>
 
-        <div className="mt-4 flex items-center gap-2 border-t border-line pt-4 sm:gap-3 md:mt-5 md:pt-5">
+        {/* Phones: controls + mute on the first row, waveform + time below.
+            From sm: one row. Volume slider from md (phones use hardware keys). */}
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4 sm:flex-nowrap sm:gap-3 md:mt-5 md:pt-5">
           <button
             aria-label={
               playing
@@ -96,6 +101,7 @@ export function FeaturedPlayer({
                 : fill(dict.player.playTrack, { title: song.title })
             }
             className="play-btn"
+            data-track-play={song.id}
             onClick={() => toggle(song.id, song.src)}
             type="button"
           >
@@ -107,7 +113,7 @@ export function FeaturedPlayer({
           </button>
           <button
             aria-label={dict.player.prev}
-            className="icon-btn hidden sm:inline-flex"
+            className="icon-btn"
             disabled={!canSkip}
             onClick={previous}
             type="button"
@@ -124,21 +130,22 @@ export function FeaturedPlayer({
             <Icon name="next" size={18} />
           </button>
 
-          <Waveform
-            className="mx-1 flex-1 md:mx-2"
-            heightClass="h-10 md:h-12"
-            label={fill(dict.player.seek, { title: song.title })}
-            seekable
-            songId={song.id}
-            title={song.title}
-          />
+          <div className="order-last flex w-full min-w-0 items-center gap-3 sm:order-none sm:w-auto sm:flex-1">
+            <Waveform
+              className="flex-1 sm:mx-1 md:mx-2"
+              heightClass="h-10 md:h-12"
+              label={fill(dict.player.seek, { title: song.title })}
+              seekable
+              songId={song.id}
+              title={song.title}
+            />
+            <span className="tabular flex-none text-[0.875rem] text-paper-2">
+              {formatTime(isCurrent ? position : 0)}
+              <span className="text-paper-3"> / {formatTime(shownDuration ?? 0)}</span>
+            </span>
+          </div>
 
-          <span className="tabular hidden flex-none text-[0.875rem] text-paper-2 xs:inline">
-            {formatTime(isCurrent ? position : 0)}
-            <span className="text-paper-3"> / {formatTime(shownDuration ?? 0)}</span>
-          </span>
-
-          <div className="hidden flex-none items-center gap-1 border-l border-line pl-3 lg:flex">
+          <div className="ml-auto flex flex-none items-center gap-1 sm:ml-0 sm:border-l sm:border-line sm:pl-3">
             <button
               aria-label={muted ? dict.player.unmute : dict.player.mute}
               aria-pressed={muted}
@@ -150,8 +157,8 @@ export function FeaturedPlayer({
             </button>
             <input
               aria-label={dict.player.volume}
-              aria-valuetext={`${volumePct} %`}
-              className="range"
+              aria-valuetext={percent.format(muted ? 0 : volume)}
+              className="range hidden md:block"
               max={1}
               min={0}
               onChange={(e) => setVolume(Number(e.target.value))}

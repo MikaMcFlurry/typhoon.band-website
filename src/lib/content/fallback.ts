@@ -69,6 +69,7 @@ export function buildMembersFallback(locale: Locale): Member[] {
     role: dict.members.instrument[m.id] ?? m.role,
     bio: dict.members.bio[m.id] ?? m.bio,
     photoUrl: m.photo,
+    photoPosition: m.photoPosition,
     isPlaceholder: Boolean(m.isPlaceholder),
     sortOrder: m.sortOrder,
   }));
@@ -80,6 +81,7 @@ export function buildSongsFallback(): SongItem[] {
     title: s.title,
     audioUrl: s.src,
     coverImageUrl: s.cover,
+    durationSeconds: s.durationSeconds,
     isFeatured: s.id === featuredSong.id,
     sortOrder: s.sortOrder,
   }));
@@ -133,17 +135,21 @@ export function buildSeoFallback(path: string, locale: Locale): SeoEntry {
   // home page in their `<title>`. The root layout applies a `· Typhoon`
   // suffix template, so we return the bare page label here.
   let title = dict.meta.title;
+  let description = dict.meta.description;
   if (path === "/legal/imprint") {
     title = dict.legal.imprintTitle;
+    description = dict.legal.imprintDescription;
   } else if (path === "/legal/privacy") {
     title = dict.legal.privacyTitle;
+    description = dict.legal.privacyDescription;
   } else if (path === "/legal/cookies") {
     title = dict.legal.cookiesTitle;
+    description = dict.legal.cookiesDescription;
   }
   return {
     path,
     title,
-    description: dict.meta.description,
+    description,
     ogImageUrl: "/og-image.jpg",
   };
 }

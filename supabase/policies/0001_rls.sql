@@ -19,8 +19,16 @@ alter table public.seo_entries             enable row level security;
 alter table public.consent_settings        enable row level security;
 
 -- Helper: is the auth.uid() linked to an active admin profile?
+-- SECURITY DEFINER with an empty search_path (Supabase recommendation), the
+-- same definition as 0007_security_hardening.sql, so re-running this file
+-- never weakens the hardened helpers.
 create or replace function public.is_active_admin()
-returns boolean language sql stable as $$
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
   select exists (
     select 1
     from public.admin_profiles ap
@@ -30,7 +38,12 @@ returns boolean language sql stable as $$
 $$;
 
 create or replace function public.is_owner()
-returns boolean language sql stable as $$
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
   select exists (
     select 1
     from public.admin_profiles ap
@@ -39,6 +52,11 @@ returns boolean language sql stable as $$
       and ap.role = 'owner'
   )
 $$;
+
+revoke all on function public.is_active_admin() from public;
+revoke all on function public.is_owner() from public;
+grant execute on function public.is_active_admin() to anon, authenticated, service_role;
+grant execute on function public.is_owner() to anon, authenticated, service_role;
 
 -- Public read policies (visible/published rows only).
 

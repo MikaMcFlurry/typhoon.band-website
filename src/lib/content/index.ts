@@ -39,6 +39,7 @@ import {
   normaliseSiteSettings,
   normaliseSongs,
 } from "./normalize";
+import { withDurations } from "./song-durations";
 import {
   fetchBandInfo,
   fetchGallery,
@@ -128,7 +129,7 @@ export async function getSongs(_locale: Locale): Promise<SongItem[]> {
   const rows = await safe(() => fetchSongs());
   if (!rows || rows.length === 0) return fallback;
   const normalised = normaliseSongs(rows, fallback);
-  return normalised.length > 0 ? normalised : fallback;
+  return normalised.length > 0 ? withDurations(normalised) : fallback;
 }
 
 export async function getGalleryItems(locale: Locale): Promise<GalleryItem[]> {

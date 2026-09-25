@@ -5,12 +5,14 @@ import { redirect } from "next/navigation";
 
 import { resolveLocale, requireAdminWithPasswordOk } from "@/lib/admin/auth";
 import {
+  hardDeleteBooking,
   isBookingStatus,
   markBookingConverted,
   softDeleteBooking,
   restoreBooking,
   updateBookingStatus,
 } from "@/lib/admin/bookings";
+import { isAdminLike } from "@/lib/admin/roles";
 import { createShow } from "@/lib/admin/shows";
 import { validateShow } from "@/lib/validation/show";
 
@@ -57,6 +59,27 @@ export async function archiveBookingAction(formData: FormData) {
 
   const paths = bookingPaths(locale, id);
   revalidatePath(paths.detail);
+  revalidatePath(paths.list);
+  redirect(paths.list);
+}
+
+export async function deleteBookingPermanentlyAction(formData: FormData) {
+  const locale = resolveLocale(String(formData.get("locale") ?? ""));
+  const admin = await requireAdminWithPasswordOk(locale);
+  if (!isAdminLike(admin.profile)) {
+    throw new Error("Nur Owner oder Admin dürfen Anfragen endgültig löschen.");
+  }
+
+  const id = String(formData.get("id") ?? "");
+  if (!isUuid(id)) throw new Error("Ungültige Booking-ID.");
+  if (formData.get("confirm") !== "on") {
+    throw new Error("Bitte das endgültige Löschen bestätigen.");
+  }
+
+  const result = await hardDeleteBooking(id);
+  if (!result.ok) throw new Error(result.reason);
+
+  const paths = bookingPaths(locale, id);
   revalidatePath(paths.list);
   redirect(paths.list);
 }

@@ -1,11 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { useDict } from "@/components/i18n/DictProvider";
 import { Icon } from "@/components/ui/Icon";
 
+// Shown when a page under /<locale> calls notFound(). Unknown URLs are
+// handled by src/app/global-not-found.tsx, which is rendered on the server.
 export default function NotFound() {
   const { dict, locale } = useDict();
+  useEffect(() => {
+    document.title = `${dict.notFound.title} · Typhoon`;
+  }, [dict.notFound.title]);
   return (
     <section className="container-x flex min-h-[70svh] flex-col items-start justify-center pb-24 pt-[calc(var(--header-h)+48px)]">
       <p className="label">404</p>

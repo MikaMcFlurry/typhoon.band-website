@@ -142,6 +142,23 @@ export async function softDeleteBooking(id: string): Promise<MutationResult> {
   return { ok: true };
 }
 
+// Permanent erasure (Art. 17 GDPR). Only for requests that are already
+// archived, so an active request cannot be wiped by a single click. A show
+// converted from the request keeps existing (FK is ON DELETE SET NULL).
+export async function hardDeleteBooking(id: string): Promise<MutationResult> {
+  const supabase = getAdminSupabase();
+  if (!supabase) return { ok: false, reason: "supabase-not-configured" };
+  const { data, error } = await supabase
+    .from("booking_requests")
+    .delete()
+    .eq("id", id)
+    .not("deleted_at", "is", null)
+    .select("id");
+  if (error) return { ok: false, reason: error.message };
+  if (!data || data.length === 0) return { ok: false, reason: "not-archived-or-missing" };
+  return { ok: true };
+}
+
 export async function restoreBooking(id: string): Promise<MutationResult> {
   const supabase = getAdminSupabase();
   if (!supabase) return { ok: false, reason: "supabase-not-configured" };

@@ -13,8 +13,10 @@ import { Icon } from "@/components/ui/Icon";
 
 // Shows the first `initial` children and reveals the rest on demand, so the
 // one-pager stays compact (owner rule: "preview first, reveal all").
-// All items are in the HTML (crawlable); the rest get `!hidden` until
-// expanded. Children must be <li> elements.
+// All items are in the HTML (crawlable) and visible without JavaScript: the
+// extra items are only hidden by CSS once <html data-js> is set (inline
+// script in the root layout), so a visitor without JS still sees everything.
+// Children must be <li> elements.
 
 export function CollapsibleList({
   children,
@@ -38,12 +40,11 @@ export function CollapsibleList({
 
   return (
     <>
-      <Tag className={className} id={id}>
+      <Tag className={className} data-collapsed={open ? undefined : "true"} id={id}>
         {items.map((child, i) => {
-          if (i < initial || open || !isValidElement(child)) return child;
-          const el = child as ReactElement<{ className?: string }>;
-          return cloneElement(el, {
-            className: `${el.props.className ?? ""} !hidden`,
+          if (i < initial || !isValidElement(child)) return child;
+          return cloneElement(child as ReactElement<Record<string, unknown>>, {
+            "data-extra": "",
           });
         })}
       </Tag>

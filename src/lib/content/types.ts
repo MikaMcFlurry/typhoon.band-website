@@ -40,6 +40,8 @@ export type Member = {
   role: string;
   bio: string;
   photoUrl: string;
+  /** CSS object-position; only set for repo photos that need it. */
+  photoPosition?: string;
   isPlaceholder: boolean;
   sortOrder: number;
 };
@@ -49,6 +51,8 @@ export type SongItem = {
   title: string;
   audioUrl: string;
   coverImageUrl: string | null;
+  /** Seconds; null when it could not be read (the player shows it once loaded). */
+  durationSeconds: number | null;
   isFeatured: boolean;
   sortOrder: number;
 };

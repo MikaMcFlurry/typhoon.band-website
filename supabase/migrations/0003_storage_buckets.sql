@@ -26,33 +26,18 @@ values
 on conflict (id) do update set public = excluded.public;
 
 -- ---------------------------------------------------------------
--- Public read policy — one row per managed bucket.
--- Re-runs are safe because each policy is dropped first.
+-- No public SELECT policy on storage.objects.
+-- Public buckets serve files by URL without one; a SELECT policy would
+-- only let anonymous visitors LIST every object (hidden demos included).
+-- Older versions of this file created "typhoon_public_read_*" policies;
+-- they are dropped here so a re-run can never re-open listing (same as
+-- 0007_security_hardening.sql).
 -- ---------------------------------------------------------------
 drop policy if exists "typhoon_public_read_public_media"  on storage.objects;
-create policy "typhoon_public_read_public_media"
-  on storage.objects for select
-  using (bucket_id = 'public-media');
-
 drop policy if exists "typhoon_public_read_audio_demos"   on storage.objects;
-create policy "typhoon_public_read_audio_demos"
-  on storage.objects for select
-  using (bucket_id = 'audio-demos');
-
 drop policy if exists "typhoon_public_read_member_images" on storage.objects;
-create policy "typhoon_public_read_member_images"
-  on storage.objects for select
-  using (bucket_id = 'member-images');
-
 drop policy if exists "typhoon_public_read_gallery"       on storage.objects;
-create policy "typhoon_public_read_gallery"
-  on storage.objects for select
-  using (bucket_id = 'gallery');
-
 drop policy if exists "typhoon_public_read_legal_assets"  on storage.objects;
-create policy "typhoon_public_read_legal_assets"
-  on storage.objects for select
-  using (bucket_id = 'legal-assets');
 
 -- ---------------------------------------------------------------
 -- Admin write policies — authenticated active admins only. The

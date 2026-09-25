@@ -81,10 +81,10 @@ export function Band({
           </div>
         </div>
 
-        <div className="mt-24 scroll-mt-[calc(var(--header-h)+16px)] md:mt-32" id="lineup">
+        <div className="mt-20 md:mt-28" id="lineup">
           <h3 className="h-sub reveal">{dict.members.title}</h3>
           <CollapsibleList
-            className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4"
+            className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4"
             initial={4}
             lessLabel={dict.members.showLess}
             moreLabel={dict.members.showAll}
@@ -95,10 +95,11 @@ export function Band({
                   <div className="relative aspect-[4/5] overflow-hidden rounded-md border border-line bg-ink-3">
                     <Image
                       alt={`${m.name}, ${m.role}`}
-                      className="object-cover object-top sepia-img"
+                      className="object-cover sepia-img"
                       fill
-                      sizes="(min-width: 1024px) 300px, (min-width: 768px) 30vw, 50vw"
+                      sizes="(min-width: 1024px) 300px, (min-width: 768px) 25vw, 50vw"
                       src={m.photoUrl}
+                      style={{ objectPosition: m.photoPosition ?? "50% 0%" }}
                     />
                   </div>
                   <h4 className="mt-4 font-display text-[1.375rem] leading-tight text-paper md:text-[1.5rem]">

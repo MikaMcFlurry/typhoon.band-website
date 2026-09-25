@@ -71,9 +71,19 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    // Unknown URLs render src/app/global-not-found.tsx on the server (the
+    // segment-level not-found boundary only renders on the client).
+    globalNotFound: true,
+  },
   images: {
     remotePatterns,
     formats: ["image/avif", "image/webp"],
+    // 70 for the large hero collage (LCP), 75 (default) everywhere else.
+    qualities: [70, 75],
+    // Optimised images are cacheable for 31 days (default is 60 s). Public
+    // assets rarely change and Admin uploads get unique file names.
+    minimumCacheTTL: 2678400,
   },
   async headers() {
     return [

@@ -43,6 +43,7 @@
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --dock-h: 0px;
+  --notice-h: 0px;
   --header-h: 72px;
 
   /* Legacy aliases (admin area still uses these names). */
@@ -75,6 +76,8 @@ html {
   text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 8px);
+  /* Keep focused elements clear of the player dock and privacy notice. */
+  scroll-padding-bottom: calc(var(--dock-h) + var(--notice-h) + 16px);
   background: var(--ink);
 }
 
@@ -150,12 +153,14 @@ a {
     }
   }
 
+  /* Compact vertical rhythm (owner rule: the one-pager must not become
+     exhausting). */
   .section {
-    padding-block: 72px;
+    padding-block: 56px;
   }
   @media (min-width: 768px) {
     .section {
-      padding-block: 120px;
+      padding-block: 96px;
     }
   }
 
@@ -168,6 +173,9 @@ a {
     letter-spacing: -0.018em;
     color: var(--paper);
     text-wrap: balance;
+    /* Long German compounds ("Datenschutzerklärung") on 320 px phones. */
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .h-sub {
@@ -429,7 +437,8 @@ a {
     width: 100%;
     min-width: 0;
     background: var(--ink);
-    border: 1px solid var(--line-2);
+    /* ≥ 3:1 against the form card (WCAG 1.4.11). */
+    border: 1px solid rgba(239, 226, 200, 0.45);
     border-radius: var(--r-sm);
     padding: 12px 14px;
     color: var(--paper);
@@ -450,13 +459,15 @@ a {
   .field input:hover,
   .field textarea:hover,
   .field select:hover {
-    border-color: rgba(239, 226, 200, 0.34);
+    border-color: rgba(239, 226, 200, 0.62);
   }
   .field input:focus-visible,
   .field textarea:focus-visible,
   .field select:focus-visible,
   .input:focus-visible {
-    outline: none;
+    /* Transparent outline becomes visible in forced-colors mode. */
+    outline: 2px solid transparent;
+    outline-offset: 2px;
     border-color: var(--gold);
     box-shadow: 0 0 0 3px rgba(214, 179, 106, 0.22);
   }
@@ -559,9 +570,15 @@ a {
     mix-blend-mode: overlay;
   }
 
+  /* CollapsibleList: extra items are hidden only when JS is available
+     (<html data-js> is set by an inline script before first paint). */
+  html[data-js] [data-collapsed="true"] > [data-extra] {
+    display: none;
+  }
+
   /* Progressive reveal: visible by default, animated only when JS marks
      <html data-motion="on"> and the element has not entered yet. */
-  html[data-motion="on"] .reveal:not(.is-in) {
+  html[data-motion="on"] .reveal:not([data-revealed]) {
     opacity: 0;
     transform: translateY(18px);
   }
@@ -596,8 +613,33 @@ a {
   background: var(--gold-hi);
 }
 
+/* Windows High Contrast / forced colors: keep waveform and switch state. */
+@media (forced-colors: active) {
+  .wave-bar {
+    forced-color-adjust: none;
+    background: GrayText;
+  }
+  .wave-bar[data-played="true"] {
+    background: Highlight;
+  }
+  [role="switch"] {
+    forced-color-adjust: none;
+    border-color: ButtonText;
+    background: Canvas;
+  }
+  [role="switch"][aria-checked="true"] {
+    background: Highlight;
+  }
+  [role="switch"] .switch-knob {
+    background: ButtonText;
+  }
+  [role="switch"][aria-checked="true"] .switch-knob {
+    background: HighlightText;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  html[data-motion="on"] .reveal:not(.is-in) {
+  html[data-motion="on"] .reveal:not([data-revealed]) {
     opacity: 1;
     transform: none;
   }

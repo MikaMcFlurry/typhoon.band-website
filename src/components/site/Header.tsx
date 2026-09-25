@@ -27,6 +27,7 @@ export function Header({
   const [active, setActive] = useState<SectionId | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const labels: Record<SectionId, string> = {
     music: dict.nav.music,
@@ -71,19 +72,28 @@ export function Header({
     return () => io.disconnect();
   }, [isHome]);
 
-  // Mobile sheet: lock scroll, Esc to close, keep focus inside, restore focus.
+  // Mobile sheet is a modal dialog with its own close button: lock scroll,
+  // make everything behind it inert (header, main, footer, dock, privacy
+  // notice), Esc to close, keep focus inside, restore focus.
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const sheet = sheetRef.current;
+    const behind = Array.from(document.body.children).filter(
+      (el): el is HTMLElement => el instanceof HTMLElement && el !== sheet && !el.contains(sheet),
+    );
+    const wasInert = behind.map((el) => el.inert);
+    behind.forEach((el) => {
+      el.inert = true;
+    });
     const focusables = () =>
       Array.from(
         sheet?.querySelectorAll<HTMLElement>(
           'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
         ) ?? [],
       );
-    focusables()[0]?.focus();
+    closeButtonRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
@@ -107,6 +117,9 @@ export function Header({
     return () => {
       document.body.style.overflow = prevOverflow;
       document.removeEventListener("keydown", onKey);
+      behind.forEach((el, i) => {
+        el.inert = wasInert[i];
+      });
       button?.focus();
     };
   }, [open]);
@@ -137,7 +150,6 @@ export function Header({
               alt="Typhoon"
               className="h-9 w-auto md:h-11"
               height={724}
-              priority
               sizes="160px"
               src="/assets/branding/typhoon-signature-gold-bold.png"
               width={2099}
@@ -170,19 +182,19 @@ export function Header({
 
           <div className="flex items-center gap-2 md:gap-4">
             <LocaleSwitcher className="hidden sm:flex" />
-            <a className="btn btn-primary btn-sm hidden sm:inline-flex" href={hrefFor("booking")}>
+            <a className="btn btn-primary btn-sm px-4 sm:px-5" href={hrefFor("booking")}>
               {dict.nav.booking}
             </a>
             <button
               aria-controls="site-menu"
               aria-expanded={open}
-              aria-label={open ? dict.a11y.closeMenu : dict.a11y.openMenu}
-              className="icon-btn text-paper lg:hidden"
-              onClick={() => setOpen((v) => !v)}
+              aria-label={dict.a11y.openMenu}
+              className="icon-btn -mr-2 text-paper lg:hidden"
+              onClick={() => setOpen(true)}
               ref={menuButtonRef}
               type="button"
             >
-              <Icon name={open ? "close" : "menu"} size={24} />
+              <Icon name="menu" size={24} />
             </button>
           </div>
         </div>
@@ -191,16 +203,37 @@ export function Header({
       <div
         aria-label={dict.a11y.mainNav}
         aria-modal="true"
-        className={`fixed inset-0 z-[45] flex flex-col bg-ink transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 z-[80] flex flex-col bg-ink transition-opacity duration-300 lg:hidden ${
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         id="site-menu"
         inert={!open}
         ref={sheetRef}
         role="dialog"
-        style={{ paddingTop: "var(--header-h)" }}
       >
-        <nav className="container-x flex flex-1 flex-col justify-between overflow-y-auto pb-[calc(24px+var(--dock-h))] pt-6">
+        <div
+          className="container-x flex flex-none items-center justify-between gap-6 border-b border-line"
+          style={{ height: "var(--header-h)" }}
+        >
+          <Image
+            alt=""
+            className="-ml-1 h-9 w-auto p-0 md:h-11"
+            height={724}
+            sizes="160px"
+            src="/assets/branding/typhoon-signature-gold-bold.png"
+            width={2099}
+          />
+          <button
+            aria-label={dict.a11y.closeMenu}
+            className="icon-btn -mr-2 text-paper"
+            onClick={() => setOpen(false)}
+            ref={closeButtonRef}
+            type="button"
+          >
+            <Icon name="close" size={24} />
+          </button>
+        </div>
+        <nav className="container-x flex flex-1 flex-col justify-between overflow-y-auto pb-[calc(24px+env(safe-area-inset-bottom))] pt-6">
           <ul className="flex flex-col">
             {[...SECTIONS, "booking" as const].map((id, i) => (
               <li className="border-b border-line" key={id}>

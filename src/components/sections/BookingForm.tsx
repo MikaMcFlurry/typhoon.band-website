@@ -36,13 +36,19 @@ export function BookingForm({ email }: { email: string }) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [errors, setErrors] = useState<Errors>({});
   const [minDate, setMinDate] = useState<string | undefined>(undefined);
+  // Until hydration the form works as a plain POST with native validation;
+  // afterwards JavaScript takes over (inline errors, no page reload).
+  const [enhanced, setEnhanced] = useState(false);
+  // Time trap: measured on the client with a monotonic clock and sent as a
+  // duration, so a wrong device clock can never drop a real request.
   const startedAt = useRef<number>(0);
   const formRef = useRef<HTMLFormElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    startedAt.current = Date.now();
+    startedAt.current = performance.now();
     setMinDate(todayIso());
+    setEnhanced(true);
   }, []);
 
   useEffect(() => {
@@ -81,7 +87,11 @@ export function BookingForm({ email }: { email: string }) {
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, locale, started_at: startedAt.current }),
+        body: JSON.stringify({
+          ...data,
+          locale,
+          elapsed_ms: Math.round(performance.now() - startedAt.current),
+        }),
       });
       const body = (await res.json().catch(() => null)) as ApiResponse | null;
       if (!body) {
@@ -134,7 +144,7 @@ export function BookingForm({ email }: { email: string }) {
           <button
             className="btn btn-secondary mt-6"
             onClick={() => {
-              startedAt.current = Date.now();
+              startedAt.current = performance.now();
               setStatus({ kind: "idle" });
             }}
             type="button"
@@ -189,11 +199,14 @@ export function BookingForm({ email }: { email: string }) {
 
   return (
     <form
+      action="/api/booking"
       className="relative rounded-md border border-line-2 bg-ink-3 p-5 sm:p-6 md:p-8"
-      noValidate
+      method="post"
+      noValidate={enhanced}
       onSubmit={onSubmit}
       ref={formRef}
     >
+      <input name="locale" type="hidden" value={locale} />
       {/* Honeypot: off-screen, not focusable, ignored by assistive tech. */}
       <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label>
@@ -203,14 +216,14 @@ export function BookingForm({ email }: { email: string }) {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        {field("name", t.nameLabel, <input {...a11y("name")} autoComplete="name" required type="text" />, { required: true })}
+        {field("name", t.nameLabel, <input {...a11y("name")} autoComplete="name" minLength={2} required type="text" />, { required: true })}
         {field("email", t.emailLabel, <input {...a11y("email")} autoComplete="email" inputMode="email" required type="email" />, { required: true })}
         {field("phone", t.phoneLabel, <input {...a11y("phone")} autoComplete="tel" inputMode="tel" type="tel" />)}
         {field("event_date", t.dateLabel, <input {...a11y("event_date")} min={minDate} type="date" />)}
         {field(
           "event_location",
           t.locationLabel,
-          <input {...a11y("event_location", true)} autoComplete="address-level2" required type="text" />,
+          <input {...a11y("event_location", true)} autoComplete="address-level2" minLength={2} required type="text" />,
           { required: true, hint: t.locationHint },
         )}
         {field(
@@ -231,7 +244,7 @@ export function BookingForm({ email }: { email: string }) {
         {field(
           "message",
           t.messageLabel,
-          <textarea {...a11y("message", true)} required rows={6} />,
+          <textarea {...a11y("message", true)} minLength={10} required rows={6} />,
           { required: true, hint: t.messageHint, span: true },
         )}
       </div>
