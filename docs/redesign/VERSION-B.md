@@ -98,57 +98,107 @@ Behaviour changes:
   - "Homebase: Kanzlei Studio, Hechingen" and the studio paragraph
   - "über 30 Jahre Bühnenerfahrung"
 
-## 4. Evidence
+## 4. Evidence (final state, commit on this branch after `95e2a57`)
 
+**Build and code checks**
 - `npm run lint`: no warnings. `npm run build`: passes.
-- Impeccable detector: one finding (layout transition on the body padding),
-  fixed.
-- Playwright (local production build, fallback data, **no bookings sent**):
-  19/19 journeys pass:
-  - play from the setlist → the dock appears with the title
-  - only one song plays at a time
-  - a seek slider appears on the active row
-  - no download links or native controls
-  - line-up renders all member cards (no stage plot)
-  - lightbox: open, arrow key, Esc, focus returns
-  - booking: client validation and preview updates
-  - DE→TR switch keeps `#band`, with correct Turkish uppercase (OLAĞANÜSTÜ)
-  - mobile menu: open, Esc, link navigation
-  - no overflow while playing
+- Impeccable detector: 0 findings in the public site. One remaining finding
+  is the admin's gold focus shadow, which is outside Version B's scope.
+
+**Accessibility (axe-core 4, WCAG 2.2 AA + best practice): 0 violations**
+- Pages: `/de` at 1440 and 390, `/tr` at 390, legal, 404.
+- Interactive states: song playing + dock, lightbox, mobile menu, booking
+  errors, consent dialog.
+- Keyboard order is logical, and focus is visible everywhere (chalk on
+  deck, ink on the setlist paper).
+
+**Lighthouse (mobile, simulated throttling, `/de`)**
+- Accessibility 100, Best Practices 100, SEO 100, Performance 88.
+- CLS 0, TBT 30 ms, FCP 0.9 s, Speed Index 1.2 s.
+- LCP (the gold signature) is ~3.9 s simulated. Hydration dominates it;
+  the page is visually complete at 1.2 s.
+
+**Journeys (Playwright, local production build, no bookings sent): 18/18
+pass**
+- play from the setlist → the dock appears
+- only one song plays at a time
+- seek slider on the active row
+- no download links or native controls
+- line-up cards present, no stage plot
+- lightbox: keys, Esc, focus returns
+- booking: validation and live preview
+- DE→TR switch keeps `#band`, with correct Turkish capitals
+- mobile menu: open, Esc, navigate
+- no overflow while playing
+
+**States checked with temporary sample data (never committed)**
+- The shows list: long names, "Datum folgt", past shows.
+- The booking fallback screen. The local server has no mail or database
+  channel, so nothing was sent.
+
+**Live data (Vercel preview of `95e2a57`, production Supabase, read-only)**
+- 6 songs, 8 members incl. "Mika El Jackson" and "Tan – Percussion", 9
+  gallery images, no shows.
+- No broken images and no errors. No overflow at 1440, 390 or 320.
+- Live member photos are 1122–3024 px wide and render sharp in the
+  monochrome treatment.
+
+**Layout**
 - No horizontal overflow at 320 / 390 / 768 / 1024 / 1280 / 1440 px.
-- Impeccable finish review (fresh reviewer, no shared context):
-  - First review: `fix`, 8 material fixes.
-  - Verdict 1: 7 resolved; the photo plate was partial and there was one
-    regression.
-  - Verdict 2: both resolved; one new regression (the headline touched the
-    setlist at 1024 px).
-  - I fixed that last regression and checked it by measurement only: a gap of
-    at least 77 px from 1024 to 1440. It has **not** been re-scored by the
-    reviewer.
+
+**Impeccable finish reviews (fresh reviewer each time)**
+1. Build review: `fix`, 8 material fixes. Two verdict rounds, then one
+   self-measured regression fix.
+2. Final ship review after the line-up change: `fix`, 8 items. All
+   addressed:
+   - one photo treatment for the line-up
+   - distinct gallery frames in the fallback
+   - no green icon tile on the booking result
+   - date-picker icon visible
+   - seed key and header decision recorded
+   - live line-up evidence captured
+   - live photo resolution confirmed
+
+   These fixes are verified by measurement and captures, not re-scored by
+   the reviewer.
+
+**Assets**
 - Every shipped raster carries an embedded origin note (`impeccable
-  embed-prompt --scan` → 0 missing). All images are owner-supplied; none were
-  generated.
-- Screenshots in [`version-b/`](version-b/):
-  - `de-{320,390,768,1024,1440}-{fold,full}.jpg`
-  - `tr-{390,1440}-*.jpg`
-  - `legal-en-390-*.jpg`
-  - `journey-*.png` (playing, line-up, booking validation + preview,
-    lightbox, mobile menu, mobile dock)
+  embed-prompt --scan` → 0 missing). Band photos and the logo are
+  owner-supplied.
+- The new share image and the icons were composed from the site's own
+  tokens, fonts and the owner's photo. None were AI-generated.
 
-## 5. Open points
+**Screenshots in [`version-b/`](version-b/)**
+- `de-{320,390,768,1024,1440}-{fold,full}.jpg`
+- `tr-{390,1440}-*.jpg`
+- `legal-en-390-*.jpg`
+- `live-*.jpg` (live data)
+- `journey-*.png`
+- `state-shows-sample-data-1440.png` (sample data)
+- `state-booking-fallback-390.png`
+- `share-image.jpg`
 
-- **Owner review of the direction** on the Vercel preview. Preview deployments
-  use production Supabase and Resend, so **do not send test bookings there**.
-- Items the reviewer noted but did not order a fix for:
-  - The pink "Funk." strip shares its colour with the now-playing tape.
-  - The singer photo appears both in the gallery and in the band section
-    (fallback data).
-  - The tape is set in type; there is no hand-marker lettering and no torn
-    ends.
-- Owner facts, unchanged from Version A:
-  - line-up slot 8 (live: "Tan – Percussion")
-  - the Hechingen / Kanzlei Studio wording (still in the JSON-LD location and
-    the booking "Basis" row)
-  - real platform links
-  - song covers
-  - higher-resolution member photos (cards show them at up to ~300 px)
+## 5. Open points (content, for the owner in Admin — no code needed)
+
+- **Owner review** on the Vercel preview. Preview deployments use
+  production Supabase and Resend, so **do not send test bookings there**.
+- The live gallery (Admin → Media) repeats frames:
+  - the singer photo appears twice
+  - the band collage is also the Termine poster
+
+  Removing the duplicates makes the contact sheet stronger.
+- Line-up slot 8 (live: "Tan – Percussion") and the live bio typos
+  ("Frontman -", "Posaunen Sound", missing final periods): Admin → Members.
+- Song titles without diacritics in the DB (e.g. "Cilgin"): the site shows
+  the canonical spelling, but fixing them in Admin → Music is cleaner.
+- The Hechingen wording, still in the JSON-LD location and the booking
+  "Basis" row: confirm it.
+- Real platform links (Admin → Platform links) and song covers
+  (Admin → Music).
+- Optional design ideas the reviewer listed as "ceiling", not required:
+  - hand-marker lettering on the setlist
+  - torn tape ends
+  - consistent tape on every section heading
+- Going live = merge this branch into `main`. That is the owner's decision
+  and has not been done.
