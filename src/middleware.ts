@@ -1,10 +1,15 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/locales";
 
-// Locale routing. Every page lives under /de, /en or /tr. Requests without a
-// locale prefix are redirected to the best match from Accept-Language (no
-// cookie is set, so no consent is needed). API routes, Next internals and
-// static files are excluded by the matcher below.
+// 1. Locale routing. Every page lives under /de, /en or /tr. Requests without
+//    a locale prefix are redirected to the best match from Accept-Language
+//    (no cookie is set, so no consent is needed).
+// 2. Admin session refresh. For /<locale>/admin/* the Supabase auth cookies
+//    are refreshed here (the documented @supabase/ssr pattern). Server
+//    Components cannot write cookies, so without this admins were logged
+//    out once the access token expired (~1 h).
+// API routes, Next internals and static files are excluded by the matcher.
 
 function pickLocale(header: string | null): Locale {
   if (!header) return DEFAULT_LOCALE;
@@ -12,9 +17,7 @@ function pickLocale(header: string | null): Locale {
     .split(",")
     .map((part) => {
       const [tag, ...params] = part.trim().split(";");
-      const q = params
-        .map((p) => p.trim())
-        .find((p) => p.startsWith("q="));
+      const q = params.map((p) => p.trim()).find((p) => p.startsWith("q="));
       return { tag: tag.toLowerCase(), q: q ? Number(q.slice(2)) || 0 : 1 };
     })
     .filter((entry) => entry.tag && entry.q > 0)
@@ -26,10 +29,46 @@ function pickLocale(header: string | null): Locale {
   return DEFAULT_LOCALE;
 }
 
-export function middleware(request: NextRequest) {
+async function refreshAdminSession(request: NextRequest): Promise<NextResponse> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  let response = NextResponse.next({ request });
+  if (!url || !anon) return response;
+
+  const supabase = createServerClient(url, anon, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        for (const { name, value } of cookiesToSet) request.cookies.set(name, value);
+        response = NextResponse.next({ request });
+        for (const { name, value, options } of cookiesToSet) {
+          response.cookies.set(name, value, options);
+        }
+      },
+    },
+  });
+  try {
+    // Validates the JWT with Supabase and refreshes it when needed.
+    await supabase.auth.getUser();
+  } catch {
+    // Network hiccup: let the page-level guard decide.
+  }
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const first = pathname.split("/")[1];
-  if (isLocale(first)) return NextResponse.next();
+  const segments = pathname.split("/");
+  const first = segments[1];
+
+  if (isLocale(first)) {
+    if (segments[2] === "admin") return refreshAdminSession(request);
+    return NextResponse.next();
+  }
 
   const locale = pickLocale(request.headers.get("accept-language"));
   const url = request.nextUrl.clone();

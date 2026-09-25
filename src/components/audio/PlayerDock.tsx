@@ -65,8 +65,8 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
     <section
       aria-hidden={!visible}
       aria-label={dict.player.dock}
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink-2/95 backdrop-blur-md transition-transform duration-300 ease-out supports-[backdrop-filter]:bg-ink-2/85 ${
-        visible ? "translate-y-0" : "pointer-events-none translate-y-full"
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink-2/95 backdrop-blur-md transition-[transform,visibility] duration-300 ease-out supports-[backdrop-filter]:bg-ink-2/85 ${
+        visible ? "visible translate-y-0" : "pointer-events-none invisible translate-y-full"
       }`}
       inert={!visible}
       ref={dockRef}
@@ -146,7 +146,6 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
         <div className="hidden min-w-0 flex-1 items-center gap-4 md:flex">
           {currentTrack ? (
             <Waveform
-              bars={96}
               heightClass="h-9"
               label={fill(dict.player.seek, { title })}
               seekable

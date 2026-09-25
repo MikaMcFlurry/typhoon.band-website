@@ -64,6 +64,9 @@ export type Dict = {
     loading: string;
     error: string;
     noDownload: string;
+    showAll: string;
+    showLess: string;
+    alsoOn: string;
   };
   about: {
     kicker: string;
@@ -71,6 +74,8 @@ export type Dict = {
     headline: string;
     body: string;
     lead: string;
+    more: string;
+    imageAlt: string;
     cta: string;
     ctaBook: string;
     facts: { label: string; value: string }[];
@@ -78,7 +83,8 @@ export type Dict = {
   members: {
     kicker: string;
     title: string;
-    photoSoon: string;
+    showAll: string;
+    showLess: string;
     instrument: Record<string, string>;
     bio: Record<string, string>;
   };
@@ -175,8 +181,10 @@ export type Dict = {
     title: string;
     body: string;
     accept: string;
+    acceptShort: string;
     decline: string;
     save: string;
+    cancel: string;
     necessary: string;
     necessaryBody: string;
     external: string;
@@ -290,7 +298,7 @@ const de: Dict = {
   meta: {
     title: "Typhoon · Bluesrock, Funk & Soul mit türkischen Texten",
     description:
-      "Typhoon verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock. Demos anhören, Konzerte finden, Band buchen.",
+      "Typhoon aus Hechingen verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock. Demos anhören, Konzerte finden, Band buchen.",
     ogAlt: "Typhoon: acht Musiker in einer Sepia-Collage mit goldenem Schriftzug",
   },
   a11y: {
@@ -305,7 +313,7 @@ const de: Dict = {
     home: "Start",
     band: "Band",
     music: "Musik",
-    shows: "Live",
+    shows: "Termine",
     media: "Bilder",
     booking: "Booking",
     contact: "Kontakt",
@@ -338,6 +346,9 @@ const de: Dict = {
     loading: "Lädt …",
     error: "Dieser Song konnte nicht geladen werden.",
     noDownload: "Nur zum Anhören",
+    showAll: "Alle Demos zeigen",
+    showLess: "Weniger zeigen",
+    alsoOn: "Auch zu hören auf",
   },
   about: {
     kicker: "Über Typhoon",
@@ -346,19 +357,22 @@ const de: Dict = {
     body:
       "Typhoon sprengt Genregrenzen, ohne die eigene Handschrift zu verlieren: markante Blues-Riffs, funkige Grooves, soulige Melodien, jazzige Finessen und türkischsprachige Texte. Eine erfahrene Band, die live sofort zündet.",
     lead:
-      "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.",
+      "Typhoon präsentiert einen kraftvollen Mix aus Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Selbstkomponierte Songs verbinden markante Blues-Riffs, funkige Grooves, soulige Melodien und jazzige Finessen. Türkischsprachige Texte geben den Songs Tiefe und kulturelle Eigenständigkeit.\n\nIm Zentrum steht ein eingespieltes Kollektiv aus acht erfahrenen Musikern mit über 30 Jahren Bühnenerfahrung: Sänger Typhoon, Posaunist Mika, Saxophonist Schack, Trompeter Hardy, Funk-Bassist Stefan, Schlagzeuger Tom sowie die Gitarristen Buğra und Jürgen.\n\nIm eigenen Kanzlei Studio in Hechingen produziert die Band ihre Arrangements mit viel Liebe zum Detail und moderner Technik. Das Ergebnis ist ein Gesamtpaket aus handwerklicher Präzision und authentischer Spielfreude.",
+    more: "Mehr über Typhoon",
+    imageAlt: "Typhoon singt live auf der Bühne",
     cta: "Die Besetzung",
     ctaBook: "Booking anfragen",
     facts: [
       { label: "Besetzung", value: "{count} Musiker mit Bläsersatz" },
-      { label: "Texte", value: "Türkisch" },
-      { label: "Songs", value: "Eigene Kompositionen" },
+      { label: "Texte", value: "Türkisch, eigene Songs" },
+      { label: "Homebase", value: "Kanzlei Studio, Hechingen" },
     ],
   },
   members: {
     kicker: "Band Mitglieder",
     title: "Die Besetzung",
-    photoSoon: "Foto folgt",
+    showAll: "Alle Musiker zeigen",
+    showLess: "Weniger zeigen",
     ...buildMemberMaps("de"),
   },
   demos: {
@@ -367,7 +381,7 @@ const de: Dict = {
   },
   shows: {
     kicker: "Termine",
-    title: "Live",
+    title: "Termine",
     intro: "Die nächsten Konzerte. Tickets und Details direkt beim Veranstalter.",
     link: "Alle Termine ansehen →",
     tickets: "Tickets",
@@ -418,6 +432,7 @@ const de: Dict = {
       { label: "Programm", value: "Eigene Songs mit türkischen Texten" },
       { label: "Stil", value: "Bluesrock, Funk, Soul, Jazz, Southern Rock" },
       { label: "Anlässe", value: "Festival, Club, Stadtfest, Firmen- und Privatevents" },
+      { label: "Basis", value: "Hechingen, Baden-Württemberg – gerne auch weiter weg" },
     ],
     direct: "Direkt erreichbar",
     reply: "Antwort in der Regel innerhalb von 48 Stunden.",
@@ -489,8 +504,10 @@ const de: Dict = {
     body:
       "Diese Website setzt keine Tracking- oder Werbe-Cookies. Externe Inhalte wie Videos oder Streaming-Player laden wir nur, wenn du zustimmst.",
     accept: "Externe Medien erlauben",
+    acceptShort: "Alle erlauben",
     decline: "Nur notwendige",
     save: "Auswahl speichern",
+    cancel: "Abbrechen",
     necessary: "Notwendig",
     necessaryBody: "Speichert nur diese Auswahl in deinem Browser.",
     external: "Externe Medien",
@@ -541,7 +558,7 @@ const en: Dict = {
   meta: {
     title: "Typhoon · Blues rock, funk & soul with Turkish lyrics",
     description:
-      "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock. Listen to the demos, find a show, book the band.",
+      "Typhoon from Hechingen, Germany, blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock. Listen to the demos, find a show, book the band.",
     ogAlt: "Typhoon: eight musicians in a sepia collage with a gold signature logo",
   },
   a11y: {
@@ -556,7 +573,7 @@ const en: Dict = {
     home: "Home",
     band: "Band",
     music: "Music",
-    shows: "Live",
+    shows: "Shows",
     media: "Photos",
     booking: "Booking",
     contact: "Contact",
@@ -589,6 +606,9 @@ const en: Dict = {
     loading: "Loading …",
     error: "This song could not be loaded.",
     noDownload: "Streaming only",
+    showAll: "Show all demos",
+    showLess: "Show fewer",
+    alsoOn: "Also on",
   },
   about: {
     kicker: "About Typhoon",
@@ -597,19 +617,22 @@ const en: Dict = {
     body:
       "Typhoon breaks genre boundaries without losing their handwriting: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
     lead:
-      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.",
+      "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of eight experienced musicians with more than 30 years of stage experience: singer Typhoon, trombonist Mika, saxophonist Schack, trumpeter Hardy, funk bassist Stefan, drummer Tom and guitarists Buğra and Jürgen.\n\nIn their own Kanzlei Studio in Hechingen, the band works out its arrangements with great attention to detail and modern equipment. The result is a complete package of craftsmanship and genuine joy of playing.",
+    more: "More about Typhoon",
+    imageAlt: "Typhoon singing live on stage",
     cta: "Meet the line-up",
     ctaBook: "Booking request",
     facts: [
       { label: "Line-up", value: "{count} musicians incl. horn section" },
-      { label: "Lyrics", value: "Turkish" },
-      { label: "Songs", value: "Original compositions" },
+      { label: "Lyrics", value: "Turkish, original songs" },
+      { label: "Home base", value: "Kanzlei Studio, Hechingen (DE)" },
     ],
   },
   members: {
     kicker: "Band Members",
     title: "The line-up",
-    photoSoon: "Photo coming soon",
+    showAll: "Show all musicians",
+    showLess: "Show fewer",
     ...buildMemberMaps("en"),
   },
   demos: {
@@ -618,7 +641,7 @@ const en: Dict = {
   },
   shows: {
     kicker: "Shows",
-    title: "Live",
+    title: "Shows",
     intro: "Upcoming concerts. Tickets and details come straight from the promoter.",
     link: "All shows →",
     tickets: "Tickets",
@@ -668,6 +691,7 @@ const en: Dict = {
       { label: "Set", value: "Original songs with Turkish lyrics" },
       { label: "Style", value: "Blues rock, funk, soul, jazz, southern rock" },
       { label: "Occasions", value: "Festivals, clubs, city festivals, corporate and private events" },
+      { label: "Based in", value: "Hechingen, Baden-Württemberg, Germany; happy to travel" },
     ],
     direct: "Reach us directly",
     reply: "We usually reply within 48 hours.",
@@ -738,8 +762,10 @@ const en: Dict = {
     body:
       "This site sets no tracking or advertising cookies. External content such as videos or streaming players only loads with your consent.",
     accept: "Allow external media",
+    acceptShort: "Allow all",
     decline: "Necessary only",
     save: "Save choice",
+    cancel: "Cancel",
     necessary: "Necessary",
     necessaryBody: "Only stores this choice in your browser.",
     external: "External media",
@@ -790,7 +816,7 @@ const tr: Dict = {
   meta: {
     title: "Typhoon · Türkçe sözlerle blues rock, funk ve soul",
     description:
-      "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir. Demoları dinleyin, konserleri bulun, grubu davet edin.",
+      "Hechingen'den Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir. Demoları dinleyin, konserleri bulun, grubu davet edin.",
     ogAlt: "Typhoon: altın imzalı sepya bir kolajda sekiz müzisyen",
   },
   a11y: {
@@ -838,6 +864,9 @@ const tr: Dict = {
     loading: "Yükleniyor …",
     error: "Bu şarkı yüklenemedi.",
     noDownload: "Yalnızca dinleme",
+    showAll: "Tüm demoları göster",
+    showLess: "Daha az göster",
+    alsoOn: "Ayrıca şurada",
   },
   about: {
     kicker: "Typhoon Hakkında",
@@ -846,19 +875,22 @@ const tr: Dict = {
     body:
       "Typhoon, kendi imzasını kaybetmeden tür sınırlarını aşar: vurucu blues riff'leri, funky groove'lar, ruhlu melodiler, jazz incelikleri ve Türkçe sözler. Sahneye çıktığı an alev alan tecrübeli bir grup.",
     lead:
-      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.",
+      "Typhoon; blues rock, funk, soul, jazz ve southern rock'ı Amerikan-Avrupa tınısıyla güçlü bir karışımda buluşturur. Kendi besteleri vurucu blues riff'lerini, funky groove'ları, ruhlu melodileri ve jazz inceliklerini bir araya getirir. Türkçe sözler şarkılara derinlik ve kendine has bir kültürel kimlik kazandırır.\n\nMerkezde, 30 yılı aşkın sahne tecrübesine sahip sekiz deneyimli müzisyenden oluşan uyumlu bir kolektif var: vokalist Typhoon, trombonist Mika, saksofoncu Schack, trompetçi Hardy, funk basçı Stefan, davulcu Tom ve gitaristler Buğra ile Jürgen.\n\nGrup, Hechingen'deki kendi Kanzlei Studio'sunda düzenlemelerini büyük bir özen ve modern teknikle hazırlar. Sonuç: ustalık ve içten çalma keyfinin bir araya geldiği eksiksiz bir paket.",
+    more: "Typhoon hakkında daha fazla",
+    imageAlt: "Typhoon sahnede canlı söylüyor",
     cta: "Kadroyu tanıyın",
     ctaBook: "Booking talebi",
     facts: [
       { label: "Kadro", value: "Nefesli grubuyla {count} müzisyen" },
-      { label: "Sözler", value: "Türkçe" },
-      { label: "Şarkılar", value: "Kendi besteleri" },
+      { label: "Sözler", value: "Türkçe, kendi şarkıları" },
+      { label: "Merkez", value: "Kanzlei Studio, Hechingen (Almanya)" },
     ],
   },
   members: {
     kicker: "Grup Üyeleri",
     title: "Kadro",
-    photoSoon: "Fotoğraf yakında",
+    showAll: "Tüm müzisyenleri göster",
+    showLess: "Daha az göster",
     ...buildMemberMaps("tr"),
   },
   demos: {
@@ -867,7 +899,7 @@ const tr: Dict = {
   },
   shows: {
     kicker: "Tarihler",
-    title: "Canlı",
+    title: "Konserler",
     intro: "Sıradaki konserler. Bilet ve detaylar doğrudan organizatörde.",
     link: "Tüm tarihler →",
     tickets: "Bilet",
@@ -917,6 +949,7 @@ const tr: Dict = {
       { label: "Program", value: "Türkçe sözlü kendi şarkıları" },
       { label: "Tarz", value: "Blues rock, funk, soul, jazz, southern rock" },
       { label: "Etkinlikler", value: "Festival, kulüp, şehir şenliği, kurumsal ve özel etkinlikler" },
+      { label: "Merkez", value: "Hechingen, Baden-Württemberg, Almanya; uzak yerlere de gelir" },
     ],
     direct: "Doğrudan ulaşın",
     reply: "Genellikle 48 saat içinde yanıt veriyoruz.",
@@ -987,8 +1020,10 @@ const tr: Dict = {
     body:
       "Bu site izleme ya da reklam çerezi kullanmaz. Video veya müzik oynatıcısı gibi harici içerikler yalnızca onayınızla yüklenir.",
     accept: "Harici medyaya izin ver",
+    acceptShort: "Tümüne izin ver",
     decline: "Yalnızca gerekli",
     save: "Seçimi kaydet",
+    cancel: "Vazgeç",
     necessary: "Gerekli",
     necessaryBody: "Yalnızca bu seçimi tarayıcınızda saklar.",
     external: "Harici medya",

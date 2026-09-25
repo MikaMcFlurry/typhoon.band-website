@@ -11,8 +11,9 @@
 // missing or the database is empty. Frontend code never touches Supabase
 // directly — it always goes through these loaders.
 
+import { cache } from "react";
 import type { Locale } from "@/i18n/locales";
-import { fetchPublicAssetSettings } from "@/lib/admin/site-settings";
+import { fetchPublicAssetSettings as fetchPublicAssetSettingsRaw } from "@/lib/admin/site-settings";
 import {
   buildBandInfoFallback,
   buildGalleryFallback,
@@ -65,6 +66,10 @@ import type {
   SongItem,
 } from "./types";
 
+// Per-request memoisation: the layout and the page both need site
+// settings / platform links, and hero + band info both read the asset map.
+const fetchPublicAssetSettings = cache(fetchPublicAssetSettingsRaw);
+
 async function safe<T>(fn: () => Promise<T | null>): Promise<T | null> {
   try {
     return await fn();
@@ -73,12 +78,12 @@ async function safe<T>(fn: () => Promise<T | null>): Promise<T | null> {
   }
 }
 
-export async function getSiteSettings(): Promise<SiteSettings> {
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   const fallback = buildSiteSettingsFallback();
   const rows = await safe(() => fetchSiteSettings());
   if (!rows || rows.length === 0) return fallback;
   return normaliseSiteSettings(rows, fallback);
-}
+});
 
 export async function getHeroContent(locale: Locale): Promise<HeroContent> {
   const fallback = buildHeroFallback(locale);
@@ -126,11 +131,8 @@ export async function getSongs(_locale: Locale): Promise<SongItem[]> {
   return normalised.length > 0 ? normalised : fallback;
 }
 
-export async function getGalleryItems(
-  _locale: Locale,
-): Promise<GalleryItem[]> {
-  void _locale;
-  const fallback = buildGalleryFallback();
+export async function getGalleryItems(locale: Locale): Promise<GalleryItem[]> {
+  const fallback = buildGalleryFallback(locale);
   const rows = await safe(() => fetchGallery());
   if (!rows || rows.length === 0) return fallback;
   const normalised = normaliseGallery(rows, fallback);
@@ -154,12 +156,12 @@ export async function getLegalPage(
   return normaliseLegalPage(row, type, fallback);
 }
 
-export async function getPlatformLinks(): Promise<PlatformLink[]> {
+export const getPlatformLinks = cache(async (): Promise<PlatformLink[]> => {
   const fallback = buildPlatformLinksFallback();
   const rows = await safe(() => fetchPlatformLinks());
   if (!rows) return fallback;
   return normalisePlatformLinks(rows);
-}
+});
 
 export async function getSeoEntry(
   path: string,

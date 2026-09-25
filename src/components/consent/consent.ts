@@ -9,9 +9,9 @@
 //   }
 //
 // The banner reads/writes via the helpers in this module; embed gates
-// subscribe to the `typhoon:consent-changed` event and the Footer
-// "Cookie preferences" link emits `typhoon:open-consent` to reopen the
-// dialog. Keeping the helpers free of React lets server components and
+// subscribe to the `typhoon:consent-changed` event and the footer
+// "Privacy settings" button emits `typhoon:open-consent` to reopen the
+// dialog. Nothing else is stored: the public site sets no cookies. Keeping the helpers free of React lets server components and
 // utility code share the same storage contract.
 
 export const CONSENT_STORAGE_KEY = "typhoon.consent.v1";
@@ -42,11 +42,30 @@ function isChoice(value: unknown): value is ConsentChoice {
   );
 }
 
+// Key used by the previous live site ("accepted" | "declined"). Neither
+// choice covered external media, so it maps to "necessary only" and
+// returning visitors are not asked again.
+const LEGACY_STORAGE_KEY = "typhoon.cookie-consent";
+
 export function readConsent(): ConsentState {
   if (typeof window === "undefined") return { decided: false };
   try {
     const raw = window.localStorage.getItem(CONSENT_STORAGE_KEY);
-    if (!raw) return { decided: false };
+    if (!raw) {
+      const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy === "accepted" || legacy === "declined") {
+        return {
+          decided: true,
+          choice: {
+            v: 1,
+            necessary: true,
+            external_media: false,
+            decided_at: new Date(0).toISOString(),
+          },
+        };
+      }
+      return { decided: false };
+    }
     const parsed = JSON.parse(raw) as unknown;
     if (!isChoice(parsed)) return { decided: false };
     return { decided: true, choice: parsed };

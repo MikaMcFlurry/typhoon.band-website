@@ -220,7 +220,7 @@ a {
     left: 16px;
     top: 12px;
     z-index: 100;
-    transform: translateY(-160%);
+    transform: translateY(calc(-100% - 40px));
     background: var(--gold);
     color: var(--on-gold);
     padding: 10px 16px;
@@ -573,12 +573,19 @@ a {
   }
 }
 
+/* Hero collage never taller than the viewport on desktop. */
+@media (min-width: 1024px) {
+  .hero-image {
+    max-width: min(100%, calc((100svh - var(--header-h) - 40px) / 0.86));
+  }
+}
+
 /* Waveform bars */
 .wave-bar {
   display: block;
   flex: 1 1 0;
   min-width: 1px;
-  max-width: 4px;
+  max-width: 5px;
   height: 100%;
   border-radius: 2px;
   background: var(--gold-lo);

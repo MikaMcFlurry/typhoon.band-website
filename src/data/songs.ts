@@ -2,6 +2,8 @@ export type Song = {
   id: string;
   title: string;
   src: string;
+  /** Fallback artwork until real covers are uploaded in Admin → Music. */
+  cover: string;
   sortOrder: number;
 };
 
@@ -14,36 +16,42 @@ export const songs: Song[] = [
     id: "sen-benim",
     title: "Sen Benim",
     src: "/assets/audio/demos/Sen-Benim.mp3",
+    cover: "/assets/hero/hero-collage.jpeg",
     sortOrder: 1,
   },
   {
     id: "karanfil",
     title: "Karanfil",
     src: "/assets/audio/demos/karanfil-demo.mp3",
+    cover: "/assets/gallery/gallery-6.jpg",
     sortOrder: 2,
   },
   {
     id: "gece-yine-dustun",
     title: "Gece Yine Düştün",
     src: "/assets/audio/demos/gece-yine-dustun-demo.mp3",
+    cover: "/assets/gallery/gallery-2.jpg",
     sortOrder: 3,
   },
   {
     id: "farksilin",
     title: "Farksilin",
     src: "/assets/audio/demos/farksilin-demo.mp3",
+    cover: "/assets/gallery/gallery-4.jpg",
     sortOrder: 4,
   },
   {
     id: "cilgin",
     title: "Çılgın",
     src: "/assets/audio/demos/cilgin-demo.mp3",
+    cover: "/assets/gallery/gallery-1.jpg",
     sortOrder: 5,
   },
   {
     id: "bir-tek-sen",
     title: "Bir Tek Sen",
     src: "/assets/audio/demos/bir-tek-sen-demo.mp3",
+    cover: "/assets/gallery/gallery-8.jpg",
     sortOrder: 6,
   },
 ];

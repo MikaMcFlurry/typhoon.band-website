@@ -38,7 +38,7 @@ export default async function AdminLoginPage({
   const supabaseReady = isSupabaseConfigured();
 
   return (
-    <section className="mx-auto w-full max-w-md px-4 pb-16 pt-24 md:pt-32">
+    <section className="mx-auto w-full max-w-md px-4 pb-16 pt-10 md:pt-14">
       <p className="kicker">Admin</p>
       <h1 className="mt-2 font-display text-3xl font-bold tracking-[-0.02em] md:text-4xl">
         Anmelden

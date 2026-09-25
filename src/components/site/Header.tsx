@@ -9,7 +9,7 @@ import { LocaleSwitcher } from "@/components/site/LocaleSwitcher";
 import { Icon } from "@/components/ui/Icon";
 
 // Order matches the scroll order of the home page.
-const SECTIONS = ["music", "shows", "band", "media"] as const;
+const SECTIONS = ["shows", "band", "music", "media"] as const;
 type SectionId = (typeof SECTIONS)[number] | "booking";
 
 export function Header({

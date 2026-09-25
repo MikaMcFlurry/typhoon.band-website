@@ -79,17 +79,17 @@ export function buildSongsFallback(): SongItem[] {
     id: s.id,
     title: s.title,
     audioUrl: s.src,
-    coverImageUrl: null,
+    coverImageUrl: s.cover,
     isFeatured: s.id === featuredSong.id,
     sortOrder: s.sortOrder,
   }));
 }
 
-export function buildGalleryFallback(): GalleryItem[] {
+export function buildGalleryFallback(locale: Locale): GalleryItem[] {
   return galleryFallback.map((g, i) => ({
     id: g.id,
     src: g.src,
-    alt: g.alt,
+    alt: g.alt[locale],
     thumbnailUrl: null,
     sortOrder: i + 1,
   }));
@@ -156,7 +156,7 @@ export function buildPublicPageFallback(locale: Locale): PublicPageContent {
     bandInfo: buildBandInfoFallback(locale),
     members: buildMembersFallback(locale),
     songs: buildSongsFallback(),
-    gallery: buildGalleryFallback(),
+    gallery: buildGalleryFallback(locale),
     shows: buildShowsFallback(locale),
     platformLinks: buildPlatformLinksFallback(),
   };

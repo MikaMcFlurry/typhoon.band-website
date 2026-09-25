@@ -18,7 +18,8 @@ import {
 type WaveformProps = {
   songId: string;
   title: string;
-  bars?: number;
+  /** Number of bars, or "auto" to fill the available width (≈1 bar / 6px). */
+  bars?: number | "auto";
   className?: string;
   /** Tailwind height utility for the container. */
   heightClass?: string;
@@ -62,7 +63,7 @@ function usePrefersReducedMotion() {
 export function Waveform({
   songId,
   title,
-  bars = 64,
+  bars: barsProp = "auto",
   className = "",
   heightClass = "h-10",
   seekable = false,
@@ -73,7 +74,26 @@ export function Waveform({
   const { progress, position } = useAudioTime();
   const isCurrent = currentId === songId;
   const reducedMotion = usePrefersReducedMotion();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [autoBars, setAutoBars] = useState(64);
+  const bars = barsProp === "auto" ? autoBars : barsProp;
   const barRefs = useRef<HTMLSpanElement[]>([]);
+
+  // "auto": derive the bar count from the rendered width so the waveform
+  // always fills the free space (owner feedback on the old player).
+  useEffect(() => {
+    if (barsProp !== "auto") return;
+    const node = containerRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
+    const update = () => {
+      const w = node.getBoundingClientRect().width;
+      if (w > 0) setAutoBars(Math.max(24, Math.min(180, Math.floor(w / 6))));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [barsProp]);
   const peaksRef = useRef<number[]>([]);
   const draggingRef = useRef(false);
 
@@ -201,6 +221,7 @@ export function Waveform({
       className={`relative flex min-w-0 touch-none select-none items-center gap-[2px] ${heightClass} ${
         seekable ? "cursor-pointer" : ""
       } ${className}`}
+      ref={containerRef}
       {...sliderProps}
     >
       {idleHeights.map((h, i) => (

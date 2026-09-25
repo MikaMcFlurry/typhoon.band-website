@@ -227,7 +227,8 @@ export function validatePlatformLink(raw: unknown): PlatformLinkValidation {
     };
   }
 
-  const isActive = asBool(r.is_active, true);
+  // Unchecked checkbox = absent from FormData → inactive (was stuck on true).
+  const isActive = asBool(r.is_active, false);
   const sortOrder = asInt(r.sort_order, 0);
 
   return { ok: true, data: { platform, url, isActive, sortOrder } };
