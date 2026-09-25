@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { FeaturedPlayer } from "@/components/audio/FeaturedPlayer";
 import { PlaylistRegistrar } from "@/components/audio/PlaylistRegistrar";
 import { Band } from "@/components/sections/Band";
 import { Booking } from "@/components/sections/Booking";
 import { Gallery } from "@/components/sections/Gallery";
 import { Hero } from "@/components/sections/Hero";
-import { Music } from "@/components/sections/Music";
 import { Shows, splitShows } from "@/components/sections/Shows";
 import { PlatformLinks } from "@/components/site/PlatformLinks";
 import { getDict } from "@/i18n/dictionaries";
@@ -18,7 +16,6 @@ import { absoluteUrl } from "@/lib/site-url";
 export const revalidate = 60;
 
 const FALLBACK_COVER = "/assets/hero/hero-collage.jpeg";
-const POSTER = "/assets/gallery/gallery-3.jpg";
 
 export async function generateMetadata({
   params,
@@ -92,28 +89,26 @@ export default async function HomePage({
       <Hero
         dict={dict}
         featured={featured}
-        imageUrl={content.hero.imageUrl}
         locale={locale}
+        setlistFooter={
+          content.platformLinks.length > 0 ? (
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <p className="mono-cap text-chalk-2">{dict.music.alsoOn}</p>
+              <PlatformLinks links={content.platformLinks} />
+            </div>
+          ) : null
+        }
         signatureUrl={content.hero.signatureUrl}
+        tracks={tracks}
       />
-      {featured ? <FeaturedPlayer song={featured} /> : null}
-      <Shows dict={dict} locale={locale} shows={content.shows} />
+      <Shows dict={dict} locale={locale} posterUrl={content.hero.imageUrl} shows={content.shows} />
       <Band dict={dict} imageUrl={content.bandInfo.imageUrl} members={content.members} />
-      <Music tracks={tracks}>
-        {content.platformLinks.length > 0 ? (
-          <div className="reveal mt-12 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <p className="label">{dict.music.alsoOn}</p>
-            <PlatformLinks links={content.platformLinks} />
-          </div>
-        ) : null}
-      </Music>
       <Gallery items={content.gallery.map((g) => ({ id: g.id, src: g.src, alt: g.alt }))} />
       <Booking
         dict={dict}
         email={content.siteSettings.contactBookingEmail}
         memberCount={content.members.length}
         phone={content.siteSettings.contactPhone}
-        posterUrl={POSTER}
       />
     </>
   );

@@ -103,12 +103,12 @@ export function ConsentBanner() {
   if (mode === "hidden") return null;
 
   const links = (
-    <p className="text-[0.875rem] text-paper-3">
-      <Link className="underline decoration-line-2 underline-offset-4 hover:text-gold-hi" href={`/${locale}/legal/privacy`}>
+    <p className="mono text-[rgba(18,17,16,0.72)]">
+      <Link className="underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/privacy`}>
         {dict.cookies.privacyLink}
       </Link>
       <span aria-hidden> · </span>
-      <Link className="underline decoration-line-2 underline-offset-4 hover:text-gold-hi" href={`/${locale}/legal/cookies`}>
+      <Link className="underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/cookies`}>
         {dict.cookies.cookiesLink}
       </Link>
     </p>
@@ -118,54 +118,56 @@ export function ConsentBanner() {
     return (
       <section
         aria-label={dict.cookies.title}
-        className="fixed inset-x-2 z-[60] rounded-md border border-line-2 bg-ink-3 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:inset-x-auto sm:right-6 sm:w-[400px] sm:p-5"
+        className="fixed inset-x-2 z-[60] bg-chalk p-4 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110] sm:inset-x-6 md:flex md:items-center md:gap-8 md:px-6 md:py-4"
         style={{ bottom: "calc(var(--dock-h) + 8px)" }}
       >
-        <h2 className="font-display text-[1.125rem] leading-tight text-paper sm:text-[1.25rem]">
-          {dict.cookies.title}
-        </h2>
-        <p className="mt-1.5 text-[0.875rem] leading-snug text-paper-2 sm:text-[0.9375rem] sm:leading-relaxed">
-          {dict.cookies.body}
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <button className="btn btn-secondary btn-sm px-3" onClick={() => decide(false)} type="button">
+        <div className="min-w-0 md:flex-1">
+          <h2 className="font-stage text-[1.375rem] font-extrabold uppercase leading-none">
+            {dict.cookies.title}
+          </h2>
+          <p className="mt-1.5 text-[0.875rem] leading-snug md:text-[0.9375rem]">
+            {dict.cookies.body}
+          </p>
+          <div className="mt-1.5">{links}</div>
+        </div>
+        <div className="mt-3 grid flex-none grid-cols-2 gap-2 md:mt-0 md:w-[380px]">
+          <button className="btn-line btn-sm border-[#121110] px-2 text-[#121110] hover:bg-[#121110] hover:text-chalk" onClick={() => decide(false)} type="button">
             {dict.cookies.decline}
           </button>
-          <button className="btn btn-primary btn-sm px-3" onClick={() => decide(true)} type="button">
+          <button className="btn-line btn-sm border-[#121110] bg-[#121110] px-2 text-chalk hover:bg-transparent hover:text-[#121110]" onClick={() => decide(true)} type="button">
             {dict.cookies.acceptShort}
           </button>
         </div>
-        <div className="mt-2">{links}</div>
       </section>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-ink/70 p-3 sm:items-center">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-deck/80 p-3 sm:items-center">
       <div
         aria-labelledby="consent-title"
         aria-modal="true"
-        className="w-full max-w-[480px] rounded-md border border-line-2 bg-ink-3 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+        className="w-full max-w-[480px] bg-chalk p-6 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110]"
         ref={dialogRef}
         role="dialog"
       >
-        <h2 className="font-display text-[1.625rem] leading-tight text-paper" id="consent-title">
+        <h2 className="font-stage text-[2rem] font-black uppercase leading-none" id="consent-title">
           {dict.cookies.title}
         </h2>
-        <p className="mt-2 text-[0.9375rem] leading-relaxed text-paper-2">{dict.cookies.body}</p>
+        <p className="mt-2 text-[0.9375rem] leading-relaxed">{dict.cookies.body}</p>
 
-        <ul className="mt-5 divide-y divide-line border-y border-line">
+        <ul className="mt-5 divide-y divide-[rgba(18,17,16,0.2)] border-y border-[rgba(18,17,16,0.2)]">
           <li className="flex items-start justify-between gap-4 py-4">
             <div>
-              <p className="font-semibold text-paper">{dict.cookies.necessary}</p>
-              <p className="mt-1 text-[0.875rem] text-paper-3">{dict.cookies.necessaryBody}</p>
+              <p className="font-semibold">{dict.cookies.necessary}</p>
+              <p className="mt-1 text-[0.875rem] text-[rgba(18,17,16,0.72)]">{dict.cookies.necessaryBody}</p>
             </div>
             <Switch checked disabled label={dict.cookies.necessary} />
           </li>
           <li className="flex items-start justify-between gap-4 py-4">
             <div>
-              <p className="font-semibold text-paper">{dict.cookies.external}</p>
-              <p className="mt-1 text-[0.875rem] text-paper-3">{dict.cookies.externalBody}</p>
+              <p className="font-semibold">{dict.cookies.external}</p>
+              <p className="mt-1 text-[0.875rem] text-[rgba(18,17,16,0.72)]">{dict.cookies.externalBody}</p>
             </div>
             <Switch
               checked={external}
@@ -176,10 +178,10 @@ export function ConsentBanner() {
         </ul>
 
         <div className="mt-5 flex flex-wrap justify-end gap-2">
-          <button className="btn btn-ghost btn-sm" onClick={close} type="button">
+          <button className="btn-line btn-sm border-transparent text-[#121110] hover:border-[#121110]" onClick={close} type="button">
             {dict.cookies.cancel}
           </button>
-          <button className="btn btn-primary btn-sm" onClick={() => decide(external)} type="button">
+          <button className="btn-line btn-sm border-[#121110] bg-[#121110] text-chalk hover:bg-transparent hover:text-[#121110]" onClick={() => decide(external)} type="button">
             {dict.cookies.save}
           </button>
         </div>
@@ -204,8 +206,8 @@ function Switch({
     <button
       aria-checked={checked}
       aria-label={label}
-      className={`relative mt-1 inline-flex h-7 w-12 flex-none items-center rounded-full border transition-colors ${
-        checked ? "border-gold bg-gold" : "border-line-2 bg-ink"
+      className={`relative mt-1 inline-flex h-7 w-12 flex-none items-center border-2 border-[#121110] transition-colors ${
+        checked ? "bg-green" : "bg-transparent"
       } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
@@ -214,8 +216,8 @@ function Switch({
     >
       <span
         aria-hidden
-        className={`inline-block size-5 rounded-full transition-transform ${
-          checked ? "translate-x-[22px] bg-on-gold" : "translate-x-[3px] bg-paper-2"
+        className={`inline-block size-4 bg-[#121110] transition-transform ${
+          checked ? "translate-x-[24px]" : "translate-x-[4px]"
         }`}
       />
     </button>

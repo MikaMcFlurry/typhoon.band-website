@@ -21,18 +21,18 @@ export function LegalShell({
   children: ReactNode;
 }) {
   return (
-    <article className="container-x pb-24 pt-[calc(var(--header-h)+48px)] md:pb-32 md:pt-[calc(var(--header-h)+80px)]">
+    <article className="shell pb-24 pt-[calc(var(--header-h)+40px)] md:pb-32 md:pt-[calc(var(--header-h)+72px)]">
       <div className="mx-auto max-w-[72ch]">
         <Link
-          className="inline-flex min-h-11 items-center gap-2 text-[0.9375rem] text-paper-2 hover:text-gold-hi"
+          className="mono-cap inline-flex min-h-11 items-center gap-2 text-chalk-2 hover:text-chalk"
           href={homeHref}
         >
           <Icon name="arrow-left" size={16} />
           {backLabel}
         </Link>
-        <h1 className="h-section mt-6">{title}</h1>
-        {meta ? <p className="mt-4 text-[0.9375rem] text-paper-3">{meta}</p> : null}
-        <div className="mt-12 border-t border-line pt-4">{children}</div>
+        <h1 className="h-stage mt-6 [overflow-wrap:anywhere]">{title}</h1>
+        {meta ? <p className="mono mt-4 text-chalk-3">{meta}</p> : null}
+        <div className="mt-10 border-t-2 border-chalk pt-2">{children}</div>
       </div>
     </article>
   );
@@ -49,7 +49,7 @@ function Linkify({ text }: { text: string }) {
           const isMail = part.includes("@") && !part.startsWith("http");
           return (
             <a
-              className="text-gold-hi underline decoration-line-2 underline-offset-4 hover:text-paper"
+              className="link-u break-words text-chalk"
               href={isMail ? `mailto:${part}` : part}
               key={i}
               rel={isMail ? undefined : "noopener noreferrer"}
@@ -67,7 +67,7 @@ function Linkify({ text }: { text: string }) {
 
 function Paragraph({ text }: { text: string }) {
   return (
-    <p className="mt-4 whitespace-pre-line text-[1.0625rem] leading-relaxed text-paper-2">
+    <p className="mt-4 whitespace-pre-line text-[1.0625rem] leading-relaxed text-chalk-2">
       <Linkify text={text} />
     </p>
   );
@@ -75,7 +75,7 @@ function Paragraph({ text }: { text: string }) {
 
 function List({ items }: { items: string[] }) {
   return (
-    <ul className="mt-4 flex list-disc flex-col gap-2 pl-5 text-[1.0625rem] leading-relaxed text-paper-2 marker:text-gold-lo">
+    <ul className="mt-4 flex list-[square] flex-col gap-2 pl-5 text-[1.0625rem] leading-relaxed text-chalk-2 marker:text-chalk-3">
       {items.map((item, i) => (
         <li key={i}>
           <Linkify text={item} />
@@ -87,7 +87,7 @@ function List({ items }: { items: string[] }) {
 
 function H2({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mt-12 font-display text-[1.5rem] leading-tight text-paper md:text-[1.75rem]">
+    <h2 className="mt-12 font-stage text-[1.75rem] font-extrabold uppercase leading-none md:text-[2rem]">
       {children}
     </h2>
   );

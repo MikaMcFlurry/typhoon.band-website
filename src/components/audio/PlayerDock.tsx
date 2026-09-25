@@ -13,8 +13,8 @@ import { Icon } from "@/components/ui/Icon";
 import { fill } from "@/i18n/dictionaries";
 
 // Persistent player bar. Appears after the first play and stays while the
-// visitor scrolls, so music keeps going with visible controls everywhere
-// on the site (the old site had no global controls).
+// visitor scrolls, so music keeps going with visible controls everywhere.
+// Stage grammar: deck surface, pink progress tape, square controls.
 
 const DOCK_HEIGHT = 76;
 
@@ -43,7 +43,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
   // Reserve space at the bottom of the page while the dock is shown.
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty("--dock-h", visible ? `${DOCK_HEIGHT}px` : "0px");
+    root.style.setProperty("--dock-h", visible ? `calc(${DOCK_HEIGHT}px + env(safe-area-inset-bottom))` : "0px");
     return () => {
       root.style.setProperty("--dock-h", "0px");
     };
@@ -65,51 +65,45 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
     <section
       aria-hidden={!visible}
       aria-label={dict.player.dock}
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink-2/95 backdrop-blur-md transition-[transform,visibility] duration-300 ease-out supports-[backdrop-filter]:bg-ink-2/85 ${
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-deck-2 transition-[transform,visibility] duration-300 ease-out ${
         visible ? "visible translate-y-0" : "pointer-events-none invisible translate-y-full"
       }`}
       inert={!visible}
       ref={dockRef}
-      style={{ height: DOCK_HEIGHT, paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{ height: `calc(${DOCK_HEIGHT}px + env(safe-area-inset-bottom))`, paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {/* Mobile progress line */}
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[2px] bg-line md:hidden">
+      {/* Progress: a strip of pink tape across the top edge. */}
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[3px] bg-rule">
         <div
-          className="h-full origin-left bg-gold transition-transform duration-300 ease-linear"
+          className="h-full origin-left bg-pink transition-transform duration-300 ease-linear"
           style={{ transform: `scaleX(${progress})` }}
         />
       </div>
 
-      <div className="container-x flex h-full items-center gap-3 md:gap-5">
-        <div className="flex min-w-0 flex-1 items-center gap-3 md:w-[260px] md:flex-none">
-          <div className="relative size-11 flex-none overflow-hidden rounded-sm bg-ink-3">
+      <div className="shell flex h-full items-center gap-3 md:gap-5" style={{ height: DOCK_HEIGHT }}>
+        <div className="flex min-w-0 flex-1 items-center gap-3 md:w-[280px] md:flex-none">
+          <div className="live-mark relative size-11 flex-none overflow-hidden bg-deck-3" data-live="">
             {currentTrack ? (
-              <Image
-                alt=""
-                className="object-cover sepia-img"
-                fill
-                sizes="44px"
-                src={cover}
-              />
+              <Image alt="" className="object-cover" fill sizes="44px" src={cover} />
             ) : null}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-display text-[1.0625rem] leading-tight text-paper">
+            <p className="truncate font-stage text-[1.25rem] font-extrabold uppercase leading-none">
               {title}
             </p>
             <p
               aria-live="polite"
-              className={`truncate text-[0.8125rem] ${hasError ? "text-[color:var(--danger)]" : "text-paper-3"}`}
+              className={`mono-cap mt-1 truncate ${hasError ? "text-alert" : "text-chalk-3"}`}
             >
               {dict.player.by} · {status}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-none items-center gap-1">
+        <div className="flex flex-none items-center gap-0.5">
           <button
             aria-label={dict.player.prev}
-            className="icon-btn hidden xs:inline-flex"
+            className="ctl hidden xs:inline-flex"
             disabled={!canSkip}
             onClick={previous}
             type="button"
@@ -122,7 +116,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
                 ? fill(dict.player.pauseTrack, { title })
                 : fill(dict.player.playTrack, { title })
             }
-            className="play-btn play-btn-sm"
+            className="ctl ctl-play"
             onClick={() => currentTrack && toggle(currentTrack.id)}
             type="button"
           >
@@ -134,7 +128,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
           </button>
           <button
             aria-label={dict.player.next}
-            className="icon-btn"
+            className="ctl"
             disabled={!canSkip}
             onClick={next}
             type="button"
@@ -146,15 +140,15 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
         <div className="hidden min-w-0 flex-1 items-center gap-4 md:flex">
           {currentTrack ? (
             <Waveform
+              className="flex-1"
               heightClass="h-9"
               label={fill(dict.player.seek, { title })}
               seekable
               songId={currentTrack.id}
               title={title}
-              className="flex-1"
             />
           ) : null}
-          <span className="tabular flex-none text-[0.875rem] text-paper-2">
+          <span className="mono flex-none text-chalk-2">
             {formatTime(position)} / {formatTime(duration)}
           </span>
         </div>
@@ -163,7 +157,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
           <button
             aria-label={muted ? dict.player.unmute : dict.player.mute}
             aria-pressed={muted}
-            className="icon-btn"
+            className="ctl"
             onClick={toggleMute}
             type="button"
           >
@@ -172,7 +166,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
           <input
             aria-label={dict.player.volume}
             aria-valuetext={`${volumePct} %`}
-            className="range"
+            className="st-range"
             max={1}
             min={0}
             onChange={(e) => setVolume(Number(e.target.value))}
@@ -185,7 +179,7 @@ export function PlayerDock({ fallbackCover }: { fallbackCover: string }) {
 
         <button
           aria-label={dict.player.close}
-          className="icon-btn flex-none"
+          className="ctl flex-none"
           onClick={stop}
           type="button"
         >

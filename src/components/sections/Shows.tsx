@@ -1,12 +1,15 @@
+import Image from "next/image";
 import { Icon } from "@/components/ui/Icon";
 import type { Dict } from "@/i18n/dictionaries";
 import { INTL_LOCALE, type Locale } from "@/i18n/locales";
 import type { ShowItem } from "@/lib/content/types";
 
-// Gig list, poster style: big day number, month + weekday, venue, place,
-// time, event type and a clear ticket action. Upcoming first, TBA after,
-// past shows folded away. With no dates, an honest empty state that points
-// promoters to booking (we never invent dates).
+// Dates on the wall next to the band poster: blue tape carries the day,
+// venue in stage caps, place/time/type in mono, ticket link when set.
+// Upcoming first, TBA after, past shows folded away. With no dates, an
+// honest note that points promoters to booking (we never invent dates).
+// The poster is the admin's hero image (Site assets → hero_image), shown
+// whole: the band collage is never cropped.
 
 export function todayInBerlin(): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -65,54 +68,50 @@ function ShowRow({ show, dict, locale, muted = false }: { show: ShowItem; dict: 
 
   return (
     <li
-      className={`grid grid-cols-[72px_1fr] items-center gap-x-5 gap-y-3 border-b border-line py-6 sm:grid-cols-[96px_1fr_auto] md:gap-x-8 ${
+      className={`grid grid-cols-[76px_minmax(0,1fr)] items-start gap-x-4 gap-y-3 border-b border-rule py-5 sm:grid-cols-[92px_minmax(0,1fr)_auto] sm:items-center md:gap-x-6 ${
         muted ? "opacity-70" : ""
       }`}
     >
-      <div className="text-center">
+      <div className={`flex aspect-square flex-col items-center justify-center text-[#121110] ${muted ? "bg-chalk-2" : "bg-blue"}`}>
         {parts ? (
-          <time dateTime={show.date ?? undefined} title={parts.full}>
-            <span className="block font-sans text-[2.75rem] font-bold leading-none tracking-[-0.02em] text-gold [font-stretch:80%] md:text-[3.5rem]">
-              {parts.day}
-            </span>
-            <span className="mt-1 block text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-paper-2">
+          <time className="text-center" dateTime={show.date ?? undefined} title={parts.full}>
+            <span className="block font-stage text-[2.5rem] font-black leading-none sm:text-[3rem]">{parts.day}</span>
+            <span className="mono-cap mt-1 block">
               {parts.month}
               {parts.year !== currentYear ? ` ${parts.year}` : ""}
             </span>
           </time>
         ) : (
-          <span className="block text-[0.8125rem] font-semibold uppercase leading-tight tracking-[0.08em] text-gold-hi">
-            {dict.shows.tba}
-          </span>
+          <span className="mono-cap px-1 text-center leading-tight">{dict.shows.tba}</span>
         )}
       </div>
 
       <div className="min-w-0">
-        <h3 className="font-display text-[1.5rem] leading-tight text-paper md:text-[1.875rem]">
+        <h3 className="font-stage text-[1.75rem] font-extrabold uppercase leading-[0.95] md:text-[2.125rem]">
           {show.venue}
         </h3>
-        <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.9375rem] text-paper-2">
+        <p className="mono mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-chalk-2">
           {place ? (
             <span className="inline-flex items-center gap-1.5">
-              <Icon className="text-gold-lo" name="pin" size={16} />
+              <Icon className="text-chalk-3" name="pin" size={15} />
               {place}
             </span>
           ) : null}
           {parts ? (
             <span className="inline-flex items-center gap-1.5">
-              <Icon className="text-gold-lo" name="calendar" size={16} />
+              <Icon className="text-chalk-3" name="calendar" size={15} />
               <span className="capitalize">{parts.weekday}</span>
-              {show.startTime ? <span className="tabular">· {show.startTime}</span> : null}
+              {show.startTime ? <span>· {show.startTime}</span> : null}
             </span>
           ) : null}
-          {type ? <span className="text-paper-3">{type}</span> : null}
+          {type ? <span className="text-chalk-3">{type}</span> : null}
         </p>
       </div>
 
       {show.ticketUrl && !muted ? (
         <div className="col-span-2 sm:col-span-1 sm:justify-self-end">
           <a
-            className="btn btn-secondary btn-sm"
+            className="btn-line btn-sm"
             href={show.ticketUrl}
             rel="noopener noreferrer"
             target="_blank"
@@ -131,61 +130,71 @@ export function Shows({
   dict,
   locale,
   shows,
+  posterUrl,
 }: {
   dict: Dict;
   locale: Locale;
   shows: ShowItem[];
+  posterUrl: string;
 }) {
   const { upcoming, past } = splitShows(shows);
 
   return (
-    <section aria-labelledby="shows-title" className="section scroll-mt-[var(--header-h)]" id="shows">
-      <div className="container-x">
-        <div className="grid gap-6 md:grid-cols-12 md:items-end">
-          <h2 className="h-section reveal md:col-span-7" id="shows-title">
+    <section aria-labelledby="shows-title" className="block-y border-t border-rule" id="shows">
+      <div className="shell grid gap-x-12 gap-y-12 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <h2 className="h-stage reveal" id="shows-title">
             {dict.shows.title}
           </h2>
           {upcoming.length > 0 ? (
-            <p className="reveal text-paper-2 md:col-span-5 md:justify-self-end md:text-right">
-              {dict.shows.intro}
-            </p>
+            <>
+              <p className="copy reveal mt-4">{dict.shows.intro}</p>
+              <ul className="reveal mt-8 border-t border-rule">
+                {upcoming.map((show) => (
+                  <ShowRow dict={dict} key={show.id} locale={locale} show={show} />
+                ))}
+              </ul>
+            </>
+          ) : (
+            <div className="reveal mt-8 md:mt-10">
+              <p className="font-stage text-[clamp(2rem,1.4rem+2.2vw,3.25rem)] font-extrabold uppercase leading-[1.02]">
+                <span className="lay tape -rotate-[0.8deg]">{dict.shows.emptyTitle}</span>
+              </p>
+              <p className="copy-lg mt-6">{dict.shows.emptyBody}</p>
+              <a className="btn-tape mt-8" href="#booking">
+                {dict.shows.emptyCta}
+                <Icon name="arrow-right" size={20} />
+              </a>
+            </div>
+          )}
+
+          {past.length > 0 ? (
+            <details className="group mt-10">
+              <summary className="mono-cap inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-chalk-2 hover:text-chalk [&::-webkit-details-marker]:hidden">
+                <Icon className="transition-transform group-open:rotate-180" name="arrow-down" size={16} />
+                {dict.shows.past} ({past.length})
+              </summary>
+              <ul className="mt-4 border-t border-rule">
+                {past.map((show) => (
+                  <ShowRow dict={dict} key={show.id} locale={locale} muted show={show} />
+                ))}
+              </ul>
+            </details>
           ) : null}
         </div>
 
-        {upcoming.length > 0 ? (
-          <ul className="reveal mt-10 border-t border-line md:mt-14">
-            {upcoming.map((show) => (
-              <ShowRow dict={dict} key={show.id} locale={locale} show={show} />
-            ))}
-          </ul>
-        ) : (
-          <div className="reveal mt-10 grid gap-6 rounded-md border border-line bg-ink-2 p-6 md:mt-14 md:grid-cols-[1fr_auto] md:items-center md:p-10">
-            <div>
-              <p className="font-display text-[1.75rem] leading-tight text-paper md:text-[2.25rem]">
-                {dict.shows.emptyTitle}
-              </p>
-              <p className="mt-3 max-w-[56ch] text-paper-2">{dict.shows.emptyBody}</p>
-            </div>
-            <a className="btn btn-primary justify-self-start" href="#booking">
-              {dict.shows.emptyCta}
-              <Icon name="arrow-right" size={18} />
-            </a>
+        <figure className="reveal relative mx-auto w-full max-w-[520px] lg:col-span-5 lg:max-w-none lg:-rotate-[1deg]">
+          <span aria-hidden className="tape-piece -top-2 left-1/2 z-10 -translate-x-1/2 rotate-2 !bg-blue" />
+          <div className="relative aspect-square overflow-hidden bg-deck-2 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.9)]">
+            <Image
+              alt={dict.meta.ogAlt}
+              className="object-contain"
+              fill
+              sizes="(min-width: 1024px) 38vw, (min-width: 560px) 520px, 100vw"
+              src={posterUrl}
+            />
           </div>
-        )}
-
-        {past.length > 0 ? (
-          <details className="group mt-10">
-            <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-paper-2 hover:text-gold-hi [&::-webkit-details-marker]:hidden">
-              <Icon className="transition-transform group-open:rotate-180" name="arrow-down" size={16} />
-              {dict.shows.past} ({past.length})
-            </summary>
-            <ul className="mt-4 border-t border-line">
-              {past.map((show) => (
-                <ShowRow dict={dict} key={show.id} locale={locale} muted show={show} />
-              ))}
-            </ul>
-          </details>
-        ) : null}
+        </figure>
       </div>
     </section>
   );

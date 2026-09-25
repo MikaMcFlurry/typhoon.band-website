@@ -1,4 +1,5 @@
 import { AudioPlayerProvider } from "@/components/audio/AudioPlayerProvider";
+import { LiveLevel } from "@/components/audio/LiveLevel";
 import { PlayerDock } from "@/components/audio/PlayerDock";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { Footer } from "@/components/site/Footer";
@@ -48,6 +49,7 @@ export default async function SiteLayout({
       <PlayerDock fallbackCover="/assets/hero/hero-collage.jpeg" />
       <ConsentBanner />
       <MotionInit />
+      <LiveLevel />
     </AudioPlayerProvider>
   );
 }

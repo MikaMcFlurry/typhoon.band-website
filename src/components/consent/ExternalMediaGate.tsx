@@ -43,21 +43,21 @@ export function ExternalMediaGate({ provider, ratio = "16 / 9", children }: Prop
 
   return (
     <div
-      className="flex flex-col items-start justify-center gap-4 rounded-md border border-line bg-ink-2 p-6"
+      className="flex flex-col items-start justify-center gap-4 border-2 border-rule-2 bg-deck-2 p-6"
       style={{ aspectRatio: ratio }}
     >
-      <p className="label">{dict.gate.title}</p>
-      <p className="max-w-prose text-paper-2">{fill(dict.gate.body, { provider })}</p>
+      <p className="mono-cap text-chalk-2">{dict.gate.title}</p>
+      <p className="copy">{fill(dict.gate.body, { provider })}</p>
       {allowed === null ? null : (
         <div className="flex flex-wrap gap-2">
-          <button className="btn btn-secondary btn-sm" onClick={() => setOnce(true)} type="button">
+          <button className="btn-line btn-sm" onClick={() => setOnce(true)} type="button">
             {dict.gate.load}
           </button>
-          <button className="btn btn-primary btn-sm" onClick={always} type="button">
+          <button className="btn-play btn-sm" onClick={always} type="button">
             {dict.gate.always}
           </button>
           <button
-            className="btn btn-ghost btn-sm"
+            className="mono-cap min-h-10 px-2 text-chalk-2 underline underline-offset-4 hover:text-chalk"
             onClick={() => window.dispatchEvent(new CustomEvent(CONSENT_OPEN_EVENT))}
             type="button"
           >

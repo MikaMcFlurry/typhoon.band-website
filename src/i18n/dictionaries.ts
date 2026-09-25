@@ -207,6 +207,18 @@ export type Dict = {
     body: string;
     cta: string;
   };
+  stage: {
+    setlist: string;
+    setlistNote: string;
+    plotLabel: string;
+    plotHint: string;
+    audience: string;
+    more: string;
+    previewTitle: string;
+    previewTo: string;
+    previewFrom: string;
+    previewEmpty: string;
+  };
 };
 
 const memberInstruments: Record<string, Record<Locale, string>> = {
@@ -507,6 +519,18 @@ const de: Dict = {
     body: "Vielleicht hilft ein Neustart auf der Startseite. Die Musik läuft dort.",
     cta: "Zur Startseite",
   },
+  stage: {
+    setlist: "Setlist",
+    setlistNote: "Tippen zum Abspielen · nur Stream, kein Download",
+    plotLabel: "Bühnenplan der Besetzung",
+    plotHint: "Tippe auf eine Position, um die Musiker kennenzulernen.",
+    audience: "Publikum",
+    more: "Weitere Musiker",
+    previewTitle: "So kommt deine Anfrage an",
+    previewTo: "An",
+    previewFrom: "Von",
+    previewEmpty: "noch offen",
+  },
 };
 
 const en: Dict = {
@@ -742,6 +766,18 @@ const en: Dict = {
     body: "Head back to the home page. The music is playing there.",
     cta: "Back to home",
   },
+  stage: {
+    setlist: "Setlist",
+    setlistNote: "Tap to play · streaming only, no download",
+    plotLabel: "Stage plot of the line-up",
+    plotHint: "Tap a position to meet the musicians.",
+    audience: "Audience",
+    more: "More musicians",
+    previewTitle: "This is how your request arrives",
+    previewTo: "To",
+    previewFrom: "From",
+    previewEmpty: "not set yet",
+  },
 };
 
 const tr: Dict = {
@@ -771,7 +807,7 @@ const tr: Dict = {
     line2: "OLAĞANÜSTÜ.",
     line3: "FUNK.",
     description:
-      "Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede dolu enerjik.",
+      "Typhoon, Türkçe sözleri blues rock, funk, soul, caz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede enerji dolu.",
     ctaListen: "Şarkıları dinle",
     ctaBook: "Booking talebi",
     playFeatured: "{title} dinle",
@@ -976,6 +1012,18 @@ const tr: Dict = {
     title: "Bu sayfa bulunamadı.",
     body: "Ana sayfaya dönün. Müzik orada çalıyor.",
     cta: "Ana sayfaya dön",
+  },
+  stage: {
+    setlist: "Set listesi",
+    setlistNote: "Dinlemek için dokun · yalnızca dinleme, indirme yok",
+    plotLabel: "Kadronun sahne planı",
+    plotHint: "Müzisyenleri tanımak için bir pozisyona dokun.",
+    audience: "Seyirci",
+    more: "Diğer müzisyenler",
+    previewTitle: "Talebin bize böyle ulaşır",
+    previewTo: "Alıcı",
+    previewFrom: "Gönderen",
+    previewEmpty: "henüz boş",
   },
 };
 

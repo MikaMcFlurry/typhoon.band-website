@@ -8,6 +8,7 @@ import { useEffect, useState, type RefObject } from "react";
 //     ~0.5 MB, on load)
 //   - de-duplicated: one metadata request per file for the whole page
 //   - `preload="metadata"` only fetches the header bytes
+//   - deferred to browser idle time
 
 const cache = new Map<string, Promise<number | null>>();
 
@@ -42,10 +43,18 @@ export function useTrackDuration(
   useEffect(() => {
     if (!src || typeof window === "undefined") return;
     let cancelled = false;
+    // Metadata requests wait for an idle moment so they never compete with
+    // the first paint (the setlist sits in the first viewport).
     const start = () => {
-      loadDuration(src).then((d) => {
-        if (!cancelled) setDuration(d);
-      });
+      const run = () =>
+        loadDuration(src).then((d) => {
+          if (!cancelled) setDuration(d);
+        });
+      const w = window as Window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      };
+      if (w.requestIdleCallback) w.requestIdleCallback(run, { timeout: 2500 });
+      else window.setTimeout(run, 1200);
     };
     const node = targetRef?.current;
     if (!node || !("IntersectionObserver" in window)) {

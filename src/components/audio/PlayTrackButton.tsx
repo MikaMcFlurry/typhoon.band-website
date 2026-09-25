@@ -5,7 +5,7 @@ import { useDict } from "@/components/i18n/DictProvider";
 import { Icon } from "@/components/ui/Icon";
 import { fill } from "@/i18n/dictionaries";
 
-// Gold CTA that starts (or pauses) a specific track, used in the hero.
+// Pink (audio) action that starts or pauses one specific track.
 export function PlayTrackButton({
   id,
   src,
@@ -23,11 +23,11 @@ export function PlayTrackButton({
   return (
     <button
       aria-pressed={playing}
-      className={`btn btn-primary ${className}`}
+      className={`btn-play ${className}`}
       onClick={() => toggle(id, src)}
       type="button"
     >
-      <Icon name={playing ? "pause" : "play"} size={18} />
+      <Icon name={playing ? "pause" : "play"} size={20} />
       {playing ? dict.player.pause : fill(dict.hero.playFeatured, { title })}
     </button>
   );

@@ -53,8 +53,8 @@ export function PlatformLinks({
               aria-label={variant === "icons" ? meta.label : undefined}
               className={
                 variant === "icons"
-                  ? "inline-flex size-11 items-center justify-center rounded-full border border-line-2 text-paper-2 transition-colors hover:border-gold hover:text-gold-hi"
-                  : "inline-flex h-10 items-center gap-2 rounded-full border border-line-2 px-4 text-[0.875rem] text-paper-2 transition-colors hover:border-gold hover:text-gold-hi"
+                  ? "inline-flex size-11 items-center justify-center border-2 border-rule-2 text-chalk-2 transition-colors hover:border-chalk hover:text-chalk"
+                  : "mono-cap inline-flex h-11 items-center gap-2 border-2 border-rule-2 px-3 text-chalk-2 transition-colors hover:border-chalk hover:text-chalk"
               }
               href={link.url}
               rel="noopener noreferrer"

@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { Metadata } from "next";
+import { Archivo, Newsreader } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,6 +10,23 @@ import Link from "next/link";
 // requireAdmin()/requireAdminWithPasswordOk() server-side. The admin lives
 // outside the public (site) route group, so it no longer inherits the
 // public header, footer, player or consent banner.
+
+// The admin keeps its own typography (Archivo + Newsreader) and palette;
+// the public site's Version B design does not apply here.
+const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin", "latin-ext"],
+  axes: ["opsz"],
+  style: ["normal"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -24,7 +42,7 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
   return (
-    <div className="min-h-screen bg-ink">
+    <div className={`admin-root min-h-screen bg-ink ${archivo.variable} ${newsreader.variable}`}>
       <div className="border-b border-line bg-ink-2">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
           <Link aria-label="Admin" className="flex items-center gap-3" href={`/${locale}/admin`}>

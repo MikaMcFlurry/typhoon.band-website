@@ -32,17 +32,15 @@ export function LocaleSwitcher({
   }
 
   return (
-    <ul aria-label={dict.a11y.langNav} className={`flex items-center gap-1 ${className}`}>
+    <ul aria-label={dict.a11y.langNav} className={`flex items-center ${className}`}>
       {LOCALES.map((code) => {
         const active = code === locale;
         return (
           <li key={code}>
             <Link
               aria-current={active ? "true" : undefined}
-              className={`inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2 text-[0.8125rem] font-semibold uppercase tracking-[0.06em] transition-colors ${
-                active
-                  ? "bg-paper text-ink"
-                  : "text-paper-2 hover:text-gold-hi"
+              className={`mono-cap inline-flex h-11 min-w-10 items-center justify-center px-2 transition-colors ${
+                active ? "text-chalk" : "text-chalk-3 hover:text-chalk"
               }`}
               href={pathFor(code)}
               hrefLang={code}
@@ -51,7 +49,7 @@ export function LocaleSwitcher({
               scroll={false}
               title={LOCALE_LABEL[code]}
             >
-              {code}
+              <span className={active ? "tape py-0.5" : ""}>{code}</span>
             </Link>
           </li>
         );

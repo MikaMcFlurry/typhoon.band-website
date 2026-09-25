@@ -1,115 +1,94 @@
 import Image from "next/image";
 import { PlayTrackButton } from "@/components/audio/PlayTrackButton";
+import { Setlist, type SetlistTrack } from "@/components/audio/Setlist";
 import { Icon } from "@/components/ui/Icon";
 import type { Dict } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/locales";
 
-// Three separate layers, as the owner asked: text block, the full band
-// collage (only the paper margins are trimmed, every musician stays
-// visible, edges fade softly instead of a hard overlay seam) and the gold
-// signature, which sits on the image and bleeds past the hero into the
-// featured player. The signature never covers the text.
+// First viewport: the gold signature is the name, the tagline is laid as
+// three strips of tape, and the setlist is taped to the floor next to it:
+// one tap plays a song. The one orange action is booking.
 
 function titleCase(line: string, locale: Locale) {
   const lower = line.toLocaleLowerCase(locale);
   return lower.charAt(0).toLocaleUpperCase(locale) + lower.slice(1);
 }
 
-const IMAGE_MASK =
-  "linear-gradient(to right, transparent 0%, #000 9%, #000 94%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 7%, #000 84%, transparent 100%)";
+const STRIPS = [
+  { key: "line1", tilt: "-rotate-[1.4deg]", tape: "tape" },
+  { key: "line2", tilt: "rotate-[0.8deg]", tape: "tape" },
+  { key: "line3", tilt: "-rotate-[0.6deg]", tape: "tape tape-pink" },
+] as const;
 
 export function Hero({
   dict,
   locale,
-  imageUrl,
   signatureUrl,
+  tracks,
   featured,
+  setlistFooter,
 }: {
   dict: Dict;
   locale: Locale;
-  imageUrl: string;
   signatureUrl: string;
-  featured: { id: string; title: string; src: string } | null;
+  tracks: SetlistTrack[];
+  featured: SetlistTrack | null;
+  setlistFooter?: React.ReactNode;
 }) {
-  const genres = dict.brand.genres;
-
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative isolate overflow-x-clip pt-[var(--header-h)]"
+      className="relative overflow-x-clip pt-[var(--header-h)]"
       id="home"
     >
-      <div className="container-x grid items-center gap-y-6 pb-20 lg:min-h-[min(86svh,900px)] lg:grid-cols-12 lg:gap-x-10 lg:pb-28">
-        {/* Image + signature */}
-        <div className="relative order-1 -mx-4 sm:-mx-6 lg:order-2 lg:col-span-6 lg:mx-0 xl:col-span-7">
-          <div
-            className="hero-image grain relative mx-auto aspect-[1/0.86] w-full lg:ml-auto"
-            style={{
-              maskImage: IMAGE_MASK,
-              WebkitMaskImage: IMAGE_MASK,
-              maskComposite: "intersect",
-              WebkitMaskComposite: "source-in",
-            }}
-          >
+      <div className="shell grid gap-x-10 gap-y-14 pb-20 pt-6 md:pb-28 md:pt-10 lg:grid-cols-12 lg:items-center xl:min-h-[calc(100svh-var(--header-h))] xl:pb-16">
+        <div className="lg:col-span-7">
+          <h1 id="hero-title">
             <Image
-              alt={dict.meta.ogAlt}
-              className="object-cover object-[50%_42%]"
-              fill
+              alt="Typhoon"
+              className="h-auto w-[min(86%,480px)] -translate-x-[2%] lg:w-[min(88%,560px)]"
+              height={724}
               priority
-              sizes="(min-width: 1024px) 58vw, 100vw"
-              src={imageUrl}
-              style={{ filter: "sepia(0.28) saturate(0.9) contrast(1.06) brightness(0.9)" }}
+              sizes="(min-width: 1024px) 560px, 88vw"
+              src={signatureUrl}
+              width={2099}
             />
-          </div>
-          <Image
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute bottom-[-9%] right-[4%] z-30 w-[82%] -rotate-[4deg] drop-shadow-[0_10px_24px_rgba(0,0,0,0.75)] sm:w-[70%] lg:bottom-[-11%] lg:right-[6%] lg:w-[78%]"
-            height={724}
-            priority
-            sizes="(min-width: 1024px) 44vw, 80vw"
-            src={signatureUrl}
-            width={2099}
-          />
-        </div>
-
-        {/* Text */}
-        <div className="order-2 pt-14 sm:pt-16 lg:order-1 lg:col-span-6 lg:pt-0 xl:col-span-5">
-          <h1
-            className="font-display text-[clamp(2.75rem,1rem+4.6vw,5.25rem)] font-medium leading-[0.98] tracking-[-0.022em] text-paper"
-            id="hero-title"
-          >
-            <span className="sr-only">Typhoon. </span>
-            <span className="block">{titleCase(dict.hero.line1, locale)}</span>
-            <span className="block">{titleCase(dict.hero.line2, locale)}</span>
-            <span className="block text-gold">{titleCase(dict.hero.line3, locale)}</span>
+            <span className="mt-6 flex flex-col items-start gap-2 font-stage text-[clamp(2.5rem,0.9rem+7vw,6rem)] font-black uppercase leading-[0.92] md:mt-8">
+              {STRIPS.map((s, i) => (
+                <span
+                  className={`lay ${s.tape} ${s.tilt} origin-left`}
+                  key={s.key}
+                  style={{ ["--reveal-delay" as string]: `${120 + i * 140}ms` }}
+                >
+                  {titleCase(dict.hero[s.key], locale)}
+                </span>
+              ))}
+            </span>
           </h1>
 
-          <p className="mt-6 flex flex-wrap gap-x-3 gap-y-1 text-[0.875rem] font-semibold uppercase tracking-[0.08em] text-gold-hi">
-            {genres.map((g, i) => (
-              <span className="inline-flex items-center gap-3" key={g}>
-                {i > 0 ? <span aria-hidden className="size-1 rounded-full bg-gold-lo" /> : null}
+          <p className="mono-cap mt-8 flex flex-wrap gap-x-2 gap-y-1 text-chalk-2">
+            {dict.brand.genres.map((g, i) => (
+              <span key={g}>
+                {i > 0 ? <span aria-hidden className="mr-2 text-chalk-3">/</span> : null}
                 {g}
               </span>
             ))}
           </p>
+          <p className="copy-lg mt-4">{dict.hero.description}</p>
 
-          <p className="lede mt-5">{dict.hero.description}</p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
             {featured ? (
               <PlayTrackButton id={featured.id} src={featured.src} title={featured.title} />
-            ) : (
-              <a className="btn btn-primary" href="#music">
-                <Icon name="play" size={18} />
-                {dict.hero.ctaListen}
-              </a>
-            )}
-            <a className="btn btn-secondary" href="#booking">
+            ) : null}
+            <a className="btn-tape" href="#booking">
               {dict.hero.ctaBook}
-              <Icon name="arrow-right" size={18} />
+              <Icon name="arrow-right" size={20} />
             </a>
           </div>
+        </div>
+
+        <div className="lg:col-span-5 lg:rotate-[1deg]">
+          <Setlist featuredId={featured?.id ?? null} footer={setlistFooter} tracks={tracks} />
         </div>
       </div>
     </section>

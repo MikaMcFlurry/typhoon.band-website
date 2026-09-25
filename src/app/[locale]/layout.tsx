@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Newsreader } from "next/font/google";
+import { Big_Shoulders, Martian_Mono, Schibsted_Grotesk } from "next/font/google";
 import { notFound } from "next/navigation";
 import { DictProvider } from "@/components/i18n/DictProvider";
 import { getDict } from "@/i18n/dictionaries";
@@ -10,18 +10,27 @@ import "../globals.css";
 // Root layout lives in the locale segment so <html lang> always matches the
 // rendered language (the old root layout hard-coded lang="de").
 
-const archivo = Archivo({
+// Version B type: stage signage (Big Shoulders), a sturdy grotesk
+// for reading (Schibsted Grotesk) and a mono for times, durations and rider
+// data (Martian Mono). All self-hosted via next/font (no Google requests
+// from the browser). Latin-ext covers Turkish (ğ ı ş İ).
+const stage = Big_Shoulders({
   subsets: ["latin", "latin-ext"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
+  axes: ["opsz"],
+  variable: "--font-stage",
   display: "swap",
 });
 
-const newsreader = Newsreader({
+const body = Schibsted_Grotesk({
   subsets: ["latin", "latin-ext"],
-  axes: ["opsz"],
-  style: ["normal"],
-  variable: "--font-newsreader",
+  variable: "--font-body",
+  display: "swap",
+});
+
+const mono = Martian_Mono({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -30,7 +39,7 @@ export function generateStaticParams() {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0e0a07",
+  themeColor: "#121110",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
@@ -112,7 +121,7 @@ export default async function LocaleRootLayout({
 
   return (
     <html
-      className={`${archivo.variable} ${newsreader.variable}`}
+      className={`${stage.variable} ${body.variable} ${mono.variable}`}
       lang={locale}
       suppressHydrationWarning
     >

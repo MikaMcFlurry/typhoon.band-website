@@ -3,12 +3,52 @@
 @tailwind utilities;
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Typhoon design tokens — see docs/design/DESIGN.md.
-   Dark, warm stage. Real gold only where it matters. Oxblood is decorative
-   only (never body text: it fails AA on ink).
+   Typhoon · Version B — "Bühnenplan & Setlist". Source of truth: DESIGN.md.
+   The evening seen from the stage: matte deck black, chalk-white gaffer
+   tape as the label surface, spike tape with fixed roles:
+     orange = the one primary action (booking)
+     pink   = audio / now playing
+     green  = line-up positions
+     blue   = dates
+   Colour lives on tape and state only; text surfaces stay achromatic.
+   Gold appears only inside the signature logo.
    ────────────────────────────────────────────────────────────────────── */
 :root {
-  /* RGB channels (for Tailwind alpha modifiers) + hex tokens. */
+  --deck-rgb: 18 17 16;
+  --deck-2-rgb: 27 25 23;
+  --deck-3-rgb: 38 35 32;
+  --chalk-rgb: 238 235 228;
+  --chalk-2-rgb: 170 165 156;
+  --chalk-3-rgb: 142 137 128;
+  --gaffer-rgb: 233 229 219;
+  --tape-orange-rgb: 255 107 26;
+  --tape-pink-rgb: 255 79 154;
+  --tape-green-rgb: 61 220 132;
+  --tape-blue-rgb: 58 160 255;
+
+  --deck: rgb(var(--deck-rgb));
+  --deck-2: rgb(var(--deck-2-rgb));
+  --deck-3: rgb(var(--deck-3-rgb));
+  --chalk: rgb(var(--chalk-rgb));
+  --chalk-2: rgb(var(--chalk-2-rgb));
+  --chalk-3: rgb(var(--chalk-3-rgb));
+  --gaffer: rgb(var(--gaffer-rgb));
+  --on-tape: #121110;
+  --tape-orange: rgb(var(--tape-orange-rgb));
+  --tape-pink: rgb(var(--tape-pink-rgb));
+  --tape-green: rgb(var(--tape-green-rgb));
+  --tape-blue: rgb(var(--tape-blue-rgb));
+  --rule: rgba(238, 235, 228, 0.14);
+  --rule-2: rgba(238, 235, 228, 0.32);
+  --alert: #ff8a7a;
+  --focus: var(--chalk);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dock-h: 0px;
+  --header-h: 64px;
+  --lvl: 0;
+
+  /* ── Admin palette (unchanged from the previous version) ──────────── */
   --ink-rgb: 14 10 7;
   --ink-2-rgb: 21 16 11;
   --ink-3-rgb: 29 22 15;
@@ -19,7 +59,6 @@
   --gold-hi-rgb: 241 220 166;
   --gold-lo-rgb: 140 106 51;
   --oxblood-rgb: 155 47 36;
-
   --ink: #0e0a07;
   --ink-2: #15100b;
   --ink-3: #1d160f;
@@ -36,16 +75,9 @@
   --on-gold: #1a1208;
   --danger: #f0a092;
   --ok: #b9d3a0;
-
   --r-sm: 6px;
   --r-md: 10px;
   --r-pill: 999px;
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --dock-h: 0px;
-  --header-h: 72px;
-
-  /* Legacy aliases (admin area still uses these names). */
   --bg: var(--ink);
   --bg-2: var(--ink-2);
   --bg-3: var(--ink-3);
@@ -66,7 +98,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --header-h: 80px;
+    --header-h: 72px;
   }
 }
 
@@ -74,23 +106,25 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header-h) + 8px);
-  background: var(--ink);
+  scroll-padding-top: calc(var(--header-h) + 12px);
+  background: var(--deck);
+  scrollbar-color: rgba(238, 235, 228, 0.28) var(--deck);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  background: var(--deck);
+  color: var(--chalk);
+  font-family: var(--font-body), system-ui, sans-serif;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
   padding-bottom: var(--dock-h);
   transition: padding-bottom 240ms var(--ease-out);
+  caret-color: var(--tape-pink);
 }
 
 img,
@@ -106,14 +140,13 @@ a {
 }
 
 ::selection {
-  background: var(--gold);
-  color: var(--on-gold);
+  background: var(--tape-pink);
+  color: var(--on-tape);
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold-hi);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
-  border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -130,89 +163,116 @@ a {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Layout primitives
+   Public primitives
    ────────────────────────────────────────────────────────────────────── */
 @layer components {
-  .container-x {
+  .shell {
     width: 100%;
-    max-width: 1320px;
+    max-width: 1360px;
     margin-inline: auto;
     padding-inline: 16px;
   }
   @media (min-width: 640px) {
-    .container-x {
+    .shell {
       padding-inline: 24px;
     }
   }
   @media (min-width: 1024px) {
-    .container-x {
+    .shell {
       padding-inline: 40px;
     }
   }
 
-  .section {
+  .block-y {
     padding-block: 72px;
   }
   @media (min-width: 768px) {
-    .section {
-      padding-block: 120px;
+    .block-y {
+      padding-block: 112px;
     }
   }
 
-  /* Section title — Newsreader, roman, generous size. */
-  .h-section {
-    font-family: var(--font-newsreader), Georgia, serif;
-    font-weight: 500;
-    font-size: clamp(2.5rem, 1.6rem + 3.6vw, 5rem);
-    line-height: 1.02;
-    letter-spacing: -0.018em;
-    color: var(--paper);
-    text-wrap: balance;
-  }
-
-  .h-sub {
-    font-family: var(--font-newsreader), Georgia, serif;
-    font-weight: 500;
-    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.125rem);
-    line-height: 1.15;
+  /* Stage signage: heavy upright caps. */
+  .h-stage {
+    font-family: var(--font-stage), "Arial Narrow", sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(2.75rem, 1.6rem + 4.6vw, 6rem);
+    line-height: 0.9;
     letter-spacing: -0.01em;
     text-wrap: balance;
   }
-
-  /* Short uppercase UI label. Never used as an eyebrow over every heading. */
-  .label {
-    font-family: var(--font-archivo), system-ui, sans-serif;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+  .h-stage-sm {
+    font-family: var(--font-stage), "Arial Narrow", sans-serif;
+    font-weight: 800;
     text-transform: uppercase;
-    color: var(--paper-2);
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+    line-height: 0.95;
+    text-wrap: balance;
   }
 
-  .lede {
-    font-family: var(--font-newsreader), Georgia, serif;
-    font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.4375rem);
-    line-height: 1.5;
-    color: var(--paper-2);
-    max-width: 60ch;
-    text-wrap: pretty;
+  /* Measurements, times, counters, rider data. */
+  .mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-stretch: 87.5%;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
   }
-
-  .prose-body {
-    font-family: var(--font-newsreader), Georgia, serif;
-    font-size: 1.125rem;
-    line-height: 1.65;
-    color: var(--paper-2);
-    max-width: 66ch;
-    text-wrap: pretty;
-  }
-
-  .tabular {
+  .mono-cap {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-stretch: 87.5%;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     font-variant-numeric: tabular-nums;
   }
 
-  .hairline {
-    border-color: var(--line);
+  .copy {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--chalk-2);
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+  .copy-lg {
+    font-size: clamp(1.125rem, 1rem + 0.45vw, 1.3125rem);
+    line-height: 1.55;
+    color: var(--chalk);
+    max-width: 58ch;
+    text-wrap: pretty;
+  }
+
+  /* ── Tape ─────────────────────────────────────────────────────────
+     A strip of tape: flat, matte, square cut ends, one colour. Text on
+     tape is always the dark stage ink. */
+  .tape {
+    display: inline-block;
+    background: var(--gaffer);
+    color: var(--on-tape);
+    padding: 0.08em 0.28em 0.02em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .tape-orange {
+    background: var(--tape-orange);
+  }
+  .tape-pink {
+    background: var(--tape-pink);
+  }
+  .tape-green {
+    background: var(--tape-green);
+  }
+  .tape-blue {
+    background: var(--tape-blue);
+  }
+  /* A short piece holding paper or a photo in place. */
+  .tape-piece {
+    position: absolute;
+    width: 72px;
+    height: 22px;
+    background: var(--tape-pink);
+    opacity: 0.92;
   }
 
   .skip-link {
@@ -221,18 +281,342 @@ a {
     top: 12px;
     z-index: 100;
     transform: translateY(calc(-100% - 40px));
-    background: var(--gold);
-    color: var(--on-gold);
+    background: var(--tape-orange);
+    color: var(--on-tape);
     padding: 10px 16px;
-    border-radius: var(--r-pill);
-    font-weight: 600;
+    font-weight: 700;
     transition: transform 160ms var(--ease-out);
   }
   .skip-link:focus-visible {
     transform: translateY(0);
   }
 
-  /* ── Buttons ─────────────────────────────────────────────────────── */
+  /* ── Buttons ──────────────────────────────────────────────────────
+     Square-cut like tape. Exactly one primary colour: orange. */
+  .btn-tape,
+  .btn-line,
+  .btn-play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 20px;
+    border: 2px solid transparent;
+    font-family: var(--font-stage), "Arial Narrow", sans-serif;
+    font-size: 1.1875rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 160ms var(--ease-out),
+      border-color 160ms var(--ease-out),
+      color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+  .btn-tape:active,
+  .btn-line:active,
+  .btn-play:active {
+    transform: translateY(1px);
+  }
+  .btn-tape[disabled],
+  .btn-line[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .btn-tape {
+    background: var(--tape-orange);
+    color: var(--on-tape);
+  }
+  .btn-tape:hover {
+    background: var(--chalk);
+  }
+  .btn-line {
+    background: transparent;
+    color: var(--chalk);
+    border-color: var(--rule-2);
+  }
+  .btn-line:hover {
+    border-color: var(--chalk);
+  }
+  .btn-play {
+    background: var(--tape-pink);
+    color: var(--on-tape);
+  }
+  .btn-play:hover {
+    background: var(--chalk);
+  }
+  .btn-sm {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 1.0625rem;
+  }
+
+  /* Square icon control, 44px hit area. */
+  .ctl {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    color: var(--chalk-2);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    transition:
+      color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out);
+  }
+  .ctl:hover {
+    color: var(--chalk);
+    background: rgba(238, 235, 228, 0.08);
+  }
+  .ctl[disabled] {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .ctl-play {
+    width: 48px;
+    height: 48px;
+    background: var(--tape-pink);
+    color: var(--on-tape);
+  }
+  .ctl-play:hover {
+    background: var(--chalk);
+    color: var(--on-tape);
+  }
+
+  .link-u {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--rule-2);
+  }
+  .link-u:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* ── Form fields (booking) ───────────────────────────────────────── */
+  .st-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .st-field > label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-stretch: 87.5%;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--chalk-2);
+  }
+  .st-field input,
+  .st-field textarea,
+  .st-field select {
+    width: 100%;
+    min-width: 0;
+    background: var(--deck);
+    border: 0;
+    border-bottom: 2px solid var(--rule-2);
+    padding: 12px 12px 10px;
+    color: var(--chalk);
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.4;
+    border-radius: 0;
+    outline: none;
+    transition:
+      border-color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out);
+  }
+  .st-field input::placeholder,
+  .st-field textarea::placeholder {
+    color: var(--chalk-3);
+  }
+  .st-field input:hover,
+  .st-field textarea:hover,
+  .st-field select:hover {
+    border-bottom-color: var(--chalk-2);
+  }
+  .st-field input:focus-visible,
+  .st-field textarea:focus-visible,
+  .st-field select:focus-visible {
+    border-bottom-color: var(--tape-orange);
+    background: var(--deck-3);
+    outline: none;
+  }
+  .st-field [aria-invalid="true"] {
+    border-bottom-color: var(--alert);
+  }
+  .st-field textarea {
+    min-height: 132px;
+    resize: vertical;
+  }
+  .st-field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23eeebe4' stroke-width='1.8'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+  .st-field input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    min-height: 48px;
+  }
+  .st-field input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.92);
+    cursor: pointer;
+  }
+  .st-field-error {
+    font-size: 0.875rem;
+    color: var(--alert);
+  }
+  .st-field-hint {
+    font-size: 0.8125rem;
+    color: var(--chalk-3);
+  }
+
+  /* Range input (volume). */
+  .st-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    width: 96px;
+    background: linear-gradient(
+      to right,
+      var(--tape-pink) 0%,
+      var(--tape-pink) var(--fill, 100%),
+      var(--rule-2) var(--fill, 100%),
+      var(--rule-2) 100%
+    );
+    cursor: pointer;
+  }
+  .st-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 16px;
+    background: var(--chalk);
+    border: 0;
+  }
+  .st-range::-moz-range-thumb {
+    width: 12px;
+    height: 16px;
+    border-radius: 0;
+    background: var(--chalk);
+    border: 0;
+  }
+
+  /* ── Motion ───────────────────────────────────────────────────────
+     Content is visible by default; MotionInit sets <html data-motion>
+     only when JS runs and reduced motion is off. Tape strips are laid
+     from the left, everything else rises 16px. */
+  html[data-motion="on"] .reveal:not(.is-in) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  html[data-motion="on"] .reveal {
+    transition:
+      opacity 560ms var(--ease-out),
+      transform 560ms var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  html[data-motion="on"] .lay:not(.is-in) {
+    clip-path: inset(0 100% 0 0);
+  }
+  html[data-motion="on"] .lay {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 460ms var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+}
+
+/* Waveform bars (logic in Waveform.tsx). Unplayed: chalk at low
+   strength; played: pink tape. */
+.wave-bar {
+  display: block;
+  flex: 1 1 0;
+  min-width: 1px;
+  max-width: 4px;
+  height: 100%;
+  background: rgba(238, 235, 228, 0.34);
+  transform-origin: center;
+  transition: background-color 200ms var(--ease-out);
+}
+.wave-bar[data-played="true"] {
+  background: var(--tape-pink);
+}
+.on-light .wave-bar {
+  background: rgba(18, 17, 16, 0.28);
+}
+.on-light .wave-bar[data-played="true"] {
+  background: var(--on-tape);
+}
+
+/* Live level (0..1) written by LiveLevel onto [data-live] elements while a
+   song plays. Bounded: scale never exceeds 1.18. */
+[data-live] {
+  --lvl: 0;
+}
+.live-mark {
+  transform: scale(calc(1 + var(--lvl) * 0.18));
+  transition: transform 90ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-motion="on"] .reveal:not(.is-in) {
+    opacity: 1;
+    transform: none;
+  }
+  html[data-motion="on"] .lay:not(.is-in) {
+    clip-path: none;
+  }
+  .live-mark {
+    transform: none;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Admin primitives (unchanged look; only used under /[locale]/admin)
+   ────────────────────────────────────────────────────────────────────── */
+@layer components {
+  .container-x {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  .label {
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--paper-2);
+  }
+  .kicker {
+    font-family: var(--font-body), system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--paper-2);
+  }
+  .eyebrow {
+    font-family: var(--font-body), system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gold-hi);
+  }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -242,7 +626,7 @@ a {
     padding: 0 22px;
     border-radius: var(--r-pill);
     border: 1px solid transparent;
-    font-family: var(--font-archivo), system-ui, sans-serif;
+    font-family: var(--font-body), system-ui, sans-serif;
     font-size: 0.9375rem;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -252,21 +636,12 @@ a {
     transition:
       background-color 160ms var(--ease-out),
       border-color 160ms var(--ease-out),
-      color 160ms var(--ease-out),
-      transform 160ms var(--ease-out);
-  }
-  .btn:active {
-    transform: translateY(1px);
+      color 160ms var(--ease-out);
   }
   .btn[disabled],
   .btn[aria-disabled="true"] {
     opacity: 0.55;
     cursor: not-allowed;
-  }
-  .btn-sm {
-    min-height: 40px;
-    padding: 0 16px;
-    font-size: 0.875rem;
   }
   .btn-primary {
     background: var(--gold);
@@ -284,132 +659,11 @@ a {
     border-color: var(--gold);
     color: var(--gold-hi);
   }
-  .btn-ghost {
-    background: transparent;
-    color: var(--paper-2);
-    padding: 0 12px;
-  }
-  .btn-ghost:hover {
-    color: var(--gold-hi);
-  }
-
-  /* Round icon buttons (player). Min 44px hit area. */
-  .icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    flex: none;
-    border-radius: 999px;
-    color: var(--paper-2);
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    transition:
-      color 160ms var(--ease-out),
-      background-color 160ms var(--ease-out);
-  }
-  .icon-btn:hover {
-    color: var(--gold-hi);
-    background: rgba(239, 226, 200, 0.06);
-  }
-  .icon-btn[disabled] {
-    opacity: 0.4;
-    cursor: default;
-  }
-  .play-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    width: 56px;
-    height: 56px;
-    border-radius: 999px;
-    background: var(--gold);
-    color: var(--on-gold);
-    border: 0;
-    cursor: pointer;
-    transition:
-      background-color 160ms var(--ease-out),
-      transform 160ms var(--ease-out);
-  }
-  .play-btn:hover {
-    background: var(--gold-hi);
-  }
-  .play-btn:active {
-    transform: scale(0.97);
-  }
-  .play-btn-sm {
-    width: 44px;
-    height: 44px;
-  }
-
-  /* ── Legacy admin primitives (kept by name, restyled) ─────────────── */
-  .btn-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--gold);
-    color: var(--on-gold);
-    border: 0;
-    cursor: pointer;
-  }
-  .btn-icon-sm {
-    width: 36px;
-    height: 36px;
-  }
-  .btn-icon-xs {
-    width: 30px;
-    height: 30px;
-  }
-  .btn-ghost-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: transparent;
-    border: 0;
-    color: var(--paper-2);
-    cursor: pointer;
-  }
-  .btn-ghost-icon:hover {
-    color: var(--gold-hi);
-  }
   .panel {
     background: var(--ink-2);
     border: 1px solid var(--line);
     border-radius: var(--r-md);
   }
-  .kicker {
-    font-family: var(--font-archivo), system-ui, sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--paper-2);
-  }
-  .eyebrow {
-    font-family: var(--font-archivo), system-ui, sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--gold-hi);
-  }
-  .sepia-img {
-    filter: sepia(0.32) saturate(0.78) contrast(1.05);
-  }
-  .sepia-img-strong {
-    filter: sepia(0.4) saturate(0.85) contrast(1.08) brightness(0.78);
-  }
-
-  /* ── Form fields (booking + admin) ───────────────────────────────── */
   .field {
     display: flex;
     flex-direction: column;
@@ -434,55 +688,20 @@ a {
     padding: 12px 14px;
     color: var(--paper);
     font-family: inherit;
-    /* 16px prevents iOS zoom-on-focus. */
     font-size: 16px;
     line-height: 1.4;
     outline: none;
-    transition:
-      border-color 160ms var(--ease-out),
-      box-shadow 160ms var(--ease-out);
-  }
-  .field input::placeholder,
-  .field textarea::placeholder,
-  .input::placeholder {
-    color: var(--paper-3);
-  }
-  .field input:hover,
-  .field textarea:hover,
-  .field select:hover {
-    border-color: rgba(239, 226, 200, 0.34);
   }
   .field input:focus-visible,
   .field textarea:focus-visible,
   .field select:focus-visible,
   .input:focus-visible {
-    outline: none;
     border-color: var(--gold);
     box-shadow: 0 0 0 3px rgba(214, 179, 106, 0.22);
-  }
-  .field [aria-invalid="true"] {
-    border-color: var(--danger);
   }
   .field textarea {
     min-height: 140px;
     resize: vertical;
-  }
-  .field select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23c8b89b' stroke-width='1.6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 40px;
-  }
-  .field input[type="date"] {
-    appearance: none;
-    -webkit-appearance: none;
-    display: block;
-    min-height: 48px;
-  }
-  .field input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.85) sepia(1) saturate(1.4) hue-rotate(355deg);
-    cursor: pointer;
   }
   .field-error {
     font-size: 0.875rem;
@@ -492,113 +711,18 @@ a {
     font-size: 0.8125rem;
     color: var(--paper-3);
   }
-
-  /* Horizontal rail with edge padding so first/last cards never touch. */
-  .scroll-rail {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 16px;
-    padding-inline: 16px;
-    padding-bottom: 8px;
-    scrollbar-width: none;
-  }
-  .scroll-rail::-webkit-scrollbar {
-    display: none;
-  }
-  .scroll-rail > * {
-    scroll-snap-align: start;
-    flex: 0 0 auto;
-  }
-
-  /* Range input (volume). */
-  .range {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 4px;
-    width: 96px;
-    background: linear-gradient(
-      to right,
-      var(--gold) 0%,
-      var(--gold) var(--fill, 100%),
-      var(--line-2) var(--fill, 100%),
-      var(--line-2) 100%
-    );
-    border-radius: 999px;
-    cursor: pointer;
-  }
-  .range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--gold-hi);
-    border: 0;
-  }
-  .range::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--gold-hi);
-    border: 0;
-  }
-  .volume-slider {
-    width: 96px;
-  }
-
-  /* Film grain — only on photographic surfaces, never the whole page. */
-  .grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.78 0 0 0 0 0.55 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.07;
-    mix-blend-mode: overlay;
-  }
-
-  /* Progressive reveal: visible by default, animated only when JS marks
-     <html data-motion="on"> and the element has not entered yet. */
-  html[data-motion="on"] .reveal:not(.is-in) {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  html[data-motion="on"] .reveal {
-    transition:
-      opacity 640ms var(--ease-out),
-      transform 640ms var(--ease-out);
-    transition-delay: var(--reveal-delay, 0ms);
-  }
 }
 
-/* Hero collage never taller than the viewport on desktop. */
-@media (min-width: 1024px) {
-  .hero-image {
-    max-width: min(100%, calc((100svh - var(--header-h) - 40px) / 0.86));
-  }
+.admin-root {
+  --font-body: var(--font-archivo);
+  --font-display: var(--font-newsreader);
+  --focus: var(--gold-hi);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  line-height: 1.6;
 }
-
-/* Waveform bars */
-.wave-bar {
-  display: block;
-  flex: 1 1 0;
-  min-width: 1px;
-  max-width: 5px;
-  height: 100%;
-  border-radius: 2px;
-  background: var(--gold-lo);
-  transform-origin: center;
-  transition: background-color 200ms var(--ease-out);
-}
-.wave-bar[data-played="true"] {
-  background: var(--gold-hi);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-motion="on"] .reveal:not(.is-in) {
-    opacity: 1;
-    transform: none;
-  }
+.admin-root ::selection {
+  background: var(--gold);
+  color: var(--on-gold);
 }

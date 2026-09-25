@@ -1,12 +1,13 @@
 import Image from "next/image";
-import { CollapsibleList } from "@/components/ui/Collapsible";
+import { StagePlot } from "@/components/sections/StagePlot";
 import { Icon } from "@/components/ui/Icon";
 import type { Dict } from "@/i18n/dictionaries";
 import { fill } from "@/i18n/dictionaries";
 import type { Member } from "@/lib/content/types";
 
-// Band story as an editorial split (image left, text right; the longer
-// text sits behind a disclosure) followed by the line-up with bios.
+// Who plays: the band statement set big, the story next to a live photo
+// (Site assets → bandinfo_image), the facts as rider lines, then the line-up
+// as a stage plot.
 
 export function Band({
   dict,
@@ -20,100 +21,75 @@ export function Band({
   const count = members.length;
 
   return (
-    <section aria-labelledby="band-title" className="section border-t border-line bg-ink-2" id="band">
-      <div className="container-x">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+    <section aria-labelledby="band-title" className="block-y border-t border-rule bg-deck-2" id="band">
+      <div className="shell">
+        <h2 className="h-stage reveal max-w-[16ch]" id="band-title">
+          {dict.about.headline}
+        </h2>
+
+        <div className="mt-12 grid gap-x-12 gap-y-10 md:mt-16 lg:grid-cols-12">
           <figure className="reveal relative lg:col-span-5">
-            <div className="grain relative aspect-[4/5] overflow-hidden rounded-md border border-line">
+            <div className="relative aspect-[4/3] overflow-hidden bg-deck-3 lg:aspect-[4/5]">
               <Image
                 alt={dict.about.imageAlt}
-                className="object-cover object-[60%_30%]"
+                className="object-cover object-[55%_30%]"
                 fill
-                sizes="(min-width: 1024px) 40vw, 100vw"
+                sizes="(min-width: 1024px) 38vw, 100vw"
                 src={imageUrl}
-                style={{ filter: "sepia(0.18) saturate(0.95) contrast(1.05)" }}
               />
             </div>
           </figure>
 
-          <div className="lg:col-span-7 lg:pt-6">
-            <h2 className="h-section reveal max-w-[18ch] lg:text-[clamp(2.75rem,1.4rem+2.6vw,4.25rem)]" id="band-title">
-              {dict.about.headline}
-            </h2>
-            <p className="prose-body reveal mt-8 text-[1.1875rem] text-paper">
-              {dict.about.body}
-            </p>
+          <div className="lg:col-span-7 lg:pt-2">
+            <p className="copy-lg reveal">{dict.about.body}</p>
 
             <details className="group reveal mt-6">
-              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 font-semibold text-gold-hi hover:text-paper [&::-webkit-details-marker]:hidden">
-                {dict.about.more}
+              <summary className="mono-cap inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-chalk hover:text-chalk-2 [&::-webkit-details-marker]:hidden">
+                <span className="border-b-[3px] border-gaffer pb-0.5">{dict.about.more}</span>
                 <Icon className="transition-transform group-open:rotate-180" name="arrow-down" size={16} />
               </summary>
               <div className="mt-4 flex flex-col gap-4">
                 {dict.about.lead.split("\n\n").map((para) => (
-                  <p className="prose-body" key={para.slice(0, 24)}>
+                  <p className="copy" key={para.slice(0, 24)}>
                     {para}
                   </p>
                 ))}
               </div>
             </details>
 
-            <dl className="reveal mt-10 grid gap-6 border-t border-line pt-8 sm:grid-cols-3">
+            <dl className="reveal mt-10 border-t-2 border-chalk">
               {dict.about.facts.map((f) => (
-                <div key={f.label}>
-                  <dt className="label">{f.label}</dt>
-                  <dd className="mt-2 font-display text-[1.25rem] leading-snug text-paper">
+                <div className="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-4 border-b border-rule py-3 sm:grid-cols-[12rem_minmax(0,1fr)]" key={f.label}>
+                  <dt className="mono-cap pt-1 text-chalk-2">{f.label}</dt>
+                  <dd className="font-stage text-[1.375rem] font-bold uppercase leading-tight">
                     {fill(f.value, { count })}
                   </dd>
                 </div>
               ))}
             </dl>
 
-            <div className="reveal mt-10 flex flex-wrap gap-3">
-              <a className="btn btn-secondary" href="#lineup">
-                {dict.about.cta}
-                <Icon name="arrow-down" size={16} />
-              </a>
-              <a className="btn btn-primary" href="#booking">
+            <div className="reveal mt-8">
+              <a className="btn-tape" href="#booking">
                 {dict.about.ctaBook}
+                <Icon name="arrow-right" size={20} />
               </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-24 scroll-mt-[calc(var(--header-h)+16px)] md:mt-32" id="lineup">
-          <h3 className="h-sub reveal">{dict.members.title}</h3>
-          <CollapsibleList
-            className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4"
-            initial={4}
-            lessLabel={dict.members.showLess}
-            moreLabel={dict.members.showAll}
-          >
-            {members.map((m, i) => (
-              <li className="reveal" key={m.id} style={{ ["--reveal-delay" as string]: `${(i % 4) * 60}ms` }}>
-                <article>
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-md border border-line bg-ink-3">
-                    <Image
-                      alt={`${m.name}, ${m.role}`}
-                      className="object-cover object-top sepia-img"
-                      fill
-                      sizes="(min-width: 1024px) 300px, (min-width: 768px) 30vw, 50vw"
-                      src={m.photoUrl}
-                    />
-                  </div>
-                  <h4 className="mt-4 font-display text-[1.375rem] leading-tight text-paper md:text-[1.5rem]">
-                    {m.name}
-                  </h4>
-                  <p className="mt-1 text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-gold-hi">
-                    {m.role}
-                  </p>
-                  {m.bio ? (
-                    <p className="mt-3 text-[0.9375rem] leading-relaxed text-paper-2">{m.bio}</p>
-                  ) : null}
-                </article>
-              </li>
-            ))}
-          </CollapsibleList>
+        <div className="mt-24 md:mt-32" id="lineup">
+          <h3 className="h-stage-sm reveal">{dict.members.title}</h3>
+          <div className="reveal mt-8 md:mt-10">
+            <StagePlot
+              members={members.map((m) => ({
+                id: m.id,
+                name: m.name,
+                role: m.role,
+                bio: m.bio,
+                photoUrl: m.photoUrl,
+              }))}
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -6,8 +6,9 @@ import { useDict } from "@/components/i18n/DictProvider";
 import { Icon } from "@/components/ui/Icon";
 import { fill } from "@/i18n/dictionaries";
 
-// Contact-sheet gallery with an in-site viewer (never a new tab): keyboard
-// (Esc, ←, →), swipe, counter, captions, focus trap and focus return.
+// Photo wall with an in-site viewer (never a new tab): keyboard (Esc, ←, →),
+// swipe, counter, captions, focus trap and focus return. Photos are shown
+// in their own colour; no sepia filter, no hover zoom.
 
 export type GalleryImage = { id: string; src: string; alt: string };
 
@@ -102,18 +103,18 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
   const current = index !== null ? items[index] : null;
 
   return (
-    <section aria-labelledby="media-title" className="section border-t border-line bg-ink-2" id="media">
-      <div className="container-x">
-        <h2 className="h-section reveal" id="media-title">
+    <section aria-labelledby="media-title" className="block-y border-t border-rule" id="media">
+      <div className="shell">
+        <h2 className="h-stage reveal" id="media-title">
           {dict.media.title}
         </h2>
 
-        <ul className="mt-10 grid grid-cols-2 gap-3 md:mt-14 md:grid-cols-12 md:gap-4">
+        <ul className="mt-10 grid grid-cols-2 gap-2 md:mt-14 md:grid-cols-12 md:gap-3">
           {items.map((item, i) => (
             <li className={`reveal ${tileClass(i, count)}`} key={item.id} style={{ ["--reveal-delay" as string]: `${(i % 4) * 50}ms` }}>
               <button
                 aria-label={`${dict.media.open}: ${item.alt}`}
-                className="group relative block size-full overflow-hidden rounded-md border border-line bg-ink-3"
+                className="group relative block size-full overflow-hidden bg-deck-3 outline-offset-4 hover:outline hover:outline-2 hover:outline-chalk"
                 onClick={() => setIndex(i)}
                 ref={(el) => {
                   triggerRefs.current[i] = el;
@@ -122,7 +123,7 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
               >
                 <Image
                   alt=""
-                  className="object-cover sepia-img transition-[filter] duration-500 group-hover:[filter:none]"
+                  className="object-cover"
                   fill
                   sizes={i === 0 ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
                   src={item.src}
@@ -137,7 +138,7 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
         <div
           aria-label={dict.media.title}
           aria-modal="true"
-          className="fixed inset-0 z-[80] flex flex-col bg-ink/95"
+          className="fixed inset-0 z-[80] flex flex-col bg-deck/[0.97]"
           onClick={(e) => {
             if (e.target === e.currentTarget) close();
           }}
@@ -153,13 +154,13 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
           ref={dialogRef}
           role="dialog"
         >
-          <div className="container-x flex h-16 flex-none items-center justify-between">
-            <p aria-live="polite" className="tabular text-[0.9375rem] text-paper-2">
+          <div className="shell flex h-16 flex-none items-center justify-between">
+            <p aria-live="polite" className="mono-cap text-chalk-2">
               {fill(dict.media.counter, { index: index + 1, total: count })}
             </p>
             <button
               aria-label={dict.media.close}
-              className="icon-btn text-paper"
+              className="ctl text-chalk"
               data-autofocus
               onClick={close}
               type="button"
@@ -186,7 +187,7 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
             </figure>
             <button
               aria-label={dict.media.prev}
-              className="icon-btn absolute left-2 top-1/2 hidden -translate-y-1/2 bg-ink/70 text-paper sm:inline-flex"
+              className="ctl absolute left-2 top-1/2 hidden -translate-y-1/2 bg-deck text-chalk sm:inline-flex"
               onClick={() => step(-1)}
               type="button"
             >
@@ -194,7 +195,7 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
             </button>
             <button
               aria-label={dict.media.next}
-              className="icon-btn absolute right-2 top-1/2 hidden -translate-y-1/2 bg-ink/70 text-paper sm:inline-flex"
+              className="ctl absolute right-2 top-1/2 hidden -translate-y-1/2 bg-deck text-chalk sm:inline-flex"
               onClick={() => step(1)}
               type="button"
             >
@@ -202,12 +203,12 @@ export function Gallery({ items }: { items: GalleryImage[] }) {
             </button>
           </div>
 
-          <div className="container-x flex flex-none items-center justify-between gap-4 py-4">
-            <button aria-label={dict.media.prev} className="icon-btn text-paper sm:hidden" onClick={() => step(-1)} type="button">
+          <div className="shell flex flex-none items-center justify-between gap-4 py-4">
+            <button aria-label={dict.media.prev} className="ctl text-chalk sm:hidden" onClick={() => step(-1)} type="button">
               <Icon name="arrow-left" size={22} />
             </button>
-            <p className="mx-auto max-w-[60ch] text-center text-[0.9375rem] text-paper-2">{current.alt}</p>
-            <button aria-label={dict.media.next} className="icon-btn text-paper sm:hidden" onClick={() => step(1)} type="button">
+            <p className="mono mx-auto max-w-[60ch] text-center text-chalk-2">{current.alt}</p>
+            <button aria-label={dict.media.next} className="ctl text-chalk sm:hidden" onClick={() => step(1)} type="button">
               <Icon name="arrow-right" size={22} />
             </button>
           </div>

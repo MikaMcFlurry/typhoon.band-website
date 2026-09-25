@@ -41,3 +41,7 @@ Thumbs.db
 
 # allow web demo mp3s
 !public/assets/audio/demos/*.mp3
+
+# Impeccable local review captures (evidence lives in docs/redesign/version-b)
+.impeccable/review/
+.impeccable/config.local.json
