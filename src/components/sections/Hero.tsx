@@ -41,7 +41,7 @@ export function Hero({
     >
       <div className="container-x grid items-center gap-y-6 pb-20 lg:min-h-[min(86svh,900px)] lg:grid-cols-12 lg:gap-x-10 lg:pb-28">
         {/* Image + signature */}
-        <div className="relative order-1 -mx-4 sm:-mx-6 lg:order-2 lg:col-span-7 lg:mx-0">
+        <div className="relative order-1 -mx-4 sm:-mx-6 lg:order-2 lg:col-span-6 lg:mx-0 xl:col-span-7">
           <div
             className="hero-image grain relative mx-auto aspect-[1/0.86] w-full lg:ml-auto"
             style={{
@@ -74,9 +74,9 @@ export function Hero({
         </div>
 
         {/* Text */}
-        <div className="order-2 pt-14 sm:pt-16 lg:order-1 lg:col-span-5 lg:pt-0">
+        <div className="order-2 pt-14 sm:pt-16 lg:order-1 lg:col-span-6 lg:pt-0 xl:col-span-5">
           <h1
-            className="font-display text-[clamp(2.75rem,1.9rem+4.2vw,5.25rem)] font-medium leading-[0.98] tracking-[-0.022em] text-paper"
+            className="font-display text-[clamp(2.75rem,1rem+4.6vw,5.25rem)] font-medium leading-[0.98] tracking-[-0.022em] text-paper"
             id="hero-title"
           >
             <span className="sr-only">Typhoon. </span>
