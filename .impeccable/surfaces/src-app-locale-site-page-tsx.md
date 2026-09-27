@@ -35,6 +35,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 - The admin hero image (band collage, must stay whole) is the band poster in Shows; the first viewport's photo plate is the live colour photo `public/assets/band-cards/typhoon-band-card.jpg`.
 - Booking section sits on deck black; orange = heading tape + submit.
 - Owner 2026-09-27 ("Mobil sieht es gut aus, aber im Browser ist die Landing Page komisch"): desktop now uses the mobile composition — photo as a landscape band, setlist taped over its lower edge — plus a height-aware `short` variant for laptop screens; the header shows the small signature at all times (an empty left header read as broken).
+- Owner 2026-09-27 ("Mir hat die Setlist im Header sehr gut gefallen"): the setlist is back in the hero, taped over the band poster's bottom paper margin (≤13% of the poster height, % of column width so it scales); no separate Music section. Poster 62% (lg) / 68% (xl) / 52% (short) of its column; setlist play squares 36px from lg so poster + sheet + CTAs fit 1024x768 → 1920x1080.
 - Line-up photos get one monochrome treatment (grayscale + contrast) so colour snapshots and sepia crops read as one set.
 - Owner 2026-09-25: "Die Bühnen-Aufstellung ist hässlich und stimmt nicht, wir haben keine feste Bühnen-Aufstellung." The stage plot is removed; the line-up is a row of taped member cards (photo, name on gaffer, role on green tape, bio). Never show stage positions.
 

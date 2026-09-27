@@ -4,7 +4,6 @@ import { Band } from "@/components/sections/Band";
 import { Booking } from "@/components/sections/Booking";
 import { Gallery } from "@/components/sections/Gallery";
 import { Hero } from "@/components/sections/Hero";
-import { Music } from "@/components/sections/Music";
 import { Shows, splitShows } from "@/components/sections/Shows";
 import { PlatformLinks } from "@/components/site/PlatformLinks";
 import { getDict } from "@/i18n/dictionaries";
@@ -92,19 +91,15 @@ export default async function HomePage({
         featured={featured}
         imageUrl={content.hero.imageUrl}
         locale={locale}
-        signatureUrl={content.hero.signatureUrl}
-      />
-      <Music
-        dict={dict}
-        featuredId={featured?.id ?? null}
-        platforms={
+        setlistFooter={
           content.platformLinks.length > 0 ? (
-            <div className="flex flex-col gap-3">
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
               <p className="mono-cap text-chalk-2">{dict.music.alsoOn}</p>
               <PlatformLinks links={content.platformLinks} />
             </div>
           ) : null
         }
+        signatureUrl={content.hero.signatureUrl}
         tracks={tracks}
       />
       <Shows dict={dict} locale={locale} shows={content.shows} />
