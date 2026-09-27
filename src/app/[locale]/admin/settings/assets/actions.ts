@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
+import { revalidatePublicHome } from "@/lib/admin/revalidate";
 import { redirect } from "next/navigation";
 
 import { resolveLocale, requireAdminWithPasswordOk } from "@/lib/admin/auth";
@@ -54,7 +56,7 @@ export async function saveSiteAssetAction(formData: FormData) {
   }
 
   revalidatePath(`/${locale}/admin/settings/assets`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   flashRedirect(locale, "saved");
 }
 
@@ -69,6 +71,6 @@ export async function clearSiteAssetAction(formData: FormData) {
   if (!result.ok) flashRedirect(locale, "error", result.reason);
 
   revalidatePath(`/${locale}/admin/settings/assets`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   flashRedirect(locale, "cleared");
 }

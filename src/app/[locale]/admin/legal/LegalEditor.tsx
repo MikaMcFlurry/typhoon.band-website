@@ -110,7 +110,7 @@ export function LegalEditor({
             type="text"
             name="title"
             defaultValue={translation.title}
-            className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+            className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             maxLength={160}
             required
           />
@@ -122,7 +122,7 @@ export function LegalEditor({
             name="body_md"
             defaultValue={translation.bodyMd}
             rows={16}
-            className="resize-y rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 font-mono text-[12px] leading-relaxed text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+            className="resize-y rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 font-mono text-[12px] leading-relaxed text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             maxLength={16000}
           />
         </label>

@@ -1,15 +1,12 @@
-import Image from "next/image";
 import { Icon } from "@/components/ui/Icon";
 import type { Dict } from "@/i18n/dictionaries";
 import { INTL_LOCALE, type Locale } from "@/i18n/locales";
 import type { ShowItem } from "@/lib/content/types";
 
-// Dates on the wall next to the band poster: blue tape carries the day,
-// venue in stage caps, place/time/type in mono, ticket link when set.
-// Upcoming first, TBA after, past shows folded away. With no dates, an
-// honest note that points promoters to booking (we never invent dates).
-// The poster is the admin's hero image (Site assets → hero_image), shown
-// whole: the band collage is never cropped.
+// Dates: blue tape carries the day, venue in stage caps, place/time/type
+// in mono, ticket link when set. Upcoming first, TBA after, past shows
+// folded away. With no dates, an honest note that points promoters to
+// booking (we never invent dates).
 
 export function todayInBerlin(): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -130,19 +127,17 @@ export function Shows({
   dict,
   locale,
   shows,
-  posterUrl,
 }: {
   dict: Dict;
   locale: Locale;
   shows: ShowItem[];
-  posterUrl: string;
 }) {
   const { upcoming, past } = splitShows(shows);
 
   return (
     <section aria-labelledby="shows-title" className="block-y border-t border-rule" id="shows">
-      <div className="shell grid gap-x-12 gap-y-12 lg:grid-cols-12">
-        <div className="lg:col-span-7">
+      <div className="shell">
+        <div className="max-w-[880px]">
           <h2 className="h-stage reveal" id="shows-title">
             {dict.shows.title}
           </h2>
@@ -183,18 +178,6 @@ export function Shows({
           ) : null}
         </div>
 
-        <figure className="reveal relative mx-auto w-full max-w-[520px] lg:col-span-5 lg:max-w-none lg:-rotate-[1deg]">
-          <span aria-hidden className="tape-piece -top-2 left-1/2 z-10 -translate-x-1/2 rotate-2 !bg-blue" />
-          <div className="relative aspect-square overflow-hidden bg-deck-2 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.9)]">
-            <Image
-              alt={dict.meta.ogAlt}
-              className="object-contain"
-              fill
-              sizes="(min-width: 1024px) 38vw, (min-width: 560px) 520px, 100vw"
-              src={posterUrl}
-            />
-          </div>
-        </figure>
       </div>
     </section>
   );

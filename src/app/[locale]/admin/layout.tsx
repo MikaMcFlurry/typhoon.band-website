@@ -1,7 +1,6 @@
 import "server-only";
 
 import type { Metadata } from "next";
-import { Archivo, Newsreader } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,22 +10,9 @@ import Link from "next/link";
 // outside the public (site) route group, so it no longer inherits the
 // public header, footer, player or consent banner.
 
-// The admin keeps its own typography (Archivo + Newsreader) and palette;
-// the public site's Version B design does not apply here.
-const archivo = Archivo({
-  subsets: ["latin", "latin-ext"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-
-const newsreader = Newsreader({
-  subsets: ["latin", "latin-ext"],
-  axes: ["opsz"],
-  style: ["normal"],
-  variable: "--font-newsreader",
-  display: "swap",
-});
+// Same stage world as the public site (owner 2026-09-27): the fonts come
+// from the locale layout; `.admin-root` re-points the admin's token names
+// at the Version B palette (see globals.css).
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -42,9 +28,9 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
   return (
-    <div className={`admin-root min-h-screen bg-ink ${archivo.variable} ${newsreader.variable}`}>
-      <div className="border-b border-line bg-ink-2">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
+    <div className="admin-root min-h-screen bg-ink">
+      <div className="border-b border-line bg-ink">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
           <Link aria-label="Admin" className="flex items-center gap-3" href={`/${locale}/admin`}>
             <Image
               alt="Typhoon"
@@ -54,10 +40,10 @@ export default async function AdminLayout({
               src="/assets/branding/typhoon-signature-gold-bold.png"
               width={2099}
             />
-            <span className="label">Admin</span>
+            <span className="tape mono-cap !px-1.5 !py-0.5">Admin</span>
           </Link>
-          <Link className="text-[0.875rem] text-paper-2 hover:text-gold-hi" href={`/${locale}`}>
-            Zur Website ↗
+          <Link className="mono-cap inline-flex min-h-11 items-center text-paper-2 hover:text-paper" href={`/${locale}`}>
+            Zur Website →
           </Link>
         </div>
       </div>

@@ -202,7 +202,7 @@ components:
 
 # Design System: Typhoon
 
-> Visual source of truth for **Version B ("Bühnenplan & Setlist")** on branch `claude/typhoon-website-impeccable`: the public site (home, legal pages, 404, player dock, consent). Tokens live as CSS custom properties in `src/app/globals.css`; Tailwind only maps names onto them. **Out of scope:** the admin area (`/[locale]/admin`, the `.admin-root` scope and the "Admin primitives" block with its ink/paper/gold palette, pill buttons, `.kicker`/`.eyebrow`) keeps its previous look and is not part of this system. Nothing here may be applied to the admin, and nothing from the admin may be used on public surfaces. `docs/design/DESIGN.md` is the discarded Version A system, kept only for reference.
+> Visual source of truth for **Version B ("Bühnenplan & Setlist")** on branch `claude/typhoon-website-impeccable`: the public site (home, legal pages, 404, player dock, consent). Tokens live as CSS custom properties in `src/app/globals.css`; Tailwind only maps names onto them. **Admin** (`/[locale]/admin`, owner 2026-09-27): uses the same stage world. Its TSX keeps the legacy token names (ink / paper / gold / line, `.btn`, `.panel`, `.kicker`); `.admin-root` in globals.css re-points them at this palette (deck, chalk, orange primary, square corners, Big Shoulders headings, mono labels). Admin screens are an Operate surface: dense forms, no tape decoration beyond the header label. `docs/design/DESIGN.md` is the discarded Version A system, kept only for reference.
 
 ## Overview
 
@@ -233,7 +233,7 @@ The palette is an achromatic stage (deck and chalk) plus four saturated spike-ta
 
 ### Tertiary
 - **Line-up Green** (`tape-green`): line-up only. Used for the instrument/role tape on each member card. Green on deck is 10.6:1.
-- **Date Blue** (`tape-blue`): dates only. Used for the show date blocks (past shows use `chalk-2` instead) and the tape piece on the Shows poster. Ink on blue is 6.9:1.
+- **Date Blue** (`tape-blue`): dates only. Used for the show date blocks (past shows use `chalk-2` instead) and nothing else. Ink on blue is 6.9:1.
 
 ### Neutral
 - **Stage Deck** (`deck`): page ground, fields, and the footer.
@@ -285,7 +285,9 @@ All three are self-hosted through next/font with latin-ext, for Turkish ğ ı ş
 
 - **Shell:** max 1360px, with side padding of 16px, 24px from 640px, and 40px from 1024px. Sections use `block-y` padding (72px, 112px from 768px) and are separated by a `rule` top border.
 - **Grid:** a 12-column grid from lg. Content sections split 7/5 (Shows) or 5/7 (Band).
-- **Hero:** one composition on every width (owner, 2026-09-27: mobile looked right, desktop looked odd). The colour stage photo is a landscape band across the right column (16:10 mobile, 2:1 at lg, 16:9 at xl) and the setlist sheet is taped over its lower edge (overlap 56px mobile, 80px sm/lg, 96px xl; inset 20px each side from lg; rotated 0.8°), so the face stays clear above the sheet. Stacked below lg; 6/6 at lg; 7/5 at xl with min-height 100svh minus the header. **`short` screen** (`min-width 1024px and max-height 879px`, e.g. 1280×800, 1366×768 laptops) switches the hero to its compact sizes (signature ≤400px, tagline 4.25rem, 2:1 photo, tighter setlist rows) so signature, tagline, CTAs and all six songs fit one screen.
+- **Hero:** the band comes first (owner, 2026-09-27: "wie eine Band wirken, nicht ein Künstler mit Band"). Left: gold signature, tagline tape strips, genre line, one sentence, pink play CTA + orange booking CTA. Right: the band collage from Admin → Site assets (`hero_image`) as a square poster taped up with two pink pieces, `object-contain` so every musician stays visible, rotated -0.8° from lg. Stacked below lg (poster after the CTAs); 6/6 at lg; 7/5 at xl. The `short` screen (≥1024px wide, <880px tall) keeps the compact tagline size. No photo of a single member in the hero.
+- **Music:** directly after the hero: heading + intro (+ platform links) left (5 cols), the setlist sheet right (7 cols, rotated 0.8°); stacked on mobile.
+- **Shows:** list or honest empty state, max 880px wide, no poster (the collage now lives in the hero).
 - **Header:** 64px tall, 72px from md. The small gold signature sits left on every page and scroll position (the bar never reads empty). Mono nav from lg, with a hamburger menu below lg. The locale switcher and Booking button appear from sm.
 - **Player dock:** fixed to the bottom at 76px. It writes `--dock-h` so the body and the consent banner clear it. Previous/volume controls hide at the smaller breakpoints (xs/lg).
 - **Line-up:** 2 columns on mobile, 3 from md, 4 from lg.
@@ -295,7 +297,7 @@ All three are self-hosted through next/font with latin-ext, for Turkish ğ ı ş
 
 ## Elevation & Depth
 
-The stage is flat. Depth comes from exactly one device: paper lying on the deck. Chalk sheets (the setlist, the Shows poster, the consent notice and dialog) cast a single soft shadow that falls downward. Nothing else is lifted, and nothing glows.
+The stage is flat. Depth comes from exactly one device: paper lying on the deck. Chalk sheets (the setlist, the hero poster, the consent notice and dialog) cast a single soft shadow that falls downward. Nothing else is lifted, and nothing glows.
 
 ### Shadow Vocabulary
 - **Sheet on deck** (`box-shadow: 0 24px 48px -24px rgba(0,0,0,0.8)`, 0.9 on the poster): taped sheets and prints.

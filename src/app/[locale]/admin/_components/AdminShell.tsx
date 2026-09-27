@@ -69,7 +69,7 @@ export function AdminShell({
       <header className="flex flex-col gap-4 border-b border-[color:var(--line)] pb-5 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="kicker">Typhoon Admin</p>
-          <h1 className="mt-1 font-display text-2xl font-bold tracking-[-0.02em] md:text-3xl">
+          <h1 className="mt-2 font-display text-3xl md:text-4xl">
             {displayName}
           </h1>
           <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-[color:var(--muted-cream)]">
@@ -99,10 +99,10 @@ export function AdminShell({
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               className={
-                "rounded-full border px-3 py-1.5 transition " +
+                "inline-flex min-h-10 items-center border-2 px-3 font-mono transition [font-stretch:87.5%] " +
                 (isActive
-                  ? "border-[color:var(--gold-soft)] bg-[color:var(--gold)] text-[#060403]"
-                  : "border-[color:var(--line)] text-[color:var(--muted-cream)] hover:border-[color:var(--gold-soft)] hover:text-[color:var(--gold-soft)]")
+                  ? "border-[color:var(--paper)] bg-[color:var(--paper)] text-[#121110]"
+                  : "border-[color:var(--line)] text-[color:var(--muted-cream)] hover:border-[color:var(--paper)] hover:text-[color:var(--paper)]")
               }
             >
               {item.label}

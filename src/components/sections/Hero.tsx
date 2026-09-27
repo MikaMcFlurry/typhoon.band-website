@@ -1,21 +1,21 @@
 import Image from "next/image";
 import { PlayTrackButton } from "@/components/audio/PlayTrackButton";
-import { Setlist, type SetlistTrack } from "@/components/audio/Setlist";
+import type { SetlistTrack } from "@/components/audio/Setlist";
 import { Icon } from "@/components/ui/Icon";
 import type { Dict } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/locales";
 
 // First viewport: the gold signature is the name, the tagline is laid as
-// three strips of tape; on the right a real colour stage photo band with
-// the setlist taped over its lower edge: one tap plays a song. The one
-// orange action is booking.
+// three strips of tape, and the whole band is on the right — the band
+// collage from Admin → Site assets (hero_image), taped up like a poster
+// and always shown whole (the band presents itself as a band, not as a
+// singer with backing musicians). The setlist follows in the next section;
+// the pink CTA plays the current single right here. Orange = booking.
 
 function titleCase(line: string, locale: Locale) {
   const lower = line.toLocaleLowerCase(locale);
   return lower.charAt(0).toLocaleUpperCase(locale) + lower.slice(1);
 }
-
-const STAGE_PHOTO = "/assets/band-cards/typhoon-band-card.jpg";
 
 const STRIPS = [
   { key: "line1", tilt: "-rotate-[1.4deg]", tape: "tape" },
@@ -27,16 +27,14 @@ export function Hero({
   dict,
   locale,
   signatureUrl,
-  tracks,
+  imageUrl,
   featured,
-  setlistFooter,
 }: {
   dict: Dict;
   locale: Locale;
   signatureUrl: string;
-  tracks: SetlistTrack[];
+  imageUrl: string;
   featured: SetlistTrack | null;
-  setlistFooter?: React.ReactNode;
 }) {
   return (
     <section
@@ -91,24 +89,20 @@ export function Hero({
           </div>
         </div>
 
-        <div className="relative lg:col-span-6 xl:col-span-5">
-          {/* Same composition on every width (the owner liked mobile): a
-              landscape band of the colour stage photo, the setlist taped
-              over its lower edge. The face stays clear above the sheet. */}
-          <figure className="relative -mx-4 aspect-[16/10] overflow-hidden bg-deck-3 sm:mx-0 lg:aspect-[2/1] xl:aspect-[16/9] short:aspect-[2/1]">
+        <figure className="relative mx-auto w-full max-w-[640px] lg:col-span-6 lg:max-w-none xl:col-span-5 lg:-rotate-[0.8deg]">
+          <span aria-hidden className="tape-piece -top-2.5 left-8 z-10 -rotate-6" />
+          <span aria-hidden className="tape-piece -top-2.5 right-8 z-10 rotate-3" />
+          <div className="relative aspect-square bg-deck-2 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.9)]">
             <Image
-              alt={dict.hero.photoAlt}
-              className="object-cover object-[72%_30%]"
+              alt={dict.meta.ogAlt}
+              className="object-contain"
               fill
-              loading="eager"
-              sizes="(min-width: 1024px) 30vw, 100vw"
-              src={STAGE_PHOTO}
+              priority
+              sizes="(min-width: 1280px) 40vw, (min-width: 1024px) 48vw, (min-width: 672px) 640px, 100vw"
+              src={imageUrl}
             />
-          </figure>
-          <div className="relative z-10 -mt-14 sm:-mt-20 lg:mx-5 lg:-mt-20 lg:rotate-[0.8deg] xl:-mt-24 short:-mt-20">
-            <Setlist featuredId={featured?.id ?? null} footer={setlistFooter} tracks={tracks} />
           </div>
-        </div>
+        </figure>
       </div>
     </section>
   );

@@ -179,6 +179,30 @@ pass**
 - `state-booking-fallback-390.png`
 - `share-image.jpg`
 
+## 4b. Owner round 2026-09-27
+
+- **Band first:** the hero now shows the band collage (Admin → Site assets →
+  hero image), whole, as a taped poster. The singer's single photo left the
+  hero; the setlist moved to its own "Hör rein" section right after it.
+  Termine no longer repeats the collage.
+- **Line-up can grow:** Malvin (Keys & Klavier) is in the repo line-up and
+  shows on the live site even before he has a DB row. Admin → Members can
+  now add musicians ("Neues Mitglied"), edit and hide everyone, and delete
+  musicians added in Admin. A member without photo gets a quiet initial
+  panel, never a placeholder badge. 9 members lay out as 3 × 3.
+- **Admin in the stage world:** same palette, type and square corners as
+  the site; dashboard copy updated. Verified locally with a temporary
+  preview switch (not committed): all 12 admin pages render without errors
+  or overflow at 1440 and 390 px; without login every admin page still
+  redirects to the login.
+- **CMS freshness fix:** shows, media, music, site assets, booking→show and
+  members now refresh the home page in all three languages immediately
+  after saving (before: only the Admin's current language; EN/TR waited
+  for the 60-second cache).
+- Not testable here: real saves against the live database (no Admin login
+  in this environment). Suggested owner check after deploy: add a test
+  member, upload a photo, hide it, delete it.
+
 ## 5. Open points (content, for the owner in Admin — no code needed)
 
 - **Owner review** on the Vercel preview. Preview deployments use

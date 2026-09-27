@@ -29,6 +29,8 @@ export type MemberFormProps = {
   };
   fallbackByLocale: Record<string, { name: string; role: string; bio: string }>;
   db: (AdminMemberRow & { translations: AdminMemberTranslationRow[] }) | null;
+  /** Added in Admin (not a repo member). */
+  extra?: boolean;
 };
 
 const LOCALES = ["de", "en", "tr"] as const;
@@ -52,10 +54,15 @@ export function MemberForm({
   fallback,
   fallbackByLocale,
   db,
+  extra = false,
 }: MemberFormProps) {
   const [phase, setPhase] = useState<UploadFieldPhase>("idle");
   const photoUrl = db?.photo_url || fallback.photoUrl;
-  const photoSource = db?.photo_url ? "Supabase" : "Fallback (Repo)";
+  const photoSource = db?.photo_url
+    ? "Foto: Supabase"
+    : photoUrl
+      ? "Foto: Repo"
+      : "Noch kein Foto";
   const isVisible = db?.is_visible ?? true;
   const sortOrder = db?.sort_order ?? fallback.sortOrder;
 
@@ -77,6 +84,7 @@ export function MemberForm({
           </p>
           <p className="mt-1 text-[10px] uppercase tracking-[0.22em] text-[color:var(--muted-cream)]">
             slug: {slug}
+            {extra ? " · neu angelegt" : " · Stammmitglied"}
           </p>
         </div>
         <span className="rounded-full border border-[color:var(--line)] px-2 py-0.5 text-[9px] uppercase tracking-[0.22em] text-[color:var(--muted-cream)]">
@@ -86,12 +94,18 @@ export function MemberForm({
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-[140px_1fr]">
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-[color:var(--line)] md:w-[140px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            alt={headingName}
-            className="h-full w-full object-cover"
-            src={photoUrl}
-          />
+          {photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              alt={headingName}
+              className="h-full w-full object-cover"
+              src={photoUrl}
+            />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-xs text-[color:var(--muted-cream)]">
+              Kein Foto
+            </span>
+          )}
         </div>
 
         <div className="grid gap-2">
