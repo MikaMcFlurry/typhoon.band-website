@@ -38,7 +38,7 @@ export default async function AdminLoginPage({
   const supabaseReady = isSupabaseConfigured();
 
   return (
-    <section className="mx-auto w-full max-w-md px-4 pb-16 pt-24 md:pt-32">
+    <section className="mx-auto w-full max-w-md px-4 pb-16 pt-10 md:pt-14">
       <p className="kicker">Admin</p>
       <h1 className="mt-2 font-display text-3xl font-bold tracking-[-0.02em] md:text-4xl">
         Anmelden
@@ -51,7 +51,7 @@ export default async function AdminLoginPage({
       {supabaseReady ? (
         <LoginForm locale={locale} from={from} />
       ) : (
-        <div className="mt-8 rounded-[10px] border border-[color:var(--line)] bg-[color:var(--panel)] p-4 text-sm text-[color:var(--muted-cream)]">
+        <div className="mt-8 rounded-[10px] border border-[color:var(--line)] bg-[color:var(--panel)] p-4 text-sm text-[color:var(--muted-cream)] [overflow-wrap:anywhere]">
           Supabase ist nicht konfiguriert. Setze
           <code className="mx-1">NEXT_PUBLIC_SUPABASE_URL</code>
           und

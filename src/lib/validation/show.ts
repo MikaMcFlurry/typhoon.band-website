@@ -142,8 +142,11 @@ export function validateShow(raw: unknown): ShowValidation {
     ticket_url = ticketRaw;
   }
 
-  const is_visible = asBool(r.is_visible, true);
-  const is_published = asBool(r.is_published, true);
+  // Every show form renders these checkboxes; an unchecked box is simply
+  // absent from FormData, so "missing" must mean false (the old fallback
+  // `true` made it impossible to hide or unpublish a show).
+  const is_visible = asBool(r.is_visible, false);
+  const is_published = asBool(r.is_published, false);
   const sort_order = asInt(r.sort_order, 0);
 
   return {

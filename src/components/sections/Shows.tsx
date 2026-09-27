@@ -1,120 +1,201 @@
-"use client";
-
-import { useDict } from "@/components/i18n/DictProvider";
-import { SectionHeader } from "@/components/sections/SectionHeader";
+import Image from "next/image";
+import { Icon } from "@/components/ui/Icon";
+import type { Dict } from "@/i18n/dictionaries";
+import { INTL_LOCALE, type Locale } from "@/i18n/locales";
 import type { ShowItem } from "@/lib/content/types";
 
-// Termine — placed directly under the FeaturedPlayer per docs/v5 §3.
-// Desktop = 4 compact cards in a row, mobile = horizontal scroll-snap.
-//
-// When the homepage server-fetches Supabase rows it passes them in via
-// `rows`. If `rows` is empty (Supabase missing, no published shows, or a
-// transient error) the section falls back to the localised TBA copy from
-// the dictionary so the design never collapses.
-export function Shows({ rows }: { rows?: ShowItem[] }) {
-  const { dict } = useDict();
-  const cards =
-    rows && rows.length > 0
-      ? rows.map((row) => formatShowCard(row))
-      : dict.shows.placeholderTitles.map((title, i) => ({
-          id: `tba-${i + 1}`,
-          title,
-          region: dict.shows.placeholderRegion[i] ?? "",
-          time: dict.shows.placeholderTime[i] ?? "",
-          ticketUrl: null as string | null,
-          year: "2025",
-          dateLabel: "TBA",
-        }));
+// Dates on the wall next to the band poster: blue tape carries the day,
+// venue in stage caps, place/time/type in mono, ticket link when set.
+// Upcoming first, TBA after, past shows folded away. With no dates, an
+// honest note that points promoters to booking (we never invent dates).
+// The poster is the admin's hero image (Site assets → hero_image), shown
+// whole: the band collage is never cropped.
 
-  return (
-    <section className="mx-auto mt-7 max-w-container px-4 md:px-8" id="shows">
-      <SectionHeader kicker={dict.shows.kicker} link={{ href: "#booking", label: dict.shows.link }} />
-      <div className="hidden grid-cols-4 gap-2.5 md:grid">
-        {cards.slice(0, 4).map((s) => (
-          <ShowCard key={s.id} show={s} />
-        ))}
-      </div>
-      <div className="scroll-rail md:hidden">
-        {cards.map((s) => (
-          <div className="w-[78%] max-w-[280px]" key={s.id}>
-            <ShowCard show={s} />
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+export function todayInBerlin(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Berlin",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 
-type CardModel = {
-  id: string;
-  title: string;
-  region: string;
-  time: string;
-  ticketUrl: string | null;
-  year: string;
-  dateLabel: string;
-};
+export function splitShows(shows: ShowItem[], today = todayInBerlin()) {
+  const upcoming: ShowItem[] = [];
+  const past: ShowItem[] = [];
+  for (const s of shows) {
+    if (s.date && s.date < today) past.push(s);
+    else upcoming.push(s);
+  }
+  past.reverse();
+  return { upcoming, past };
+}
 
-function formatShowCard(row: ShowItem): CardModel {
-  const date = row.startsAt ? new Date(row.startsAt) : null;
-  const valid = date && Number.isFinite(date.getTime());
-  const dateLabel = valid
-    ? date.toLocaleDateString("de-DE", { day: "2-digit", month: "short" })
-    : "TBA";
-  const year = valid
-    ? String(date.getFullYear())
-    : new Date().getFullYear().toString();
+function dateParts(date: string, locale: Locale) {
+  // Wall-clock date → format in UTC so the day never shifts.
+  const d = new Date(`${date}T00:00:00Z`);
+  const intl = INTL_LOCALE[locale];
   return {
-    id: row.id,
-    title: row.title,
-    region: row.region,
-    time: row.time,
-    ticketUrl: row.ticketUrl,
-    year,
-    dateLabel,
+    day: new Intl.DateTimeFormat(intl, { day: "2-digit", timeZone: "UTC" }).format(d),
+    month: new Intl.DateTimeFormat(intl, { month: "short", timeZone: "UTC" })
+      .format(d)
+      .replace(".", ""),
+    weekday: new Intl.DateTimeFormat(intl, { weekday: "short", timeZone: "UTC" })
+      .format(d)
+      .replace(".", ""),
+    year: d.getUTCFullYear(),
+    full: new Intl.DateTimeFormat(intl, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(d),
   };
 }
 
-function ShowCard({ show }: { show: CardModel }) {
-  const inner = (
-    <>
-      <div className="flex min-w-[44px] flex-col items-start border-r border-[color:var(--line)] pr-3">
-        <span className="font-display text-[24px] font-bold leading-none tracking-[-0.02em] text-[color:var(--gold-soft)] md:text-[28px]">
-          {show.dateLabel}
-        </span>
-        <span className="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[color:var(--muted-cream)]">
-          {show.year}
-        </span>
+function eventTypeLabel(type: string | null, dict: Dict) {
+  if (!type) return null;
+  const key = type.trim().toLowerCase();
+  return dict.shows.eventTypes[key] ?? type;
+}
+
+function ShowRow({ show, dict, locale, muted = false }: { show: ShowItem; dict: Dict; locale: Locale; muted?: boolean }) {
+  const parts = show.date ? dateParts(show.date, locale) : null;
+  const place = [show.city, show.country].filter(Boolean).join(", ");
+  const type = eventTypeLabel(show.eventType, dict);
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <li
+      className={`grid grid-cols-[76px_minmax(0,1fr)] items-start gap-x-4 gap-y-3 border-b border-rule py-5 sm:grid-cols-[92px_minmax(0,1fr)_auto] sm:items-center md:gap-x-6 ${
+        muted ? "opacity-70" : ""
+      }`}
+    >
+      <div className={`flex aspect-square flex-col items-center justify-center text-[#121110] ${muted ? "bg-chalk-2" : "bg-blue"}`}>
+        {parts ? (
+          <time className="text-center" dateTime={show.date ?? undefined} title={parts.full}>
+            <span className="block font-stage text-[2.5rem] font-black leading-none sm:text-[3rem]">{parts.day}</span>
+            <span className="mono-cap mt-1 block">
+              {parts.month}
+              {parts.year !== currentYear ? ` ${parts.year}` : ""}
+            </span>
+          </time>
+        ) : (
+          <span className="mono-cap px-1 text-center leading-tight">{dict.shows.tba}</span>
+        )}
       </div>
+
       <div className="min-w-0">
-        <div className="truncate font-semibold text-[13px] text-[color:var(--cream)] md:text-[14px]">
-          {show.title}
-        </div>
-        <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-[color:var(--muted-cream)]">
-          <span aria-hidden className="text-[7px] text-[color:var(--gold-soft)]">
-            ◉
-          </span>
-          <span className="truncate">{show.region}</span>
-        </div>
-        <div className="mt-0.5 text-[11px] text-[color:var(--muted)]">{show.time}</div>
+        <h3 className="font-stage text-[1.75rem] font-extrabold uppercase leading-[0.95] md:text-[2.125rem]">
+          {show.venue}
+        </h3>
+        <p className="mono mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-chalk-2">
+          {place ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Icon className="text-chalk-3" name="pin" size={15} />
+              {place}
+            </span>
+          ) : null}
+          {parts ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Icon className="text-chalk-3" name="calendar" size={15} />
+              <span className="capitalize">{parts.weekday}</span>
+              {show.startTime ? <span>· {show.startTime}</span> : null}
+            </span>
+          ) : null}
+          {type ? <span className="text-chalk-3">{type}</span> : null}
+        </p>
       </div>
-    </>
+
+      {show.ticketUrl && !muted ? (
+        <div className="col-span-2 sm:col-span-1 sm:justify-self-end">
+          <a
+            className="btn-line btn-sm"
+            href={show.ticketUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {dict.shows.tickets}
+            <span className="sr-only">: {show.venue}</span>
+            <Icon name="external" size={16} />
+          </a>
+        </div>
+      ) : null}
+    </li>
   );
+}
 
-  const className =
-    "grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3.5 rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.55)] px-4 py-4 transition hover:border-[color:var(--line-strong)]";
+export function Shows({
+  dict,
+  locale,
+  shows,
+  posterUrl,
+}: {
+  dict: Dict;
+  locale: Locale;
+  shows: ShowItem[];
+  posterUrl: string;
+}) {
+  const { upcoming, past } = splitShows(shows);
 
-  if (show.ticketUrl) {
-    return (
-      <a
-        href={show.ticketUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={className}
-      >
-        {inner}
-      </a>
-    );
-  }
-  return <article className={className}>{inner}</article>;
+  return (
+    <section aria-labelledby="shows-title" className="block-y border-t border-rule" id="shows">
+      <div className="shell grid gap-x-12 gap-y-12 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <h2 className="h-stage reveal" id="shows-title">
+            {dict.shows.title}
+          </h2>
+          {upcoming.length > 0 ? (
+            <>
+              <p className="copy reveal mt-4">{dict.shows.intro}</p>
+              <ul className="reveal mt-8 border-t border-rule">
+                {upcoming.map((show) => (
+                  <ShowRow dict={dict} key={show.id} locale={locale} show={show} />
+                ))}
+              </ul>
+            </>
+          ) : (
+            <div className="reveal mt-8 md:mt-10">
+              <p className="font-stage text-[clamp(2rem,1.4rem+2.2vw,3.25rem)] font-extrabold uppercase leading-[1.02]">
+                <span className="lay tape -rotate-[0.8deg]">{dict.shows.emptyTitle}</span>
+              </p>
+              <p className="copy-lg mt-6">{dict.shows.emptyBody}</p>
+              <a className="btn-tape mt-8" href="#booking">
+                {dict.shows.emptyCta}
+                <Icon name="arrow-right" size={20} />
+              </a>
+            </div>
+          )}
+
+          {past.length > 0 ? (
+            <details className="group mt-10">
+              <summary className="mono-cap inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-chalk-2 hover:text-chalk [&::-webkit-details-marker]:hidden">
+                <Icon className="transition-transform group-open:rotate-180" name="arrow-down" size={16} />
+                {dict.shows.past} ({past.length})
+              </summary>
+              <ul className="mt-4 border-t border-rule">
+                {past.map((show) => (
+                  <ShowRow dict={dict} key={show.id} locale={locale} muted show={show} />
+                ))}
+              </ul>
+            </details>
+          ) : null}
+        </div>
+
+        <figure className="reveal relative mx-auto w-full max-w-[520px] lg:col-span-5 lg:max-w-none lg:-rotate-[1deg]">
+          <span aria-hidden className="tape-piece -top-2 left-1/2 z-10 -translate-x-1/2 rotate-2 !bg-blue" />
+          <div className="relative aspect-square overflow-hidden bg-deck-2 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.9)]">
+            <Image
+              alt={dict.meta.ogAlt}
+              className="object-contain"
+              fill
+              sizes="(min-width: 1024px) 38vw, (min-width: 560px) 520px, 100vw"
+              src={posterUrl}
+            />
+          </div>
+        </figure>
+      </div>
+    </section>
+  );
 }

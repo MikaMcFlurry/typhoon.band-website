@@ -1,43 +1,136 @@
-"use client";
-
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { useDict } from "@/components/i18n/DictProvider";
+import { Fragment, type ReactNode } from "react";
+import { Icon } from "@/components/ui/Icon";
+import type { LegalSection } from "@/content/legal";
 
-type Props = {
-  kicker: string;
+// Layout + safe renderers for legal pages. No HTML is ever injected: text
+// is split into paragraphs/lists and only e-mail addresses and http(s)
+// URLs become links.
+
+export function LegalShell({
+  homeHref,
+  backLabel,
+  title,
+  meta,
+  children,
+}: {
+  homeHref: string;
+  backLabel: string;
   title: string;
+  meta?: string | null;
   children: ReactNode;
-};
-
-export function LegalShell({ kicker, title, children }: Props) {
-  const { dict, locale } = useDict();
+}) {
   return (
-    <section className="mx-auto max-w-3xl px-4 pb-16 pt-24 md:px-8 md:pt-32">
-      <Link
-        className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted-cream)] hover:text-[color:var(--gold-soft)]"
-        href={`/${locale}`}
-      >
-        ← {dict.legal.backToHome}
-      </Link>
-      <span className="kicker mt-3 block">{kicker}</span>
-      <h1 className="mt-2 font-display text-[34px] font-bold leading-[1.05] tracking-[-0.02em] text-[color:var(--cream)] md:text-[48px]">
-        {title}
-      </h1>
-      <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-[color:var(--muted)]">
-        {dict.legal.draftNote}
-      </p>
-      <div className="mt-6 rounded-[var(--radius-card)] border border-[color:var(--line)] bg-[rgba(11,8,5,0.6)] p-5 text-sm leading-relaxed text-[color:var(--cream)] md:p-7 md:text-[15px]">
-        {children}
+    <article className="shell pb-24 pt-[calc(var(--header-h)+40px)] md:pb-32 md:pt-[calc(var(--header-h)+72px)]">
+      <div className="mx-auto max-w-[72ch]">
+        <Link
+          className="mono-cap inline-flex min-h-11 items-center gap-2 text-chalk-2 hover:text-chalk"
+          href={homeHref}
+        >
+          <Icon name="arrow-left" size={16} />
+          {backLabel}
+        </Link>
+        <h1 className="h-stage mt-6 [overflow-wrap:anywhere]">{title}</h1>
+        {meta ? <p className="mono mt-4 text-chalk-3">{meta}</p> : null}
+        <div className="mt-10 border-t-2 border-chalk pt-2">{children}</div>
       </div>
-    </section>
+    </article>
   );
 }
 
-export function LegalH2({ children }: { children: ReactNode }) {
+const TOKEN_RE = /([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|https?:\/\/[^\s)]+)/gi;
+
+function Linkify({ text }: { text: string }) {
+  const parts = text.split(TOKEN_RE);
   return (
-    <h2 className="mt-6 font-display text-lg font-semibold tracking-[-0.01em] text-[color:var(--cream)] first:mt-0 md:text-xl">
+    <>
+      {parts.map((part, i) => {
+        if (i % 2 === 1) {
+          const isMail = part.includes("@") && !part.startsWith("http");
+          return (
+            <a
+              className="link-u break-words text-chalk"
+              href={isMail ? `mailto:${part}` : part}
+              key={i}
+              rel={isMail ? undefined : "noopener noreferrer"}
+              target={isMail ? undefined : "_blank"}
+            >
+              {part}
+            </a>
+          );
+        }
+        return <Fragment key={i}>{part}</Fragment>;
+      })}
+    </>
+  );
+}
+
+function Paragraph({ text }: { text: string }) {
+  return (
+    <p className="mt-4 whitespace-pre-line text-[1.0625rem] leading-relaxed text-chalk-2">
+      <Linkify text={text} />
+    </p>
+  );
+}
+
+function List({ items }: { items: string[] }) {
+  return (
+    <ul className="mt-4 flex list-[square] flex-col gap-2 pl-5 text-[1.0625rem] leading-relaxed text-chalk-2 marker:text-chalk-3">
+      {items.map((item, i) => (
+        <li key={i}>
+          <Linkify text={item} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function H2({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="mt-12 font-stage text-[1.75rem] font-extrabold uppercase leading-none md:text-[2rem]">
       {children}
     </h2>
+  );
+}
+
+export function LegalSections({ sections }: { sections: LegalSection[] }) {
+  return (
+    <>
+      {sections.map((section, i) => (
+        <section key={i}>
+          {section.heading ? <H2>{section.heading}</H2> : null}
+          {section.blocks.map((block, j) =>
+            typeof block === "string" ? (
+              <Paragraph key={j} text={block} />
+            ) : (
+              <List items={block.list} key={j} />
+            ),
+          )}
+        </section>
+      ))}
+    </>
+  );
+}
+
+// Markdown-ish text from Admin → Legal: blank-line paragraphs, "## " or
+// "# " headings, "- " / "* " bullet lists.
+export function LegalBody({ text }: { text: string }) {
+  const blocks = text
+    .replace(/\r\n/g, "\n")
+    .split(/\n{2,}/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+  return (
+    <>
+      {blocks.map((block, i) => {
+        const heading = /^#{1,3}\s+(.+)$/.exec(block);
+        if (heading && !block.includes("\n")) return <H2 key={i}>{heading[1]}</H2>;
+        const lines = block.split("\n");
+        if (lines.every((l) => /^[-*]\s+/.test(l))) {
+          return <List items={lines.map((l) => l.replace(/^[-*]\s+/, ""))} key={i} />;
+        }
+        return <Paragraph key={i} text={block} />;
+      })}
+    </>
   );
 }

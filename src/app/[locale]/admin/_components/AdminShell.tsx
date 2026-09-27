@@ -15,7 +15,11 @@ export type AdminTab =
   | "media"
   | "music"
   | "members"
-  | "settings";
+  | "settings"
+  | "legal"
+  | "seo"
+  | "platform-links"
+  | "consent";
 
 export function AdminShell({
   locale,
@@ -40,6 +44,18 @@ export function AdminShell({
       label: "Assets",
       key: "settings",
     },
+    { href: `/${locale}/admin/legal`, label: "Legal", key: "legal" },
+    { href: `/${locale}/admin/seo`, label: "SEO", key: "seo" },
+    {
+      href: `/${locale}/admin/platform-links`,
+      label: "Platform Links",
+      key: "platform-links",
+    },
+    {
+      href: `/${locale}/admin/consent`,
+      label: "Consent",
+      key: "consent",
+    },
   ];
 
   const displayName =
@@ -49,7 +65,7 @@ export function AdminShell({
     "Admin";
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 pb-16 pt-24 md:pt-32">
+    <section className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 md:pt-14">
       <header className="flex flex-col gap-4 border-b border-[color:var(--line)] pb-5 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="kicker">Typhoon Admin</p>

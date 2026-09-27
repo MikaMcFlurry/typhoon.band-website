@@ -1,175 +1,112 @@
-"use client";
-
 import Image from "next/image";
-import { useDict } from "@/components/i18n/DictProvider";
+import { PlayTrackButton } from "@/components/audio/PlayTrackButton";
+import { Setlist, type SetlistTrack } from "@/components/audio/Setlist";
+import { Icon } from "@/components/ui/Icon";
+import type { Dict } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/locales";
 
-// Three distinct visual layers:
-//   1. TEXT block      — left-aligned headline + lede + CTAs (z 5)
-//   2. IMAGE block     — band collage (z 1)
-//   3. SIGNATURE block — oversized gold wordmark, rotated -4deg (z 50)
-//
-// Image and signature URLs are passed in by the server (`getHeroContent()`)
-// so an Admin upload via Supabase Storage can override the static repo
-// assets without touching the design.
-//
-// Desktop tweaks (Design-Fix v6):
-//   - Image block starts at ~38vw (was 38% from right edge), so the LEFT
-//     edge of the band collage is fully visible inside the hero again.
-//   - Signature offset moved ~75px left and ~20px down from the previous
-//     `right: -2%; bottom: -40px` so it no longer slams the right edge
-//     and gets cropped.
-//
-// Mobile tweaks:
-//   - The image is full-width so the band composition is visible.
-//   - Bottom fade resolves to the page background so no horizontal seam
-//     is visible under the hero.
-//   - The signature sits much lower and slightly LEFT, slightly bleeding
-//     out of the bottom of the image (the visual handoff intent).
+// First viewport: the gold signature is the name, the tagline is laid as
+// three strips of tape; on the right a real colour stage photo with the
+// setlist taped over its corner: one tap plays a song. The one orange
+// action is booking.
 
-type HeroProps = {
-  imageUrl: string;
+function titleCase(line: string, locale: Locale) {
+  const lower = line.toLocaleLowerCase(locale);
+  return lower.charAt(0).toLocaleUpperCase(locale) + lower.slice(1);
+}
+
+const STAGE_PHOTO = "/assets/band-cards/typhoon-band-card.jpg";
+
+const STRIPS = [
+  { key: "line1", tilt: "-rotate-[1.4deg]", tape: "tape" },
+  { key: "line2", tilt: "rotate-[0.8deg]", tape: "tape" },
+  { key: "line3", tilt: "-rotate-[0.6deg]", tape: "tape tape-pink" },
+] as const;
+
+export function Hero({
+  dict,
+  locale,
+  signatureUrl,
+  tracks,
+  featured,
+  setlistFooter,
+}: {
+  dict: Dict;
+  locale: Locale;
   signatureUrl: string;
-};
-
-export function Hero({ imageUrl, signatureUrl }: HeroProps) {
-  const { dict } = useDict();
+  tracks: SetlistTrack[];
+  featured: SetlistTrack | null;
+  setlistFooter?: React.ReactNode;
+}) {
   return (
-    <section className="relative overflow-visible" id="home">
-      <div
-        className="relative min-h-[600px] overflow-visible md:min-h-[640px]"
-        style={{
-          background:
-            "radial-gradient(circle at 75% 30%, rgba(199,154,75,0.20), transparent 38%), linear-gradient(90deg, #030201 0%, #050302 38%, #0c0805 100%)",
-        }}
-      >
-        {/* ── Block 2: IMAGE — desktop ─────────────────────────────────
-             `object-contain` so the full band collage is visible (no
-             right-edge crop), anchored to the right side of its block. */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] hidden w-[68%] overflow-hidden md:block">
-          <Image
-            alt="Typhoon — Band Live Collage"
-            className="h-full w-full object-contain object-right"
-            height={1500}
-            priority
-            src={imageUrl}
-            style={{
-              filter:
-                "sepia(0.4) saturate(0.85) contrast(1.08) brightness(0.78)",
-            }}
-            width={1500}
-          />
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(3,2,1,1) 0%, rgba(3,2,1,0.85) 8%, rgba(3,2,1,0.35) 22%, transparent 40%)",
-            }}
-          />
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse at 60% 50%, transparent 30%, rgba(3,2,1,0.5) 90%), linear-gradient(180deg, rgba(3,2,1,0.45) 0%, transparent 18%, transparent 78%, rgba(3,2,1,0.65) 100%)",
-            }}
-          />
+    <section
+      aria-labelledby="hero-title"
+      className="relative overflow-x-clip pt-[var(--header-h)]"
+      id="home"
+    >
+      <div className="shell grid gap-x-10 gap-y-14 pb-20 pt-6 md:pb-28 md:pt-10 lg:grid-cols-12 lg:items-center xl:min-h-[calc(100svh-var(--header-h))] xl:pb-16">
+        <div className="lg:col-span-6 xl:col-span-7">
+          <h1 id="hero-title">
+            <Image
+              alt="Typhoon"
+              className="h-auto w-[min(86%,480px)] -translate-x-[2%] lg:w-[min(88%,560px)]"
+              fetchPriority="high"
+              height={724}
+              priority
+              sizes="(min-width: 1024px) 560px, 88vw"
+              src={signatureUrl}
+              width={2099}
+            />
+            <span className="mt-6 flex flex-col items-start gap-2 font-stage text-[clamp(2.5rem,0.9rem+7vw,6rem)] lg:text-[4.25rem] xl:text-[clamp(2.5rem,0.9rem+7vw,6rem)] font-black uppercase leading-[0.92] md:mt-8">
+              {STRIPS.map((s, i) => (
+                <span
+                  className={`lay ${s.tape} ${s.tilt} origin-left`}
+                  key={s.key}
+                  style={{ ["--reveal-delay" as string]: `${120 + i * 140}ms` }}
+                >
+                  {titleCase(dict.hero[s.key], locale)}
+                </span>
+              ))}
+            </span>
+          </h1>
+
+          <p className="mono-cap mt-8 flex flex-wrap gap-x-2 gap-y-1 text-chalk-2">
+            {dict.brand.genres.map((g, i) => (
+              <span key={g}>
+                {i > 0 ? <span aria-hidden className="mr-2 text-chalk-3">/</span> : null}
+                {g}
+              </span>
+            ))}
+          </p>
+          <p className="copy-lg mt-4">{dict.hero.description}</p>
+
+          <div className="mt-8 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
+            {featured ? (
+              <PlayTrackButton id={featured.id} src={featured.src} title={featured.title} />
+            ) : null}
+            <a className="btn-tape" href="#booking">
+              {dict.hero.ctaBook}
+              <Icon name="arrow-right" size={20} />
+            </a>
+          </div>
         </div>
 
-        {/* ── Block 2: IMAGE — mobile (full-width backdrop) ──────────────
-             `object-cover object-left` so there is no horizontal letterbox
-             (= no hard bottom edge) AND the left side of the band collage
-             is visible. The right side gets the trade-off crop. */}
-        <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden md:hidden">
-          <Image
-            alt="Typhoon — Band Live Collage"
-            className="h-full w-full object-cover object-left"
-            height={1500}
-            priority
-            sizes="100vw"
-            src={imageUrl}
-            style={{
-              filter:
-                "sepia(0.38) saturate(0.85) contrast(1.06) brightness(0.72)",
-            }}
-            width={1500}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(3,2,1,0.92) 0%, rgba(3,2,1,0.65) 30%, rgba(3,2,1,0.20) 55%, transparent 90%)",
-            }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(3,2,1,0.45) 0%, transparent 22%, transparent 55%, rgba(3,2,1,0.85) 88%, #030201 100%)",
-            }}
-          />
-        </div>
-
-        {/* ── Block 3: SIGNATURE — desktop (~20px down, ~75px left) ───── */}
-        <Image
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute z-[50] hidden md:block"
-          height={724}
-          src={signatureUrl}
-          style={{
-            // was right: -2%, bottom: -40px → -20px shifted down + 75px left
-            right: "calc(-2% + 75px)",
-            bottom: "-60px",
-            width: "700px",
-            transform: "rotate(-4deg)",
-            filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.85))",
-            mixBlendMode: "screen",
-          }}
-          width={2099}
-        />
-        {/* ── Block 3: SIGNATURE — mobile (lower + slightly left) ──────── */}
-        <Image
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute z-[50] md:hidden"
-          height={724}
-          src={signatureUrl}
-          style={{
-            right: "-2%",
-            bottom: "30px",
-            width: "94%",
-            transform: "rotate(-4deg)",
-            filter: "drop-shadow(0 8px 22px rgba(0,0,0,0.9))",
-            mixBlendMode: "screen",
-          }}
-          width={2099}
-        />
-
-        {/* ── Block 1: TEXT ────────────────────────────────────────────── */}
-        <div className="relative z-[5] mx-auto max-w-container px-4 pt-[96px] md:px-8 md:pt-[132px]">
-          <div className="max-w-[240px] md:max-w-[420px]">
-            <h1 className="m-0 font-display text-[40px] font-bold leading-[0.96] tracking-[-0.04em] text-[color:var(--cream)] md:text-[76px]">
-              {dict.hero.line1}
-              <br />
-              {dict.hero.line2}
-              <br />
-              <span className="text-[color:var(--gold)]">{dict.hero.line3}</span>
-            </h1>
-            <p className="mt-[14px] max-w-[220px] text-[12px] leading-[1.55] text-[color:var(--muted-cream)] md:mt-[22px] md:max-w-[360px] md:text-[14px] md:leading-[1.6]">
-              {dict.hero.description}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2 md:mt-[26px] md:gap-2.5">
-              <a className="btn btn-primary" href="#music">
-                <svg aria-hidden className="h-2.5 w-2.5 md:h-3 md:w-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                {dict.hero.ctaListen}
-              </a>
-              <a className="btn btn-secondary" href="#booking">
-                {dict.hero.ctaBook}
-              </a>
-            </div>
+        <div className="relative lg:col-span-6 lg:pt-[40%] xl:col-span-5 xl:pt-[44%]">
+          {/* Stage photo plate (real colour live photo) carries the right
+              columns; the setlist is taped over its lower-left quadrant so
+              the face and the keys stay clear. */}
+          <figure className="relative -mx-4 aspect-[16/10] overflow-hidden bg-deck-3 sm:mx-0 lg:absolute lg:right-0 lg:top-0 lg:mx-0 lg:aspect-auto lg:h-[calc(100%-5rem)] lg:w-[70%] xl:w-[74%]">
+            <Image
+              alt={dict.hero.photoAlt}
+              className="object-cover object-[72%_35%] lg:object-[74%_center]"
+              fill
+              loading="eager"
+              sizes="(min-width: 1024px) 30vw, 100vw"
+              src={STAGE_PHOTO}
+            />
+          </figure>
+          <div className="relative z-10 -mt-14 sm:-mt-20 lg:mt-0 lg:w-[88%] lg:rotate-[1deg] xl:w-[82%]">
+            <Setlist featuredId={featured?.id ?? null} footer={setlistFooter} tracks={tracks} />
           </div>
         </div>
       </div>
