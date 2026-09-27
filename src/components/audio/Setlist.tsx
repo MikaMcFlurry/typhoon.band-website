@@ -54,7 +54,7 @@ function Row({
     <li className="border-t border-[rgba(18,17,16,0.16)] first:border-t-0" ref={rowRef}>
       <button
         aria-pressed={playing}
-        className="group grid w-full grid-cols-[1.75rem_minmax(0,1fr)_auto_2.75rem] items-center gap-x-3 py-2.5 text-left sm:grid-cols-[2rem_minmax(0,1fr)_auto_2.75rem] sm:gap-x-4"
+        className="group grid w-full grid-cols-[1.75rem_minmax(0,1fr)_auto_2.75rem] items-center gap-x-3 py-2.5 text-left lg:py-1.5 xl:py-2.5 short:py-1.5 sm:grid-cols-[2rem_minmax(0,1fr)_auto_2.75rem] sm:gap-x-4"
         onClick={() => toggle(track.id, track.src)}
         type="button"
       >
@@ -63,7 +63,7 @@ function Row({
         </span>
         <span className="min-w-0">
           <span
-            className={`block font-stage [overflow-wrap:normal] text-[1.625rem] font-extrabold uppercase leading-[1.02] sm:text-[1.875rem] ${
+            className={`block font-stage [overflow-wrap:normal] text-[1.625rem] font-extrabold uppercase leading-[1.02] sm:text-[1.875rem] lg:text-[1.625rem] xl:text-[1.875rem] short:text-[1.625rem] ${
               isCurrent ? "" : "group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4"
             }`}
           >
@@ -133,10 +133,10 @@ export function Setlist({
       <span aria-hidden className="tape-piece -top-2.5 right-6 rotate-3" />
       <section
         aria-labelledby="setlist-title"
-        className="bg-chalk px-4 pb-4 pt-6 text-[#121110] shadow-[0_24px_48px_-24px_rgba(0,0,0,0.8)] sm:px-6 sm:pt-7"
+        className="bg-chalk px-4 pb-4 pt-6 text-[#121110] shadow-[0_24px_48px_-24px_rgba(0,0,0,0.8)] sm:px-6 sm:pt-7 lg:pb-3 lg:pt-5 xl:pb-4 xl:pt-7 short:pb-3 short:pt-5"
       >
         <header className="flex items-end justify-between gap-4 border-b-2 border-[#121110] pb-3">
-          <h2 className="font-stage text-[2.5rem] font-black uppercase leading-[0.85] sm:text-[3rem]" id="setlist-title">
+          <h2 className="font-stage text-[2.5rem] font-black uppercase leading-[0.85] sm:text-[3rem] lg:text-[2.5rem] xl:text-[3rem] short:text-[2.5rem]" id="setlist-title">
             {dict.stage.setlist}
           </h2>
           <p className="mono-cap pb-1 text-right text-[rgba(18,17,16,0.72)]">

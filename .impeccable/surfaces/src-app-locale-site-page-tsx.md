@@ -34,7 +34,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 - Third tagline strip is pink (audio role), orange stays booking-only.
 - The admin hero image (band collage, must stay whole) is the band poster in Shows; the first viewport's photo plate is the live colour photo `public/assets/band-cards/typhoon-band-card.jpg`.
 - Booking section sits on deck black; orange = heading tape + submit.
-- Header at rest on the home page shows no small signature: the big hero signature is the mark in the same viewport (one logo per view); the header logo fades in once the hero has scrolled away and is always shown on other pages.
+- Owner 2026-09-27 ("Mobil sieht es gut aus, aber im Browser ist die Landing Page komisch"): desktop now uses the mobile composition — photo as a landscape band, setlist taped over its lower edge — plus a height-aware `short` variant for laptop screens; the header shows the small signature at all times (an empty left header read as broken).
 - Line-up photos get one monochrome treatment (grayscale + contrast) so colour snapshots and sepia crops read as one set.
 - Owner 2026-09-25: "Die Bühnen-Aufstellung ist hässlich und stimmt nicht, wir haben keine feste Bühnen-Aufstellung." The stage plot is removed; the line-up is a row of taped member cards (photo, name on gaffer, role on green tape, bio). Never show stage positions.
 
