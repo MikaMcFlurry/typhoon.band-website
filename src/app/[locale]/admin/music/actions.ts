@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
+import { revalidatePublicHome } from "@/lib/admin/revalidate";
 import { redirect } from "next/navigation";
 
 import { resolveLocale, requireAdminWithPasswordOk } from "@/lib/admin/auth";
@@ -113,7 +115,7 @@ export async function createSongAction(formData: FormData) {
   }
 
   revalidatePath(`/${locale}/admin/music`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   flashRedirect(locale, "created");
 }
 
@@ -163,7 +165,7 @@ export async function updateSongAction(formData: FormData) {
   }
 
   revalidatePath(`/${locale}/admin/music`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   flashRedirect(locale, "updated");
 }
 
@@ -178,6 +180,6 @@ export async function deleteSongAction(formData: FormData) {
   if (!result.ok) flashRedirect(locale, "error", result.reason);
 
   revalidatePath(`/${locale}/admin/music`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   flashRedirect(locale, "deleted");
 }

@@ -211,7 +211,7 @@ export default async function AdminBookingDetailPage({
                 className="rounded-md border border-[color:var(--line)] bg-transparent px-3 py-1.5 text-xs text-[color:var(--cream)]"
               >
                 {BOOKING_STATUSES.map((s) => (
-                  <option key={s} value={s} className="bg-[#0b0805]">
+                  <option key={s} value={s} className="bg-[#121110]">
                     {STATUS_LABEL[s]}
                   </option>
                 ))}

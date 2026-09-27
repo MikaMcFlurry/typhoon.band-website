@@ -127,7 +127,7 @@ export function Setlist({
   if (tracks.length === 0) return null;
 
   return (
-    <div className="relative" id="music">
+    <div className="relative">
       {/* Two pieces of pink tape hold the sheet on the floor. */}
       <span aria-hidden className="tape-piece -top-2.5 left-6 -rotate-6" />
       <span aria-hidden className="tape-piece -top-2.5 right-6 rotate-3" />

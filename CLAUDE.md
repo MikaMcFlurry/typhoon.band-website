@@ -53,8 +53,8 @@ refinements inherit DESIGN.md; a new visual world needs a new direction round.
 
 ## Non-negotiable frontend rule
 
-The root `DESIGN.md` controls (public site only; the admin keeps its own
-palette and fonts via the `.admin-root` wrapper):
+The root `DESIGN.md` controls (public site and, via the `.admin-root`
+token mapping, the admin's look):
 - player size
 - player card layout
 - spacing
@@ -76,11 +76,14 @@ Do not copy the old player card visual layout if it conflicts with DESIGN.md.
 Backend, admin, API, `src/lib/**`, `src/middleware.ts` and `supabase/**` are
 design-agnostic: a visual change never changes their behaviour.
 
-Content rules that stay: the repo fallback lists 8 members in the documented
-order (Typhoon, Mika, Schack, Hardy, Stefan, Tom, Buğra, Jürgen — never
-"Taifun", never "Daniel"); Supabase admin data overrides per slot (the live
-DB currently shows "Tan – Percussion" in the `jurgen` slot — owner to
-confirm), so never hard-code member names in copy. Only `booking@typhoon.band`
+Content rules that stay: the repo fallback lists 9 members in the documented
+order (Typhoon, Mika, Schack, Hardy, Stefan, Tom, Buğra, Jürgen, Malvin —
+Malvin on keys/piano per owner 2026-09-27; never "Taifun", never "Daniel");
+Supabase admin data overrides per slot (the live DB currently shows
+"Tan – Percussion" in the `jurgen` slot — owner to confirm), and further
+musicians are added in Admin → Members (new slugs are appended on the site),
+so never hard-code member names or a member count in copy. The band presents
+itself as a band: the hero shows the band image, not one member. Only `booking@typhoon.band`
 (no `info@`), never invent show dates, no placeholder badges, no horizontal
 overflow on mobile (test 320/390 px).
 

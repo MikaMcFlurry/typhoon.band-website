@@ -188,3 +188,23 @@ export async function saveMember(args: SaveMemberArgs): Promise<MutationResult> 
 
   return { ok: true };
 }
+
+// Removes a member row (translations cascade). Only used for musicians
+// added in Admin; the repo fallback slugs are hidden instead, because
+// deleting their row would just bring the static fallback back.
+export async function deleteMemberBySlug(slug: string): Promise<MutationResult> {
+  const supabase = getAdminSupabase();
+  if (!supabase) return { ok: false, reason: "supabase-not-configured" };
+  const { error } = await supabase.from("band_members").delete().eq("slug", slug);
+  if (error) return { ok: false, reason: error.message };
+  return { ok: true };
+}
+
+// Slugs already taken in the DB (for the "new member" form).
+export async function listMemberSlugs(): Promise<string[] | null> {
+  const supabase = getAdminSupabase();
+  if (!supabase) return null;
+  const { data, error } = await supabase.from("band_members").select("slug");
+  if (error) return null;
+  return (data ?? []).map((r) => r.slug);
+}

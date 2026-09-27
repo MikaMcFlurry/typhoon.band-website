@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
+import { revalidatePublicHome } from "@/lib/admin/revalidate";
 import { redirect } from "next/navigation";
 
 import { resolveLocale, requireAdminWithPasswordOk } from "@/lib/admin/auth";
@@ -115,6 +117,6 @@ export async function convertBookingToShowAction(formData: FormData) {
   revalidatePath(paths.detail);
   revalidatePath(paths.list);
   revalidatePath(`/${locale}/admin/shows`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   redirect(`${paths.detail}?converted=1`);
 }

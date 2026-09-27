@@ -61,11 +61,11 @@ src/
       layout.tsx                # root layout: <html lang>, fonts (Big Shoulders + Schibsted Grotesk + Martian Mono), metadata, DictProvider
       (site)/                   # public site (route group, URLs unchanged)
         layout.tsx              # AudioPlayerProvider, Header, Footer, PlayerDock, ConsentBanner, MotionInit, LiveLevel
-        page.tsx                # one-pager: Hero + Setlist → Shows (+ band poster) → Band/Line-up → Photos → Booking
+        page.tsx                # one-pager: Hero (band poster) → Music (setlist) → Shows → Band/Line-up → Photos → Booking
         legal/{imprint,privacy,cookies}/page.tsx  # Admin Markdown or curated fallback (src/content/legal.ts)
         not-found.tsx, [...rest]/page.tsx         # styled 404
       admin/                    # protected Admin (own chrome, noindex)
-        layout.tsx              # admin top bar + own fonts (.admin-root); auth gating happens per route
+        layout.tsx              # admin top bar (.admin-root = Version B look); auth gating happens per route
         login/, change-password/, booking/, shows/, media/, music/, members/,
         settings/assets/, legal/, seo/, platform-links/, consent/
     api/booking/route.ts        # POST handler (same-origin JSON, rate limit, validation, Supabase + Resend)
@@ -75,7 +75,7 @@ src/
     audio/                      # AudioPlayerProvider, Waveform, Setlist, PlayerDock, PlayTrackButton, LiveLevel
     consent/                    # consent contract, ConsentBanner, ExternalMediaGate, settings button
     legal/                      # LegalShell (safe renderer), LegalPage (shared server view)
-    sections/                   # Hero, Shows, Band, Lineup, Gallery, Booking, BookingForm
+    sections/                   # Hero, Music, Shows, Band, Lineup, Gallery, Booking, BookingForm
     site/                       # Header, Footer, LocaleSwitcher, PlatformLinks, MotionInit
     ui/                         # Icon set
   content/legal.ts              # fallback legal texts DE/EN/TR (not legal advice)
@@ -322,8 +322,11 @@ Auth + an active row in `admin_profiles`.
   title/alt/sort, hide, delete).
 - Music (demos): `/[locale]/admin/music` (upload/replace MP3 + cover,
   visibility, featured flag, sort).
-- Members (photos): `/[locale]/admin/members` (upload/replace photo by
-  slug, sort, visibility — names/roles/bios stay dictionary-driven).
+- Members: `/[locale]/admin/members` — edit every musician (photo, name,
+  instrument, bio in DE/EN/TR, sort, visibility), **add new musicians**
+  ("Neues Mitglied": name + instrument required, slug from the name) and
+  delete musicians that were added in Admin (repo members are hidden
+  instead). New slugs appear on the site automatically.
 - Site assets: `/[locale]/admin/settings/assets` (replace hero image,
   hero signature, bandinfo image; clearing falls back to repo asset).
 - Legal: `/[locale]/admin/legal` (imprint/privacy/cookies × de/en/tr,
@@ -417,11 +420,12 @@ record for an asset:
   `hero_image`, `hero_signature`, `bandinfo_image` (JSON `{ "url": "…" }`).
 - Gallery: visible rows in `media_items` (category `gallery`).
 - Demos: visible + streamable rows in `songs`. The featured flag chooses
-  the song shown above the demo list.
-- Members: **per-slug merge**. The 8 fallback musicians always render
+  the song the hero's play button starts and marks it in the setlist.
+- Members: **per-slug merge**. The 9 fallback musicians always render
   unless a matching Supabase row sets `is_visible = false`. A row that
   carries a photo, sort or translation overrides only that one member;
-  the other 7 stay visible. Apply
+  the others stay visible. Rows with slugs outside the fallback list
+  (musicians added in Admin) are appended, ordered by `sort_order`. Apply
   `supabase/policies/0006_phase05_member_full_read.sql` so the public
   client can see hidden member rows (without it, hidden members would
   silently fall back to the repo and render again).

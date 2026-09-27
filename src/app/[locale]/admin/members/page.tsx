@@ -9,13 +9,17 @@ import {
 
 import { AdminShell } from "../_components/AdminShell";
 
+import { DeleteMemberForm } from "./DeleteMemberForm";
 import { MemberForm } from "./MemberForm";
+import { NewMemberForm } from "./NewMemberForm";
 
 export const metadata = { title: "Admin · Members" };
 export const dynamic = "force-dynamic";
 
 type RowView = {
   slug: string;
+  /** Added in Admin (not part of src/data/members.ts) → can be deleted. */
+  extra: boolean;
   fallback: {
     name: string;
     role: string;
@@ -49,11 +53,12 @@ function buildRows(rows: AdminMemberWithTranslations[]): RowView[] {
   const bySlug = new Map<string, AdminMemberWithTranslations>();
   for (const r of rows) bySlug.set(r.slug, r);
 
-  // The static fallback file is the canonical source for "the band has
-  // these 8 musicians" — Admin can later add extras via Supabase, but the
-  // fallback list must always be editable so a fresh DB shows all 8.
-  return fallbackMembers.map((m) => ({
+  // Repo members (src/data/members.ts) are always editable so a fresh DB
+  // still shows the whole band; musicians added in Admin follow after
+  // them and can also be deleted.
+  const base: RowView[] = fallbackMembers.map((m) => ({
     slug: m.id,
+    extra: false,
     fallback: {
       name: m.name,
       role: m.role,
@@ -64,6 +69,27 @@ function buildRows(rows: AdminMemberWithTranslations[]): RowView[] {
     fallbackByLocale: buildFallbackByLocale(m.id, m.name, m.role, m.bio),
     db: bySlug.get(m.id) ?? null,
   }));
+
+  const fallbackSlugs = new Set(fallbackMembers.map((m) => m.id));
+  const extras: RowView[] = rows
+    .filter((r) => !fallbackSlugs.has(r.slug))
+    .map((r) => {
+      const de = r.translations.find((t) => t.locale === "de") ?? r.translations[0];
+      const name = de?.name ?? r.slug;
+      const role = de?.role ?? "";
+      const bio = de?.bio_md ?? "";
+      const byLocale: RowView["fallbackByLocale"] = {};
+      for (const l of LOCALES) byLocale[l] = { name, role, bio };
+      return {
+        slug: r.slug,
+        extra: true,
+        fallback: { name, role, bio, photoUrl: "", sortOrder: r.sort_order },
+        fallbackByLocale: byLocale,
+        db: r,
+      };
+    });
+
+  return [...base, ...extras];
 }
 
 export default async function AdminMembersPage({
@@ -74,6 +100,8 @@ export default async function AdminMembersPage({
   searchParams: Promise<{
     saved?: string;
     cleared?: string;
+    created?: string;
+    deleted?: string;
     error?: string;
   }>;
 }) {
@@ -89,9 +117,15 @@ export default async function AdminMembersPage({
   const flashMessage =
     flash.saved === "1"
       ? "Mitglied wurde gespeichert."
-      : flash.cleared === "1"
-        ? "Foto wurde entfernt — Fallback aus dem Repo greift wieder."
-        : null;
+      : flash.created === "1"
+        ? "Neues Mitglied wurde angelegt und erscheint auf der Website."
+        : flash.deleted === "1"
+          ? "Mitglied wurde gelöscht."
+          : flash.cleared === "1"
+            ? "Foto wurde entfernt — Fallback aus dem Repo greift wieder."
+            : null;
+  const nextSort =
+    rows.reduce((max, r) => Math.max(max, r.db?.sort_order ?? r.fallback.sortOrder), 0) + 1;
   const errorMessage = flash.error ? flash.error : null;
 
   return (
@@ -104,8 +138,10 @@ export default async function AdminMembersPage({
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[color:var(--muted-cream)]">
           Pro Mitglied können Foto, Sichtbarkeit, Sortierung sowie Name,
           Instrument und Kurz-Bio (DE Pflicht, EN/TR optional) gepflegt werden.
-          Solange ein Sprachfeld leer bleibt, greift der Dictionary-Fallback.
-          Uploads laufen direkt aus dem Browser in Supabase Storage.
+          Neue Musiker legst du unten mit „Neues Mitglied“ an; sie erscheinen
+          sofort in der Besetzung auf der Website. Stammmitglieder werden über
+          „Auf der Website anzeigen“ ausgeblendet, neu angelegte können auch
+          gelöscht werden. Die Reihenfolge auf der Website folgt „Sortierung“.
         </p>
       </header>
 
@@ -128,6 +164,13 @@ export default async function AdminMembersPage({
         </div>
       ) : null}
 
+      <section aria-labelledby="new-member" className="panel mt-6 p-4 md:p-5">
+        <h3 id="new-member" className="font-display text-lg font-semibold">
+          Neues Mitglied
+        </h3>
+        <NewMemberForm locale={locale} nextSort={nextSort} />
+      </section>
+
       <ul className="mt-6 grid gap-4 md:grid-cols-2">
         {rows.map((view) => (
           <li key={view.slug} className="panel p-4">
@@ -137,7 +180,9 @@ export default async function AdminMembersPage({
               fallback={view.fallback}
               fallbackByLocale={view.fallbackByLocale}
               db={view.db}
+              extra={view.extra}
             />
+            {view.extra ? <DeleteMemberForm locale={locale} slug={view.slug} /> : null}
           </li>
         ))}
       </ul>

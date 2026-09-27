@@ -697,7 +697,7 @@ a {
   .field select:focus-visible,
   .input:focus-visible {
     border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(214, 179, 106, 0.22);
+    box-shadow: none;
   }
   .field textarea {
     min-height: 140px;
@@ -713,16 +713,116 @@ a {
   }
 }
 
+/* Admin in the Version B stage world (owner 2026-09-27). The admin TSX
+   keeps its token names (ink / paper / gold / line …); here they are
+   re-pointed at the stage palette: deck black, chalk text, orange for the
+   primary action, square corners, Big Shoulders headings, mono labels. */
 .admin-root {
-  --font-body: var(--font-archivo);
-  --font-display: var(--font-newsreader);
-  --focus: var(--gold-hi);
+  --ink-rgb: 18 17 16;
+  --ink-2-rgb: 27 25 23;
+  --ink-3-rgb: 38 35 32;
+  --paper-rgb: 238 235 228;
+  --paper-2-rgb: 170 165 156;
+  --paper-3-rgb: 142 137 128;
+  --gold-rgb: 255 107 26;
+  --gold-hi-rgb: 238 235 228;
+  --gold-lo-rgb: 142 137 128;
+  --ink: #121110;
+  --ink-2: #1b1917;
+  --ink-3: #262320;
+  --ink-4: #2f2b28;
+  --line: rgba(238, 235, 228, 0.16);
+  --line-2: rgba(238, 235, 228, 0.34);
+  --paper: #eeebe4;
+  --paper-2: #aaa59c;
+  --paper-3: #8e8980;
+  --gold: #ff6b1a;
+  --gold-hi: #eeebe4;
+  --gold-lo: #8e8980;
+  --on-gold: #121110;
+  --danger: #ff8a7a;
+  --ok: #3ddc84;
+  --r-sm: 0px;
+  --r-md: 0px;
+  --r-pill: 0px;
+  --bg: var(--ink);
+  --bg-2: var(--ink-2);
+  --bg-3: var(--ink-3);
+  --panel: var(--ink-2);
+  --panel-strong: rgba(27, 25, 23, 0.96);
+  --bronze: var(--gold-lo);
+  --deep-gold: #ff6b1a;
+  --gold-soft: #eeebe4;
+  --cream: var(--paper);
+  --muted-cream: var(--paper-2);
+  --muted: var(--paper-3);
+  --line-strong: var(--line-2);
+  --radius-card: 0px;
+  --radius-button: 0px;
+  --font-display: var(--font-stage);
+  --focus: var(--chalk);
   background: var(--ink);
   color: var(--paper);
-  font-family: var(--font-archivo), system-ui, sans-serif;
-  line-height: 1.6;
+  font-family: var(--font-body), system-ui, sans-serif;
+  line-height: 1.55;
 }
 .admin-root ::selection {
-  background: var(--gold);
-  color: var(--on-gold);
+  background: var(--tape-pink);
+  color: var(--on-tape);
+}
+.admin-root h1,
+.admin-root h2,
+.admin-root h3 {
+  font-family: var(--font-stage), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.admin-root .kicker,
+.admin-root .label,
+.admin-root .eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-stretch: 87.5%;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+.admin-root .eyebrow {
+  color: var(--paper);
+}
+.admin-root .rounded,
+.admin-root .rounded-full,
+.admin-root .rounded-2xl,
+.admin-root .rounded-3xl,
+.admin-root .rounded-lg,
+.admin-root .rounded-xl {
+  border-radius: 0;
+}
+.admin-root .btn {
+  font-family: var(--font-stage), "Arial Narrow", sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-width: 2px;
+}
+.admin-root .btn-primary:hover {
+  background: var(--paper);
+}
+.admin-root .btn-secondary:hover {
+  border-color: var(--paper);
+  color: var(--paper);
+}
+.admin-root .field input:focus-visible,
+.admin-root .field textarea:focus-visible,
+.admin-root .field select:focus-visible,
+.admin-root .input:focus-visible,
+.admin-root input:focus,
+.admin-root textarea:focus,
+.admin-root select:focus {
+  border-color: var(--gold);
+  box-shadow: none;
+}
+.admin-root input[type="checkbox"] {
+  accent-color: var(--tape-green);
 }

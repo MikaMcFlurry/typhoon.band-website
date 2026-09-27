@@ -47,7 +47,7 @@ const CARDS: DashboardCard[] = [
   {
     key: "members",
     label: "Members",
-    description: "Bandmitglieder-Fotos hochladen und Sichtbarkeit pflegen.",
+    description: "Musiker anlegen, Foto, Name, Instrument und Bio pflegen, Reihenfolge und Sichtbarkeit.",
     status: "live",
   },
   {
@@ -102,8 +102,9 @@ export default async function AdminHomePage({
           Admin Dashboard
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[color:var(--muted-cream)]">
-          Diese Phase liefert nur die Auth-Hülle und einen schreibgeschützten
-          Booking-Überblick. Alle weiteren Module folgen schrittweise.
+          Hier pflegst du alles, was auf typhoon.band erscheint: Anfragen,
+          Termine, Musik, Besetzung, Bilder, Texte und Links. Änderungen sind
+          nach dem Speichern sofort auf der Website sichtbar.
         </p>
       </header>
 

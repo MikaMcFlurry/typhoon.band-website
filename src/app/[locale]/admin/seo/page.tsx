@@ -95,7 +95,7 @@ export default async function AdminSeoPage({
               placeholder="/"
               required
               maxLength={200}
-              className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             />
             <datalist id="seo-path-suggestions">
               {SUGGESTED_PATHS.map((p) => (
@@ -108,7 +108,7 @@ export default async function AdminSeoPage({
             <select
               name="entry_locale"
               defaultValue="de"
-              className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             >
               {LOCALES.map((l) => (
                 <option key={l} value={l}>
@@ -123,7 +123,7 @@ export default async function AdminSeoPage({
               type="text"
               name="title"
               maxLength={80}
-              className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             />
           </label>
           <label className="grid gap-1 text-xs uppercase tracking-[0.22em] text-[color:var(--muted-cream)] md:col-span-2">
@@ -132,7 +132,7 @@ export default async function AdminSeoPage({
               name="description"
               maxLength={180}
               rows={3}
-              className="resize-y rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="resize-y rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             />
           </label>
           <label className="grid gap-1 text-xs uppercase tracking-[0.22em] text-[color:var(--muted-cream)] md:col-span-2">
@@ -142,7 +142,7 @@ export default async function AdminSeoPage({
               name="og_image_url"
               placeholder="https://…/og.jpg"
               maxLength={500}
-              className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             />
           </label>
           <div className="md:col-span-2">

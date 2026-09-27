@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
+import { revalidatePublicHome } from "@/lib/admin/revalidate";
 import { redirect } from "next/navigation";
 
 import { resolveLocale, requireAdminWithPasswordOk } from "@/lib/admin/auth";
@@ -41,7 +43,7 @@ export async function createShowAction(formData: FormData) {
   if (!created.ok) throw new Error(created.reason);
 
   revalidatePath(`/${locale}/admin/shows`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   redirect(`/${locale}/admin/shows?created=1`);
 }
 
@@ -60,7 +62,7 @@ export async function updateShowAction(formData: FormData) {
 
   revalidatePath(`/${locale}/admin/shows`);
   revalidatePath(`/${locale}/admin/shows/${id}/edit`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   redirect(`/${locale}/admin/shows?updated=1`);
 }
 
@@ -75,7 +77,7 @@ export async function deleteShowAction(formData: FormData) {
   if (!result.ok) throw new Error(result.reason);
 
   revalidatePath(`/${locale}/admin/shows`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
   redirect(`/${locale}/admin/shows?deleted=1`);
 }
 
@@ -93,5 +95,5 @@ export async function toggleShowVisibilityAction(formData: FormData) {
   if (!result.ok) throw new Error(result.reason);
 
   revalidatePath(`/${locale}/admin/shows`);
-  revalidatePath(`/${locale}`);
+  revalidatePublicHome();
 }

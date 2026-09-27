@@ -228,6 +228,7 @@ const memberInstruments: Record<string, Record<Locale, string>> = {
   tom: { de: "Schlagzeug", en: "Drums", tr: "Davul" },
   bugra: { de: "Gitarre", en: "Guitar", tr: "Gitar" },
   jurgen: { de: "Gitarre", en: "Guitar", tr: "Gitar" },
+  malvin: { de: "Keys & Klavier", en: "Keys & piano", tr: "Klavye & piyano" },
 };
 
 const memberBios: Record<string, Record<Locale, string>> = {

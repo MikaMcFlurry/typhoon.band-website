@@ -10,8 +10,11 @@ export type BandMember = {
   sortOrder: number;
 };
 
-// Source of truth: docs/03-content-facts.md and docs/typhoon-design-fix-v5.md.
+// Source of truth: docs/03-content-facts.md and docs/typhoon-design-fix-v5.md,
+// plus owner 2026-09-27: Malvin plays keys/piano. More musicians are added
+// in Admin → Members (any new slug is appended on the site automatically).
 // Gold rule: Typhoon (not Taifun), Schack on Sax, Jürgen on guitar, no Daniel.
+// A member without a photo or bio shows none (never an invented one).
 export const members: BandMember[] = [
   {
     id: "typhoon",
@@ -82,5 +85,13 @@ export const members: BandMember[] = [
     bio: "Gitarrensound zwischen Rhythmus, Wärme und rockiger Kante.",
     isPlaceholder: true,
     sortOrder: 8,
+  },
+  {
+    id: "malvin",
+    name: "Malvin",
+    role: "Keys & Klavier",
+    photo: "",
+    bio: "",
+    sortOrder: 9,
   },
 ];

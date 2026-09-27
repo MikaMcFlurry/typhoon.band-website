@@ -103,7 +103,7 @@ export default async function AdminPlatformLinksPage({
               name="platform"
               required
               defaultValue={missing[0] ?? PLATFORM_KEYS[0]}
-              className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             >
               {PLATFORM_KEYS.map((p) => (
                 <option key={p} value={p}>
@@ -120,7 +120,7 @@ export default async function AdminPlatformLinksPage({
               placeholder="https://…"
               required
               maxLength={500}
-              className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             />
           </label>
           <label className="grid gap-1 text-xs uppercase tracking-[0.22em] text-[color:var(--muted-cream)]">
@@ -130,7 +130,7 @@ export default async function AdminPlatformLinksPage({
               name="sort_order"
               defaultValue={0}
               min={0}
-              className="w-24 rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+              className="w-24 rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
             />
           </label>
           <label className="flex items-center gap-2 text-xs text-[color:var(--muted-cream)]">
@@ -171,7 +171,7 @@ export default async function AdminPlatformLinksPage({
                       <select
                         name="platform"
                         defaultValue={row.platform}
-                        className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+                        className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
                       >
                         {PLATFORM_KEYS.map((p) => (
                           <option key={p} value={p}>
@@ -188,7 +188,7 @@ export default async function AdminPlatformLinksPage({
                         defaultValue={row.url}
                         required
                         maxLength={500}
-                        className="rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+                        className="rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
                       />
                     </label>
                     <label className="grid gap-1 text-xs uppercase tracking-[0.22em] text-[color:var(--muted-cream)]">
@@ -198,7 +198,7 @@ export default async function AdminPlatformLinksPage({
                         name="sort_order"
                         defaultValue={row.sort_order}
                         min={0}
-                        className="w-24 rounded-md border border-[color:var(--line)] bg-[#080604] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
+                        className="w-24 rounded-md border border-[color:var(--line)] bg-[#121110] px-3 py-2 text-sm text-[color:var(--cream)] outline-none focus:border-[color:var(--gold-soft)]"
                       />
                     </label>
                     <label className="flex items-center gap-2 text-xs text-[color:var(--muted-cream)]">

@@ -11,7 +11,13 @@ export function Lineup({ members }: { members: Member[] }) {
   if (members.length === 0) return null;
 
   return (
-    <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
+    <ul
+      className={`grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 ${
+        // 9 (or 6, 12 …) musicians read best as full rows of three;
+        // otherwise four per row on large screens.
+        members.length % 3 === 0 && members.length % 4 !== 0 ? "lg:grid-cols-3 lg:gap-x-10" : "lg:grid-cols-4"
+      }`}
+    >
       {members.map((m, i) => (
         <li
           className="reveal"
@@ -20,13 +26,24 @@ export function Lineup({ members }: { members: Member[] }) {
         >
           <article>
             <div className="relative aspect-[4/5] overflow-hidden bg-deck-3">
-              <Image
-                alt={`${m.name}, ${m.role}`}
-                className="object-cover object-top grayscale contrast-[1.08]"
-                fill
-                sizes="(min-width: 1024px) 300px, (min-width: 768px) 30vw, 50vw"
-                src={m.photoUrl}
-              />
+              {m.photoUrl ? (
+                <Image
+                  alt={`${m.name}, ${m.role}`}
+                  className="object-cover object-top grayscale contrast-[1.08]"
+                  fill
+                  sizes="(min-width: 1024px) 300px, (min-width: 768px) 30vw, 50vw"
+                  src={m.photoUrl}
+                />
+              ) : (
+                // No photo yet (e.g. a newly added musician): a quiet deck
+                // panel with the initial — no "placeholder" label.
+                <span
+                  aria-hidden
+                  className="absolute inset-0 flex items-center justify-center border border-rule font-stage text-[7rem] font-black uppercase leading-none text-chalk/10"
+                >
+                  {m.name.trim().charAt(0)}
+                </span>
+              )}
             </div>
             <h4 className="-mt-5 ml-2 font-stage text-[1.625rem] font-black uppercase leading-none sm:text-[2rem]">
               <span className={`tape relative ${i % 2 ? "rotate-[0.8deg]" : "-rotate-[0.8deg]"} inline-block max-w-full [overflow-wrap:break-word]`}>
