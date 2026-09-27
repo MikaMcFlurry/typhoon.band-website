@@ -61,7 +61,7 @@ src/
       layout.tsx                # root layout: <html lang>, fonts (Big Shoulders + Schibsted Grotesk + Martian Mono), metadata, DictProvider
       (site)/                   # public site (route group, URLs unchanged)
         layout.tsx              # AudioPlayerProvider, Header, Footer, PlayerDock, ConsentBanner, MotionInit, LiveLevel
-        page.tsx                # one-pager: Hero (band poster) → Music (setlist) → Shows → Band/Line-up → Photos → Booking
+        page.tsx                # one-pager: Hero (band poster + setlist) → Shows → Band/Line-up → Photos → Booking
         legal/{imprint,privacy,cookies}/page.tsx  # Admin Markdown or curated fallback (src/content/legal.ts)
         not-found.tsx, [...rest]/page.tsx         # styled 404
       admin/                    # protected Admin (own chrome, noindex)
@@ -75,7 +75,7 @@ src/
     audio/                      # AudioPlayerProvider, Waveform, Setlist, PlayerDock, PlayTrackButton, LiveLevel
     consent/                    # consent contract, ConsentBanner, ExternalMediaGate, settings button
     legal/                      # LegalShell (safe renderer), LegalPage (shared server view)
-    sections/                   # Hero, Music, Shows, Band, Lineup, Gallery, Booking, BookingForm
+    sections/                   # Hero, Shows, Band, Lineup, Gallery, Booking, BookingForm
     site/                       # Header, Footer, LocaleSwitcher, PlatformLinks, MotionInit
     ui/                         # Icon set
   content/legal.ts              # fallback legal texts DE/EN/TR (not legal advice)
@@ -486,7 +486,7 @@ repo assets and never reaches Storage.
   with members and `MusicEvent` for upcoming dated shows.
 - `/[locale]/admin/platform-links` — Spotify, YouTube, Instagram, Facebook,
   SoundCloud, Bandcamp. Active rows appear automatically in the footer and
-  as "Also on" links in the music section; none → the blocks are hidden.
+  as "Also on" links under the hero setlist; none → the blocks are hidden.
 - Consent: first visit shows a small non-blocking notice; the footer button
   "Datenschutz-Einstellungen" reopens it as a dialog (focus trap, Esc).
   Stored only in `localStorage` (`typhoon.consent.v1`; the old key

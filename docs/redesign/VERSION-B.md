@@ -77,9 +77,9 @@ off under reduced motion.
 | Area | Live site (`main`) | Version A (redesign branch) | Version B (this branch) |
 |---|---|---|---|
 | World | dark sepia/gold, handoff layout | cinematic record sleeve: sepia photos, antique gold, Newsreader serif + Archivo | stage floor: deck black, gaffer tape, spike-tape roles; Big Shoulders + Schibsted + Martian Mono |
-| First screen | collage + serif headline, player card below | collage with signature bleeding into a featured player | big gold signature, tagline laid as three tape strips, **setlist with all six songs** taped over a colour live photo; play + booking CTAs |
+| First screen | collage + serif headline, player card below | collage with signature bleeding into a featured player | big gold signature, tagline laid as three tape strips, band collage as a taped poster with the **setlist of all demos** taped over its bottom margin; play + booking CTAs |
 | Music | featured player + list | featured player + record-sleeve tracklist (4 + "show all") | the setlist *is* the tracklist; the active row shows a waveform and pink tape; persistent dock |
-| Shows | TBA placeholder cards | list / honest empty state | dates on blue tape next to the **band poster** (admin hero image, always shown whole); honest empty state → booking |
+| Shows | TBA placeholder cards | list / honest empty state | dates on blue tape; honest empty state → booking |
 | Band | image + text, member cards | editorial split + member cards with bios | statement headline, story, rider-style facts, member cards with name on gaffer tape, instrument on green tape and bio |
 | Photos | grid + lightbox | contact sheet + viewer | taped contact sheet with frame numbers + the same viewer |
 | Booking | form | facts + poster + form | rider: orange tape heading, facts, direct line, form with a **live request preview above submit**; errors re-check while typing |
@@ -183,8 +183,12 @@ pass**
 
 - **Band first:** the hero now shows the band collage (Admin → Site assets →
   hero image), whole, as a taped poster. The singer's single photo left the
-  hero; the setlist moved to its own "Hör rein" section right after it.
-  Termine no longer repeats the collage.
+  hero; Termine no longer repeats the collage.
+- **Setlist back in the hero** (owner: "Mir hat die Setlist im Header sehr
+  gut gefallen"): the sheet is taped over the poster's bottom paper margin
+  (covers ≤13% of the poster height, never a musician); the separate music
+  section is gone. Poster, setlist and both CTAs fit the first viewport at
+  1024x768, 1166x830, 1280x800, 1366x768, 1440x900, 1536x864 and 1920x1080.
 - **Line-up can grow:** Malvin (Keys & Klavier) is in the repo line-up and
   shows on the live site even before he has a DB row. Admin → Members can
   now add musicians ("Neues Mitglied"), edit and hide everyone, and delete
@@ -209,7 +213,7 @@ pass**
   production Supabase and Resend, so **do not send test bookings there**.
 - The live gallery (Admin → Media) repeats frames:
   - the singer photo appears twice
-  - the band collage is also the Termine poster
+  - the band collage is also the hero poster
 
   Removing the duplicates makes the contact sheet stronger.
 - Line-up slot 8 (live: "Tan – Percussion") and the live bio typos
