@@ -76,6 +76,10 @@ const config: Config = {
       },
       screens: {
         xs: "420px",
+        // Desktop windows with little height (1280x800, 1366x768 laptops):
+        // the hero switches to its compact sizes so it fits one screen.
+        // Listed last so it wins over lg/xl.
+        short: { raw: "(min-width: 1024px) and (max-height: 879px)" },
       },
     },
   },

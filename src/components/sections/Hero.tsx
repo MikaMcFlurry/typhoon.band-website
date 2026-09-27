@@ -6,9 +6,9 @@ import type { Dict } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/locales";
 
 // First viewport: the gold signature is the name, the tagline is laid as
-// three strips of tape; on the right a real colour stage photo with the
-// setlist taped over its corner: one tap plays a song. The one orange
-// action is booking.
+// three strips of tape; on the right a real colour stage photo band with
+// the setlist taped over its lower edge: one tap plays a song. The one
+// orange action is booking.
 
 function titleCase(line: string, locale: Locale) {
   const lower = line.toLocaleLowerCase(locale);
@@ -44,12 +44,12 @@ export function Hero({
       className="relative overflow-x-clip pt-[var(--header-h)]"
       id="home"
     >
-      <div className="shell grid gap-x-10 gap-y-14 pb-20 pt-6 md:pb-28 md:pt-10 lg:grid-cols-12 lg:items-center xl:min-h-[calc(100svh-var(--header-h))] xl:pb-16">
+      <div className="shell grid gap-x-10 gap-y-14 pb-20 pt-6 md:pb-28 md:pt-10 short:pt-4 lg:grid-cols-12 lg:items-center xl:min-h-[calc(100svh-var(--header-h))] xl:pb-16">
         <div className="lg:col-span-6 xl:col-span-7">
           <h1 id="hero-title">
             <Image
               alt="Typhoon"
-              className="h-auto w-[min(86%,480px)] -translate-x-[2%] lg:w-[min(88%,560px)]"
+              className="h-auto w-[min(86%,480px)] -translate-x-[2%] lg:w-[min(80%,460px)] xl:w-[min(88%,560px)] short:w-[min(80%,400px)]"
               fetchPriority="high"
               height={724}
               priority
@@ -57,7 +57,7 @@ export function Hero({
               src={signatureUrl}
               width={2099}
             />
-            <span className="mt-6 flex flex-col items-start gap-2 font-stage text-[clamp(2.5rem,0.9rem+7vw,6rem)] lg:text-[4.25rem] xl:text-[clamp(2.5rem,0.9rem+7vw,6rem)] font-black uppercase leading-[0.92] md:mt-8">
+            <span className="mt-6 flex flex-col items-start gap-2 font-stage text-[clamp(2.5rem,0.9rem+7vw,6rem)] lg:text-[4.25rem] xl:text-[clamp(2.5rem,0.9rem+7vw,6rem)] short:text-[4.25rem] font-black uppercase leading-[0.92] md:mt-8 short:mt-5">
               {STRIPS.map((s, i) => (
                 <span
                   className={`lay ${s.tape} ${s.tilt} origin-left`}
@@ -70,7 +70,7 @@ export function Hero({
             </span>
           </h1>
 
-          <p className="mono-cap mt-8 flex flex-wrap gap-x-2 gap-y-1 text-chalk-2">
+          <p className="mono-cap mt-8 flex flex-wrap gap-x-2 gap-y-1 text-chalk-2 short:mt-6">
             {dict.brand.genres.map((g, i) => (
               <span key={g}>
                 {i > 0 ? <span aria-hidden className="mr-2 text-chalk-3">/</span> : null}
@@ -80,7 +80,7 @@ export function Hero({
           </p>
           <p className="copy-lg mt-4">{dict.hero.description}</p>
 
-          <div className="mt-8 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
+          <div className="mt-8 flex flex-col gap-3 xs:flex-row xs:flex-wrap short:mt-6">
             {featured ? (
               <PlayTrackButton id={featured.id} src={featured.src} title={featured.title} />
             ) : null}
@@ -91,21 +91,21 @@ export function Hero({
           </div>
         </div>
 
-        <div className="relative lg:col-span-6 lg:pt-[40%] xl:col-span-5 xl:pt-[44%]">
-          {/* Stage photo plate (real colour live photo) carries the right
-              columns; the setlist is taped over its lower-left quadrant so
-              the face and the keys stay clear. */}
-          <figure className="relative -mx-4 aspect-[16/10] overflow-hidden bg-deck-3 sm:mx-0 lg:absolute lg:right-0 lg:top-0 lg:mx-0 lg:aspect-auto lg:h-[calc(100%-5rem)] lg:w-[70%] xl:w-[74%]">
+        <div className="relative lg:col-span-6 xl:col-span-5">
+          {/* Same composition on every width (the owner liked mobile): a
+              landscape band of the colour stage photo, the setlist taped
+              over its lower edge. The face stays clear above the sheet. */}
+          <figure className="relative -mx-4 aspect-[16/10] overflow-hidden bg-deck-3 sm:mx-0 lg:aspect-[2/1] xl:aspect-[16/9] short:aspect-[2/1]">
             <Image
               alt={dict.hero.photoAlt}
-              className="object-cover object-[72%_35%] lg:object-[74%_center]"
+              className="object-cover object-[72%_30%]"
               fill
               loading="eager"
               sizes="(min-width: 1024px) 30vw, 100vw"
               src={STAGE_PHOTO}
             />
           </figure>
-          <div className="relative z-10 -mt-14 sm:-mt-20 lg:mt-0 lg:w-[88%] lg:rotate-[1deg] xl:w-[82%]">
+          <div className="relative z-10 -mt-14 sm:-mt-20 lg:mx-5 lg:-mt-20 lg:rotate-[0.8deg] xl:-mt-24 short:-mt-20">
             <Setlist featuredId={featured?.id ?? null} footer={setlistFooter} tracks={tracks} />
           </div>
         </div>

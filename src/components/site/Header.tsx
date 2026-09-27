@@ -8,9 +8,8 @@ import { useDict } from "@/components/i18n/DictProvider";
 import { LocaleSwitcher } from "@/components/site/LocaleSwitcher";
 import { Icon } from "@/components/ui/Icon";
 
-// Top strip. On the home page the big signature lives in the hero, so the
-// small one fades in only after the hero has scrolled away. Booking is the
-// one orange tape; every other link is plain mono.
+// Top strip: small gold signature left (always, so the bar never reads
+// empty), mono nav, language switch, and the one orange booking tape.
 
 const SECTIONS = ["music", "shows", "band", "media"] as const;
 type SectionId = (typeof SECTIONS)[number] | "booking";
@@ -26,7 +25,6 @@ export function Header({
   const pathname = usePathname() ?? "";
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
   const [scrolled, setScrolled] = useState(false);
-  const [pastHero, setPastHero] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<SectionId | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -48,7 +46,6 @@ export function Header({
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 16);
-      setPastHero(window.scrollY > window.innerHeight * 0.45);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -124,8 +121,6 @@ export function Header({
     setOpen(false);
   }, [pathname]);
 
-  const showLogo = !isHome || pastHero || open;
-
   return (
     <>
       <header
@@ -137,11 +132,8 @@ export function Header({
         <div className="shell flex h-full items-center justify-between gap-4">
           <Link
             aria-label={dict.a11y.home}
-            className={`relative -ml-1 flex-none p-1 transition-opacity duration-300 ${
-              showLogo ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
+            className="relative -ml-1 flex-none p-1"
             href={isHome ? "#top" : `/${locale}`}
-            tabIndex={showLogo ? undefined : -1}
           >
             <Image
               alt="Typhoon"
