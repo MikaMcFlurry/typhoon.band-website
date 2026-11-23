@@ -133,7 +133,12 @@ export function Header({
         // After the link's own fragment navigation and the browser's focus
         // fix-up for the now inert sheet, both of which reset focus (Firefox
         // does the latter a little later, hence the second attempt).
-        const focusHeading = () => heading.focus({ preventScroll: true });
+        const sheetNode = sheet;
+        const focusHeading = () => {
+          const active = document.activeElement;
+          const dropped = !active || active === document.body || (sheetNode?.contains(active) ?? false);
+          if (dropped) heading.focus({ preventScroll: true });
+        };
         requestAnimationFrame(focusHeading);
         window.setTimeout(focusHeading, 150);
       } else {

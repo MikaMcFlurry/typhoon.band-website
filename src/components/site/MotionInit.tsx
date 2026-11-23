@@ -67,6 +67,14 @@ export function MotionInit() {
 
     const mo = new MutationObserver((records) => {
       const found: HTMLElement[] = [];
+      if (records.some((r) => r.removedNodes.length > 0)) {
+        for (const watch of Array.from(targetsOf.keys())) {
+          if (!watch.isConnected) {
+            io.unobserve(watch);
+            targetsOf.delete(watch);
+          }
+        }
+      }
       for (const record of records) {
         record.addedNodes.forEach((node) => {
           if (!(node instanceof HTMLElement)) return;

@@ -887,7 +887,7 @@ const tr: Dict = {
       "Typhoon, Türkçe sözleri blues rock, funk, soul, caz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede enerji dolu.",
     ctaListen: "Şarkıları dinleyin",
     ctaBook: "Typhoon'u davet edin",
-    playFeatured: "{title} dinleyin",
+    playFeatured: "Dinleyin: {title}",
     photoAlt: "Typhoon solisti kırmızı klavyelerde canlı",
     facts: ["Nefesli grubuyla {count} müzisyen", "Hechingen'den canlı grup"],
   },
@@ -1019,7 +1019,7 @@ const tr: Dict = {
       "Çevrimiçi gönderim şu anda kullanılamıyor. Lütfen booking@typhoon.band adresine yazın.",
     submitOk: "Talebiniz için teşekkürler. En kısa sürede size dönüş yapacağız.",
     submitOkTitle: "Talebiniz ulaştı",
-    submitAnother: "Yeni talep gönder",
+    submitAnother: "Yeni talep gönderin",
     submitError:
       "Talep gönderilemedi. Lütfen daha sonra tekrar deneyin ya da bize doğrudan yazın.",
     errors: {
@@ -1128,7 +1128,7 @@ const tr: Dict = {
   },
   stage: {
     setlist: "Set listesi",
-    setlistNote: "Dinlemek için dokun · yalnızca dinleme, indirme yok",
+    setlistNote: "Dinlemek için dokunun · yalnızca dinleme, indirme yok",
     previewTitle: "Talebin bize böyle ulaşır",
     previewTo: "Alıcı",
     previewFrom: "Gönderen",

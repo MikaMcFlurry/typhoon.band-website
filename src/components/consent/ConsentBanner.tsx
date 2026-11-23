@@ -130,7 +130,7 @@ export function ConsentBanner() {
     return (
       <section
         aria-label={dict.cookies.title}
-        className="fixed inset-x-2 z-[60] bg-chalk p-4 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110] sm:inset-x-6 md:flex md:items-center md:gap-8 md:px-6 md:py-4"
+        className="fixed inset-x-2 z-[60] max-h-[calc(100dvh-16px)] overflow-y-auto bg-chalk p-4 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110] sm:inset-x-6 md:flex md:items-center md:gap-8 md:px-6 md:py-4"
         style={{ bottom: "calc(var(--dock-h) + 8px)" }}
       >
         <div className="min-w-0 md:flex-1">
@@ -159,7 +159,7 @@ export function ConsentBanner() {
       <div
         aria-labelledby="consent-title"
         aria-modal="true"
-        className="w-full max-w-[480px] bg-chalk p-6 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110]"
+        className="max-h-full w-full max-w-[480px] overflow-y-auto overscroll-contain bg-chalk p-6 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110]"
         ref={dialogRef}
         role="dialog"
       >

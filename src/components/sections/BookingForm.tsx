@@ -174,14 +174,33 @@ export function BookingForm({
   }
 
   // WebKit ignores scroll-padding when it scrolls a focused field into
-  // view, so a field can end up behind the player dock: nudge it up.
+  // view, so a field can end up behind the player dock: once the page has
+  // stopped scrolling (smooth scrolling may still be moving it), nudge the
+  // field up.
   function keepClearOfDock(e: React.FocusEvent<HTMLFormElement>) {
-    const el = e.target as HTMLElement;
-    const dock = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
-    if (!dock || !el.getBoundingClientRect) return;
-    const r = el.getBoundingClientRect();
-    const limit = window.innerHeight - dock - 12;
-    if (r.bottom > limit) window.scrollBy({ top: Math.min(r.bottom - limit, r.top - 96) });
+    const el = e.target;
+    if (!(el instanceof HTMLElement)) return;
+    let lastY = -1;
+    let still = 0;
+    let frames = 0;
+    const settle = () => {
+      frames += 1;
+      still = window.scrollY === lastY ? still + 1 : 0;
+      lastY = window.scrollY;
+      if (still < 3 && frames < 90) {
+        requestAnimationFrame(settle);
+        return;
+      }
+      if (document.activeElement !== el) return;
+      const dock = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+      if (!dock) return;
+      const r = el.getBoundingClientRect();
+      const limit = window.innerHeight - dock - 12;
+      if (r.bottom > limit) {
+        window.scrollBy({ top: Math.min(r.bottom - limit, r.top - 96), behavior: "instant" });
+      }
+    };
+    requestAnimationFrame(settle);
   }
 
   function onDraft(e: React.FormEvent<HTMLFormElement>) {

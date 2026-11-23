@@ -113,6 +113,20 @@ notes (`SHIP_WITH_NON_BLOCKING_FINDINGS`).
 | "BOOKİNG" under `lang="tr"` (Google, P3) | Label stored in capitals, so Turkish casing cannot dot the I. |
 | Vercel toolbar requests `vercel.live` on previews (OpenAI, P2 for the owner preview) | Owner decision, see below: preview-only by the repo's own CSP design (comments for reviewers); production never loads it. |
 
+## Re-check (round 4) and fixes
+
+The round-4 OpenAI re-check confirmed the navigation fix in all engines
+(privacy link, browser Back, header logo) and the round-3 fixes.
+
+| Finding | Fix |
+|---|---|
+| Privacy settings dialog cut off its heading at 320 × 568/600 and could not scroll (OpenAI, P2; caused by the larger 44 px targets) | Dialog and notice are bounded by the viewport and scroll inside. Journey check at 320 × 568. |
+| WebKit with normal motion still scrolled the focused message field behind the dock (OpenAI, non-blocking) | The nudge waits until the focus scroll has settled. Journey check with normal motion. |
+| Delayed focus retry could undo a quick Tab (OpenAI, P3) | The retry only acts if focus was dropped (body or the closed sheet). Journey check. |
+| Detached motion targets kept after repeated client navigation (OpenAI, P3) | Removed nodes are unobserved and forgotten. |
+| Legal pages repeated the home description (OpenAI, P3) | The content fallback only gives the home page a description; Admin entries still win. |
+| Turkish success/setlist/play wording (OpenAI, P3) | "Yeni talep gönderin", "dokunun", "Dinleyin: {title}". |
+
 ## Owner decisions (open)
 
 1. Vercel: apex redirect 307 → 308.
