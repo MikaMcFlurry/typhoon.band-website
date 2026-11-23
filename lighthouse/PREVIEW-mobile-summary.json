@@ -1,0 +1,63 @@
+{
+  "url": "https://typhoon-band-website-g7y0jr85t-mikamcflurrys-projects.vercel.app/de",
+  "label": "PREVIEW",
+  "form": "mobile",
+  "runs": [
+    {
+      "perf": 82,
+      "a11y": 100,
+      "bp": 100,
+      "seo": 61,
+      "lcp": 3564.3360000000002,
+      "fcp": 999.336,
+      "tbt": 349.5,
+      "cls": 0,
+      "si": 1561.5133417604811,
+      "bytes": 590222,
+      "lcpEl": null
+    },
+    {
+      "perf": 84,
+      "a11y": 100,
+      "bp": 100,
+      "seo": 61,
+      "lcp": 3231.627,
+      "fcp": 1103.627,
+      "tbt": 373.5,
+      "cls": 0,
+      "si": 1472.7723871058015,
+      "bytes": 590295,
+      "lcpEl": null
+    },
+    {
+      "perf": 72,
+      "a11y": 100,
+      "bp": 100,
+      "seo": 61,
+      "lcp": 3748.603,
+      "fcp": 1057.603,
+      "tbt": 685.5,
+      "cls": 0,
+      "si": 1819.4577464571166,
+      "bytes": 590234,
+      "lcpEl": null
+    }
+  ],
+  "median": {
+    "perf": 82,
+    "a11y": 100,
+    "bp": 100,
+    "seo": 61,
+    "lcp": 3564.3360000000002,
+    "fcp": 1057.603,
+    "tbt": 373.5,
+    "cls": 0,
+    "si": 1561.5133417604811,
+    "bytes": 590234,
+    "lcpEl": [
+      null,
+      null,
+      null
+    ]
+  }
+}

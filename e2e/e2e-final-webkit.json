@@ -1,0 +1,198 @@
+{
+  "baseUrl": "https://typhoon-band-website-361t7tukt-mikamcflurrys-projects.vercel.app",
+  "at": "2026-11-23T14:16:15.485Z",
+  "results": [
+    {
+      "browser": "webkit",
+      "id": "consent: no first-visit notice on home (390)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "consent: footer settings open dialog, Esc closes, focus returns",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "header booking CTA visible + lands at form (320)",
+      "status": "PASS",
+      "detail": "first field y=574"
+    },
+    {
+      "browser": "webkit",
+      "id": "header booking CTA visible + lands at form (390)",
+      "status": "PASS",
+      "detail": "first field y=536"
+    },
+    {
+      "browser": "webkit",
+      "id": "mobile menu open/Esc/focus return",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "booking: empty submit -> errors, focus name, no request",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "booking: chip selection + preview rows + keyboard on chips",
+      "status": "PASS",
+      "detail": "rows: An, Von, Art der Veranstaltung, Ort"
+    },
+    {
+      "browser": "webkit",
+      "id": "booking: mocked fallback keeps the draft as mailto",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "booking: mocked delivery error keeps the draft as mailto",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "motion on: all tape strips revealed after scrolling",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "menu open: header booking steps aside, menu booking closes the sheet",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "booking: delivery error, then edit -> mailto carries the edit (CRLF)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "motion on: privacy page and back home keeps every reveal visible",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "menu Booking moves focus to the booking heading",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "consent dialog fits a 320 x 568 phone (heading reachable)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "audio dock: focused message clear with normal motion",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "quick Tab after menu Booking is not undone",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "menu reopened right after Booking keeps focus in the menu",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "consent dialog: legal link closes the dialog",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "consent dialog: Ctrl-click on a legal link keeps the dialog",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "faq: details toggle by keyboard",
+      "status": "PASS",
+      "detail": "6 questions"
+    },
+    {
+      "browser": "webkit",
+      "id": "audio: featured play opens dock (no download control)",
+      "status": "PASS",
+      "detail": "--dock-h calc(76px + 0px), scroll-padding-bottom 88px"
+    },
+    {
+      "browser": "webkit",
+      "id": "gallery viewer: open, arrow, Esc, focus return",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "webkit",
+      "id": "no horizontal scroll or clipped text at 320 (de/en/tr, legal, 404)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "http",
+      "id": "seo head /de",
+      "status": "PASS",
+      "detail": "title \"Typhoon Band – Bluesrock, Funk &amp; Soul mit türkischen Texten\"; JSON-LD WebSite+WebPage+MusicGroup+FAQPage"
+    },
+    {
+      "browser": "http",
+      "id": "seo head /en",
+      "status": "PASS",
+      "detail": "title \"Typhoon Band – Blues Rock, Funk &amp; Soul with Turkish Lyrics\"; JSON-LD WebSite+WebPage+MusicGroup+FAQPage"
+    },
+    {
+      "browser": "http",
+      "id": "seo head /tr",
+      "status": "PASS",
+      "detail": "title \"Typhoon Band – Türkçe sözlü blues rock, funk ve soul\"; JSON-LD WebSite+WebPage+MusicGroup+FAQPage"
+    },
+    {
+      "browser": "webkit",
+      "id": "404 settled DOM: title 404, no canonical/hreflang",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "http",
+      "id": "404 title + noindex, no canonical",
+      "status": "PASS",
+      "detail": "404 · Typhoon"
+    },
+    {
+      "browser": "http",
+      "id": "legal pages without the home marketing description",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "http",
+      "id": "legal og:url + x-default",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "browser": "http",
+      "id": "sitemap x-default + images, llms.txt, robots",
+      "status": "PASS",
+      "detail": ""
+    }
+  ]
+}
