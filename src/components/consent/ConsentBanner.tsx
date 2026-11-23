@@ -115,8 +115,12 @@ export function ConsentBanner() {
   if (mode === "hidden") return null;
 
   // Following a legal link from the dialog closes it, so the page it opens
-  // is not hidden behind the still-open dialog.
-  const leaveDialog = () => setMode((m) => (m === "dialog" ? "hidden" : m));
+  // is not hidden behind the still-open dialog. A modified click opens a
+  // new tab instead, so the dialog (and its unsaved choice) stays.
+  const leaveDialog = (e: React.MouseEvent) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    setMode((m) => (m === "dialog" ? "hidden" : m));
+  };
   const links = (
     <p className="mono text-[rgba(18,17,16,0.72)]">
       <Link className="inline-block py-3 underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/privacy`} onClick={leaveDialog}>

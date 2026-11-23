@@ -137,6 +137,17 @@ engines.
 | Reopening the menu within ~150 ms of a menu Booking tap let the pending heading-focus retry pull focus behind the open sheet (OpenAI, P2) | Pending retries are cancelled whenever the sheet opens. Journey check. |
 | A legal link inside the privacy settings dialog opened the page underneath the still-open dialog (OpenAI, P3, also on live) | Following a legal link closes the dialog. Journey check. |
 
+## Re-check (round 6)
+
+Verdict `SHIP_WITH_NON_BLOCKING_FINDINGS` (OpenAI): both round-5 fixes
+confirmed in all three engines; motion, focus, consent dialog, 404, mail
+recovery and WebKit dock smoke checks passed.
+
+| Finding | Status |
+|---|---|
+| Ctrl/Cmd-click on a legal link in the consent dialog closed the dialog in the original tab (P3, introduced in round 5) | Fixed: only a plain click closes the dialog. Journey check. |
+| WebKit: Tab can move focus behind the open mobile menu (P2, also on live) | Known, not changed: Safari skips links on Tab by default, so the sheet's focus trap has no tabbable items there. Follow-up candidate. |
+
 ## Owner decisions (open)
 
 1. Vercel: apex redirect 307 → 308.
