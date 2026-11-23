@@ -9,18 +9,25 @@ import { LocaleSwitcher } from "@/components/site/LocaleSwitcher";
 import { Icon } from "@/components/ui/Icon";
 
 // Top strip: small gold signature left (always, so the bar never reads
-// empty), mono nav, language switch, and the one orange booking tape.
+// empty), mono nav, language switch, and the one orange booking tape —
+// on every width, so a booker on a phone is always one tap from the form.
+// The nav follows the page order: Shows sits second only when real dates
+// exist (see the home page), otherwise just before Booking.
 
-const SECTIONS = ["music", "shows", "band", "media"] as const;
-type SectionId = (typeof SECTIONS)[number] | "booking";
+type SectionId = "music" | "shows" | "band" | "media" | "booking";
 
 export function Header({
   bookingEmail,
   phone,
+  showsFirst = false,
 }: {
   bookingEmail: string;
   phone: string;
+  showsFirst?: boolean;
 }) {
+  const SECTIONS: SectionId[] = showsFirst
+    ? ["music", "shows", "band", "media"]
+    : ["music", "band", "media", "shows"];
   const { dict, locale } = useDict();
   const pathname = usePathname() ?? "";
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
@@ -28,6 +35,11 @@ export function Header({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<SectionId | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  // Set when a menu link is used: focus then moves to that section's
+  // heading instead of back to the menu toggle (Esc still returns it).
+  const focusAfterClose = useRef<SectionId | null>(null);
+  // Pending heading-focus attempts; cancelled when the sheet opens again.
+  const focusRetries = useRef<{ raf: number; timer: number } | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
 
   const labels: Record<SectionId, string> = {
@@ -58,7 +70,7 @@ export function Header({
       setActive(null);
       return;
     }
-    const ids: SectionId[] = [...SECTIONS, "booking"];
+    const ids: SectionId[] = ["music", "shows", "band", "media", "booking"];
     const nodes = ids
       .map((id) => document.getElementById(id))
       .filter((n): n is HTMLElement => Boolean(n));
@@ -78,6 +90,11 @@ export function Header({
   // Mobile sheet: lock scroll, Esc closes, focus stays inside, focus returns.
   useEffect(() => {
     if (!open) return;
+    if (focusRetries.current) {
+      cancelAnimationFrame(focusRetries.current.raf);
+      window.clearTimeout(focusRetries.current.timer);
+      focusRetries.current = null;
+    }
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const sheet = sheetRef.current;
@@ -110,10 +127,36 @@ export function Header({
     };
     document.addEventListener("keydown", onKey);
     const button = menuButtonRef.current;
+    const pendingRef = focusAfterClose;
+    const retriesRef = focusRetries;
     return () => {
       document.body.style.overflow = prevOverflow;
       document.removeEventListener("keydown", onKey);
-      button?.focus();
+      const target = pendingRef.current;
+      pendingRef.current = null;
+      const section = target ? document.getElementById(target) : null;
+      const heading = section?.querySelector<HTMLElement>("h2, h3") ?? section;
+      if (heading) {
+        if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
+        // After the link's own fragment navigation and the browser's focus
+        // fix-up for the now inert sheet, both of which reset focus (Firefox
+        // does the latter a little later, hence the second attempt).
+        const sheetNode = sheet;
+        const focusHeading = () => {
+          const active = document.activeElement;
+          const dropped = !active || active === document.body || (sheetNode?.contains(active) ?? false);
+          if (dropped) heading.focus({ preventScroll: true });
+        };
+        retriesRef.current = {
+          raf: requestAnimationFrame(focusHeading),
+          timer: window.setTimeout(() => {
+            retriesRef.current = null;
+            focusHeading();
+          }, 150),
+        };
+      } else {
+        button?.focus();
+      }
     };
   }, [open]);
 
@@ -132,15 +175,18 @@ export function Header({
         <div className="shell flex h-full items-center justify-between gap-4">
           <Link
             aria-label={dict.a11y.home}
-            className="relative -ml-1 flex-none p-1"
+            className="relative -ml-1 flex min-h-11 flex-none items-center p-1"
             href={isHome ? "#top" : `/${locale}`}
           >
+            {/* Above the fold on every page: never lazy. On the home page it
+                is not preloaded, so it does not compete with the hero. */}
             <Image
               alt="Typhoon"
               className="h-8 w-auto md:h-10"
               height={724}
+              loading={isHome ? "eager" : undefined}
               priority={!isHome}
-              sizes="140px"
+              sizes="(min-width: 768px) 116px, 93px"
               src="/assets/branding/typhoon-signature-gold-bold.png"
               width={2099}
             />
@@ -172,7 +218,16 @@ export function Header({
 
           <div className="flex items-center gap-2 md:gap-4">
             <LocaleSwitcher className="hidden sm:flex" />
-            <a className="btn-tape btn-sm hidden sm:inline-flex" href={hrefFor("booking")}>
+            {/* While the menu sheet is open its own orange Booking row is the
+                action, so this one steps aside (keeps its space, not
+                focusable); it always closes the sheet when used. */}
+            <a
+              aria-hidden={open || undefined}
+              className={`btn-tape btn-sm ${open ? "invisible" : ""}`}
+              href={hrefFor("booking")}
+              onClick={() => setOpen(false)}
+              tabIndex={open ? -1 : undefined}
+            >
               {dict.nav.booking}
             </a>
             <button
@@ -209,7 +264,10 @@ export function Header({
                 <a
                   className="flex items-center justify-between py-3 font-stage text-[2.5rem] font-extrabold uppercase leading-none"
                   href={hrefFor(id)}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    if (isHome) focusAfterClose.current = id;
+                    setOpen(false);
+                  }}
                 >
                   <span className={id === "booking" ? "tape tape-orange" : active === id ? "tape" : ""}>
                     {labels[id]}

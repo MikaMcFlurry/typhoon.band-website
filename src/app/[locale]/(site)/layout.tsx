@@ -4,10 +4,11 @@ import { PlayerDock } from "@/components/audio/PlayerDock";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { splitShows } from "@/components/sections/Shows";
 import { MotionInit } from "@/components/site/MotionInit";
 import { getDict } from "@/i18n/dictionaries";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/locales";
-import { getPlatformLinks, getSiteSettings } from "@/lib/content";
+import { getPlatformLinks, getShows, getSiteSettings } from "@/lib/content";
 
 // Public site chrome. The admin area lives outside this route group and
 // gets its own shell (no public header, footer, player or consent banner).
@@ -24,10 +25,13 @@ export default async function SiteLayout({
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const dict = getDict(locale);
-  const [settings, platformLinks] = await Promise.all([
+  const [settings, platformLinks, shows] = await Promise.all([
     getSiteSettings(),
     getPlatformLinks(),
+    getShows(locale),
   ]);
+  // Same rule as the home page: Shows comes second only with real dates.
+  const showsFirst = splitShows(shows).upcoming.length > 0;
 
   return (
     <AudioPlayerProvider>
@@ -35,7 +39,11 @@ export default async function SiteLayout({
       <a className="skip-link" href="#main">
         {dict.a11y.skip}
       </a>
-      <Header bookingEmail={settings.contactBookingEmail} phone={settings.contactPhone} />
+      <Header
+        bookingEmail={settings.contactBookingEmail}
+        phone={settings.contactPhone}
+        showsFirst={showsFirst}
+      />
       <main id="main" tabIndex={-1} className="outline-none">
         {children}
       </main>

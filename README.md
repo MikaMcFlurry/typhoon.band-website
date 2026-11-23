@@ -482,13 +482,20 @@ repo assets and never reaches Storage.
   dictionaries (`meta.*`) and `/og-image.jpg` (1200×630).
 - Built-in SEO: per-locale `<html lang>`, canonical + hreflang alternates,
   Open Graph/Twitter cards, `sitemap.xml`, `robots.txt` (admin/api
-  disallowed, admin also `noindex`), web manifest, JSON-LD `MusicGroup`
-  with members and `MusicEvent` for upcoming dated shows.
+  disallowed, admin also `noindex`), web manifest, image sitemap entries
+  for the home pages, `/llms.txt` (plain-text summary for AI assistants,
+  built from the same content), and one JSON-LD `@graph` per home page:
+  `WebSite`, `WebPage`, `MusicGroup` (members, demo tracks, booking
+  `ContactPoint`, `MusicEvent` for upcoming dated shows) and `FAQPage` for
+  the visible promoter FAQ (`src/lib/seo/structured-data.ts`).
 - `/[locale]/admin/platform-links` — Spotify, YouTube, Instagram, Facebook,
   SoundCloud, Bandcamp. Active rows appear automatically in the footer and
   as "Also on" links under the hero setlist; none → the blocks are hidden.
-- Consent: first visit shows a small non-blocking notice; the footer button
-  "Datenschutz-Einstellungen" reopens it as a dialog (focus trap, Esc).
+- Consent: the small non-blocking notice appears only on a page that
+  contains an `ExternalMediaGate` (there is nothing to decide otherwise, and
+  the notice used to cover the hero's play and booking buttons). The footer
+  button "Datenschutz-Einstellungen" opens the dialog on every page (focus
+  trap, Esc).
   Stored only in `localStorage` (`typhoon.consent.v1`; the old key
   `typhoon.cookie-consent` is honoured). The public site sets no cookies.
   Wrap any future embed in `src/components/consent/ExternalMediaGate.tsx`.

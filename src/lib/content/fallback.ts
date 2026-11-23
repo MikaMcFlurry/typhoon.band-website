@@ -143,7 +143,9 @@ export function buildSeoFallback(path: string, locale: Locale): SeoEntry {
   return {
     path,
     title,
-    description: dict.meta.description,
+    // Only the home page has a fallback description; legal pages without
+    // an Admin entry go without one rather than repeating the home pitch.
+    description: path === "/" ? dict.meta.description : null,
     ogImageUrl: "/og-image.jpg",
   };
 }

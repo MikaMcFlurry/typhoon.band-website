@@ -39,7 +39,7 @@ export function LocaleSwitcher({
           <li key={code}>
             <Link
               aria-current={active ? "true" : undefined}
-              className={`mono-cap inline-flex h-11 min-w-10 items-center justify-center px-2 transition-colors ${
+              className={`mono-cap inline-flex h-11 min-w-11 items-center justify-center px-2 transition-colors ${
                 active ? "text-chalk" : "text-chalk-3 hover:text-chalk"
               }`}
               href={pathFor(code)}

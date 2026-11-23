@@ -165,7 +165,7 @@ components:
     height: "48px"
   button-sm:
     padding: "0 14px"
-    height: "40px"
+    height: "44px"
   control:
     backgroundColor: "transparent"
     textColor: "{colors.chalk-2}"
@@ -287,8 +287,10 @@ All three are self-hosted through next/font with latin-ext, for Turkish ğ ı ş
 - **Grid:** a 12-column grid from lg. Content sections split 7/5 (Shows) or 5/7 (Band).
 - **Hero:** the band comes first (owner, 2026-09-27: "wie eine Band wirken, nicht ein Künstler mit Band"). Left: gold signature, tagline tape strips, genre line, one sentence, pink play CTA + orange booking CTA. Right: the band collage from Admin → Site assets (`hero_image`) as a square poster taped up with two pink pieces, `object-contain` so every musician stays visible, rotated -0.8° from lg — and the **setlist sheet taped over the poster's bottom paper margin** (owner, 2026-09-27: "Mir hat die Setlist im Header sehr gut gefallen"), rotated +0.8°. The negative top margin is set in % of the column width so the sheet covers at most ~13% of the poster height (the collage's paper margin is ~16%): no musician is ever covered. Poster width: full below lg, 62% at lg, 68% at xl, 52% on the `short` screen (≥1024px wide, <880px tall), which also keeps the compact tagline size. Poster + setlist + CTAs fit the first viewport from 1024x768 to 1920x1080. Stacked below lg (poster, then setlist, after the CTAs); 6/6 at lg; 7/5 at xl. No photo of a single member in the hero. The hero column carries `id="music"` (nav target "Musik").
 - **No separate Music section:** the setlist lives in the hero; platform links ("Auch auf") sit under the sheet.
-- **Shows:** list or honest empty state, max 880px wide, no poster (the collage now lives in the hero).
-- **Header:** 64px tall, 72px from md. The small gold signature sits left on every page and scroll position (the bar never reads empty). Mono nav from lg, with a hamburger menu below lg. The locale switcher and Booking button appear from sm.
+- **Shows:** list or honest empty state, max 880px wide, no poster (the collage now lives in the hero). With upcoming dates it follows the hero; without dates it moves down to sit just above Booking as a short lead-in ("Auftritte auf Anfrage.", reduced bottom padding, no button of its own, since the booking form follows directly). The nav order follows the page order.
+- **Booking:** on phones the order is heading, intro and direct line (mail, phone), then the form, then the rider facts, so the booking link lands next to the first field. From lg the heading and the facts share the left 5 columns and the form spans both rows on the right 7.
+- **FAQ:** "Fragen von Veranstaltern" closes the page after Booking (`deck-2` band, 5/7 split): heading and one-line intro, then the orange booking tape and the phone line on the left; numbered `<details>` rows under a 2px chalk rule on the right, the first one open. On phones the questions come right after the intro and the booking tape follows them. Answers only restate owner-confirmed booking facts (no fees, set lengths or tech that the band has not published).
+- **Header:** 64px tall, 72px from md. The small gold signature sits left on every page and scroll position (the bar never reads empty). Mono nav from lg, with a hamburger menu below lg. The orange Booking button sits in the bar on every width (left of the hamburger below lg); the locale switcher appears from sm.
 - **Player dock:** fixed to the bottom at 76px. It writes `--dock-h` so the body and the consent banner clear it. Previous/volume controls hide at the smaller breakpoints (xs/lg).
 - **Line-up:** 2 columns on mobile, 3 from md, 4 from lg.
 - **Rider/preview rows:** a two-column dl (7.5 to 12rem label column). The request preview rows stack into one column below 640px.
@@ -320,7 +322,7 @@ A flat, matte, square-cut strip in one colour with stage-ink text. Padding is 0.
 - **Tape (primary):** orange with ink text. It turns chalk on hover, and pressing moves it down 1px. Use it for booking only.
 - **Play:** pink with ink text, chalk on hover. It starts audio.
 - **Line (secondary):** transparent with a `rule-2` border. The border turns chalk on hover. On chalk paper it inverts to an ink border.
-- **Small:** 40px tall, 14px padding, 1.0625rem.
+- **Small:** 44px tall (still a full hit area), 14px padding, 1.0625rem.
 - **Controls:** a square 44px icon button in chalk-2. On hover it turns chalk with a chalk 8% fill. The **play control** is 48px and pink. Disabled controls drop to 35% opacity, and disabled buttons to 60%.
 - **Transitions:** 160ms `cubic-bezier(0.16,1,0.3,1)`. Focus is a 2px chalk outline offset 3px (ink on chalk paper).
 
@@ -334,7 +336,7 @@ One card per member from live data: a 4:5 photo in one monochrome treatment (`gr
 No icon tile. The result heading sits on chalk tape; in the fallback state the orange mailto button is the one action.
 
 ### Rider (booking)
-A heading on orange tape, a facts dl under a 2px chalk rule, and contact lines in Big Shoulders. The form sits on a `deck-2` panel. A chalk **request preview** sheet (taped in orange) mirrors the draft in mono just above the submit.
+A heading on orange tape, contact lines in Big Shoulders, and a facts dl (mono "Für Veranstalter" label) under a 2px chalk rule. The form sits on a `deck-2` panel: core questions first (name, e-mail, event type, place, date, message), the optional phone last. The event type is a row of **choice chips** (square, 44px, 2px `chalk-3` stroke on deck like the field strokes; selected = orange with stage ink, since the form is the booking action). A chalk **request preview** sheet (taped in orange) mirrors the draft in mono just above the submit, listing only the rows already filled in (plus the recipient), so an empty form stays short. The reply time sits under the submit button. If online delivery is unavailable, the fallback and delivery-error states offer the draft as a prefilled e-mail.
 
 ### Inputs / Fields
 - **Style:** deck fill, no box, a 2px `chalk-3` bottom stroke (5.4:1 on deck, above the 3:1 non-text minimum), square corners, 16px text, and a mono label above.

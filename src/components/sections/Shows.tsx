@@ -133,9 +133,16 @@ export function Shows({
   shows: ShowItem[];
 }) {
   const { upcoming, past } = splitShows(shows);
+  const empty = upcoming.length === 0;
 
+  // Without dates the section is a short lead-in to the booking request
+  // right below it, so it needs neither its own button nor full padding.
   return (
-    <section aria-labelledby="shows-title" className="block-y border-t border-rule" id="shows">
+    <section
+      aria-labelledby="shows-title"
+      className={`border-t border-rule ${empty ? "pb-4 pt-[72px] md:pb-6 md:pt-[112px]" : "block-y"}`}
+      id="shows"
+    >
       <div className="shell">
         <div className="max-w-[880px]">
           <h2 className="h-stage reveal" id="shows-title">
@@ -156,10 +163,6 @@ export function Shows({
                 <span className="lay tape -rotate-[0.8deg]">{dict.shows.emptyTitle}</span>
               </p>
               <p className="copy-lg mt-6">{dict.shows.emptyBody}</p>
-              <a className="btn-tape mt-8" href="#booking">
-                {dict.shows.emptyCta}
-                <Icon name="arrow-right" size={20} />
-              </a>
             </div>
           )}
 

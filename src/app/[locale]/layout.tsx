@@ -61,27 +61,17 @@ export async function generateMetadata({
       default: dict.meta.title,
       template: "%s · Typhoon",
     },
-    description: dict.meta.description,
     applicationName: "Typhoon",
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        de: "/de",
-        en: "/en",
-        tr: "/tr",
-        "x-default": "/de",
-      },
-    },
+    // Description, canonical, hreflang, og:url and the share texts are
+    // route-specific and live on each page (home, legal); set here they
+    // leaked into routes without their own (404, admin).
     openGraph: {
       type: "website",
       siteName: "Typhoon",
-      title: dict.meta.title,
-      description: dict.meta.description,
       locale: OG_LOCALE[locale],
       alternateLocale: LOCALES.filter((l) => l !== locale).map(
         (l) => OG_LOCALE[l],
       ),
-      url: `/${locale}`,
       images: [
         {
           url: "/og-image.jpg",
@@ -93,8 +83,6 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: dict.meta.title,
-      description: dict.meta.description,
       images: ["/og-image.jpg"],
     },
     icons: {

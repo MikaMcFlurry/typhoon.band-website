@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CONSENT_CHANGE_EVENT,
+  CONSENT_GATE_ATTR,
+  CONSENT_NEEDED_EVENT,
   CONSENT_OPEN_EVENT,
   readConsent,
   writeConsent,
@@ -11,7 +13,11 @@ import {
 import { useDict } from "@/components/i18n/DictProvider";
 
 // Privacy notice + preferences.
-//   - First visit: a small, non-blocking notice (content stays usable).
+//   - First visit: a small, non-blocking notice, but only on a page that
+//     actually holds third-party content (an ExternalMediaGate). The site
+//     sets no cookies and loads nothing external by default, so without a
+//     gate there is nothing to decide and the notice would only cover the
+//     hero's play and booking buttons.
 //   - "Privacy settings" in the footer reopens it as a modal dialog with a
 //     focus trap, Esc and Cancel.
 // Nothing is tracked. The only stored item is this choice (localStorage).
@@ -27,8 +33,12 @@ export function ConsentBanner() {
 
   useEffect(() => {
     const state = readConsent();
-    if (!state.decided) setMode("notice");
-    else setExternal(state.choice.external_media);
+    if (state.decided) setExternal(state.choice.external_media);
+    const needNotice = () => {
+      if (!readConsent().decided) setMode((m) => (m === "hidden" ? "notice" : m));
+    };
+    // A gate may have mounted before this effect ran.
+    if (!state.decided && document.querySelector(`[${CONSENT_GATE_ATTR}]`)) needNotice();
 
     const onOpen = () => {
       const current = readConsent();
@@ -46,9 +56,11 @@ export function ConsentBanner() {
     };
     window.addEventListener(CONSENT_OPEN_EVENT, onOpen);
     window.addEventListener(CONSENT_CHANGE_EVENT, onChange);
+    window.addEventListener(CONSENT_NEEDED_EVENT, needNotice);
     return () => {
       window.removeEventListener(CONSENT_OPEN_EVENT, onOpen);
       window.removeEventListener(CONSENT_CHANGE_EVENT, onChange);
+      window.removeEventListener(CONSENT_NEEDED_EVENT, needNotice);
     };
   }, []);
 
@@ -102,13 +114,20 @@ export function ConsentBanner() {
 
   if (mode === "hidden") return null;
 
+  // Following a legal link from the dialog closes it, so the page it opens
+  // is not hidden behind the still-open dialog. A modified click opens a
+  // new tab instead, so the dialog (and its unsaved choice) stays.
+  const leaveDialog = (e: React.MouseEvent) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    setMode((m) => (m === "dialog" ? "hidden" : m));
+  };
   const links = (
     <p className="mono text-[rgba(18,17,16,0.72)]">
-      <Link className="underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/privacy`}>
+      <Link className="inline-block py-3 underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/privacy`} onClick={leaveDialog}>
         {dict.cookies.privacyLink}
       </Link>
       <span aria-hidden> · </span>
-      <Link className="underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/cookies`}>
+      <Link className="inline-block py-3 underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/cookies`} onClick={leaveDialog}>
         {dict.cookies.cookiesLink}
       </Link>
     </p>
@@ -118,7 +137,7 @@ export function ConsentBanner() {
     return (
       <section
         aria-label={dict.cookies.title}
-        className="fixed inset-x-2 z-[60] bg-chalk p-4 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110] sm:inset-x-6 md:flex md:items-center md:gap-8 md:px-6 md:py-4"
+        className="fixed inset-x-2 z-[60] max-h-[calc(100dvh-16px)] overflow-y-auto bg-chalk p-4 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110] sm:inset-x-6 md:flex md:items-center md:gap-8 md:px-6 md:py-4"
         style={{ bottom: "calc(var(--dock-h) + 8px)" }}
       >
         <div className="min-w-0 md:flex-1">
@@ -147,7 +166,7 @@ export function ConsentBanner() {
       <div
         aria-labelledby="consent-title"
         aria-modal="true"
-        className="w-full max-w-[480px] bg-chalk p-6 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110]"
+        className="max-h-full w-full max-w-[480px] overflow-y-auto overscroll-contain bg-chalk p-6 text-[#121110] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.7)] [--focus:#121110]"
         ref={dialogRef}
         role="dialog"
       >
@@ -206,7 +225,7 @@ function Switch({
     <button
       aria-checked={checked}
       aria-label={label}
-      className={`relative mt-1 inline-flex h-7 w-12 flex-none items-center border-2 border-[#121110] transition-colors ${
+      className={`relative inline-flex h-7 w-12 flex-none items-center border-2 border-[#121110] transition-colors before:absolute before:-inset-x-1 before:-inset-y-[10px] before:content-[''] ${
         checked ? "bg-green" : "bg-transparent"
       } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
       disabled={disabled}

@@ -46,6 +46,7 @@ export type Dict = {
     ctaBook: string;
     playFeatured: string;
     photoAlt: string;
+    facts: string[];
   };
   brand: {
     genreLine: string;
@@ -124,6 +125,11 @@ export type Dict = {
     types: Record<EventTypeKey, string>;
     messageLabel: string;
     messageHint: string;
+    phoneHint: string;
+    sendByMail: string;
+    copyDraft: string;
+    copied: string;
+    copyFailed: string;
     required: string;
     optional: string;
     privacyNote: string;
@@ -209,6 +215,11 @@ export type Dict = {
     body: string;
     cta: string;
   };
+  faq: {
+    title: string;
+    intro: string;
+    items: { q: string; a: string }[];
+  };
   stage: {
     setlist: string;
     setlistNote: string;
@@ -285,10 +296,10 @@ const buildMemberMaps = (locale: Locale) => ({
 
 const de: Dict = {
   meta: {
-    title: "Typhoon · Bluesrock, Funk & Soul mit türkischen Texten",
+    title: "Typhoon Band – Bluesrock, Funk & Soul mit türkischen Texten",
     description:
-      "Typhoon aus Hechingen verbindet türkischsprachige Texte mit Bluesrock, Funk, Soul, Jazz und Southern Rock. Demos anhören, Konzerte finden, Band buchen.",
-    ogAlt: "Typhoon: acht Musiker in einer Sepia-Collage mit goldenem Schriftzug",
+      "Live-Band aus Hechingen: türkische Texte, Bluesrock, Funk, Soul & Jazz mit Bläsersatz. Demos anhören und Typhoon für Festival, Stadtfest oder Firmenfeier buchen.",
+    ogAlt: "Die Musiker von Typhoon als Sepia-Collage",
     shareAlt: "Typhoon: goldener Schriftzug, „Smooth. Exzeptionell. Funk.“ auf Tape und der Sänger live an den roten Keyboards",
   },
   a11y: {
@@ -316,6 +327,7 @@ const de: Dict = {
     ctaBook: "Booking anfragen",
     playFeatured: "{title} anhören",
     photoAlt: "Typhoon-Sänger live an den roten Keyboards",
+    facts: ["{count} Musiker mit Bläsersatz", "Live-Band aus Hechingen"],
   },
   brand: {
     genreLine: "BLUESROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -364,7 +376,7 @@ const de: Dict = {
     intro: "Die nächsten Konzerte. Tickets und Details direkt beim Veranstalter.",
     tickets: "Tickets",
     tba: "Datum folgt",
-    emptyTitle: "Neue Termine sind in Planung.",
+    emptyTitle: "Auftritte auf Anfrage.",
     emptyBody:
       "Festival, Club, Stadtfest oder Firmenevent: Holt Typhoon auf eure Bühne.",
     emptyCta: "Booking anfragen",
@@ -427,7 +439,12 @@ const de: Dict = {
       other: "Sonstiges",
     },
     messageLabel: "Nachricht",
-    messageHint: "Zeitrahmen, Publikum, Technik vor Ort, Budget – alles hilft.",
+    messageHint: "Ein paar Sätze reichen: Zeitrahmen, Publikum, Technik vor Ort, Budget.",
+    phoneHint: "Falls ihr lieber einen Rückruf möchtet",
+    sendByMail: "Anfrage per E-Mail senden",
+    copyDraft: "Anfrage kopieren",
+    copied: "Kopiert",
+    copyFailed: "Kopieren geht hier nicht. Markiert den Text und kopiert ihn selbst:",
     required: "Pflichtfeld",
     optional: "optional",
     privacyNote:
@@ -519,6 +536,36 @@ const de: Dict = {
     body: "Vielleicht hilft ein Neustart auf der Startseite. Die Musik läuft dort.",
     cta: "Zur Startseite",
   },
+  faq: {
+    title: "Fragen von Veranstaltern",
+    intro: "Das Wichtigste vor der Anfrage, kurz beantwortet.",
+    items: [
+      {
+        q: "Was für Musik spielt Typhoon?",
+        a: "Eigene Songs mit türkischen Texten: Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Reinhören könnt ihr direkt oben in der Setlist.",
+      },
+      {
+        q: "Wie groß ist die Besetzung?",
+        a: "{count} Musiker mit Gesang, Bläsersatz und Rhythmusgruppe. Wer spielt, seht ihr oben unter „Die Besetzung“.",
+      },
+      {
+        q: "Für welche Anlässe können wir Typhoon buchen?",
+        a: "Für Festivals, Clubs, Stadtfeste, Firmen- und Privatevents. Erzählt uns in der Anfrage kurz, was ihr plant.",
+      },
+      {
+        q: "Spielt Typhoon auch außerhalb der Region?",
+        a: "Ja. Die Band ist in Hechingen, Baden-Württemberg, zu Hause und kommt gerne auch weiter weg. Schreibt uns einfach, wo euer Event stattfindet.",
+      },
+      {
+        q: "Was kostet ein Auftritt?",
+        a: "Das klären wir für jede Anfrage einzeln. Schickt uns eure Eckdaten, wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
+      },
+      {
+        q: "Wie schnell bekommen wir eine Antwort?",
+        a: "In der Regel innerhalb von 48 Stunden. Wenn es eilt, ruft uns direkt an.",
+      },
+    ],
+  },
   stage: {
     setlist: "Setlist",
     setlistNote: "Tippen zum Abspielen · nur Stream, kein Download",
@@ -531,10 +578,10 @@ const de: Dict = {
 
 const en: Dict = {
   meta: {
-    title: "Typhoon · Blues rock, funk & soul with Turkish lyrics",
+    title: "Typhoon Band – Blues Rock, Funk & Soul with Turkish Lyrics",
     description:
-      "Typhoon from Hechingen, Germany, blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock. Listen to the demos, find a show, book the band.",
-    ogAlt: "Typhoon: eight musicians in a sepia collage with a gold signature logo",
+      "Live band from Hechingen, Germany: Turkish lyrics over blues rock, funk, soul and jazz, with horns. Hear the demos and book Typhoon for your festival or event.",
+    ogAlt: "The musicians of Typhoon as a sepia collage",
     shareAlt: "Typhoon: gold signature, “Smooth. Exceptional. Funk.” on tape and the singer live at the red keyboards",
   },
   a11y: {
@@ -559,9 +606,10 @@ const en: Dict = {
     description:
       "Typhoon blends Turkish-language lyrics with blues rock, funk, soul, jazz and southern rock — powerful, warm, full of live energy.",
     ctaListen: "Listen to songs",
-    ctaBook: "Booking request",
+    ctaBook: "Request a booking",
     playFeatured: "Play {title}",
     photoAlt: "Typhoon's singer live at the red keyboards",
+    facts: ["{count} musicians with horns", "Live band from Hechingen"],
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -587,13 +635,13 @@ const en: Dict = {
     eyebrow: "Typhoon",
     headline: "American feeling. European soul. Turkish lyrics.",
     body:
-      "Typhoon breaks genre boundaries without losing their handwriting: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
+      "Typhoon breaks genre boundaries without losing their signature sound: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
     lead:
       "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of experienced musicians, built on vocals, a horn section and a grooving rhythm section.",
     more: "More about Typhoon",
     imageAlt: "Typhoon singing live on stage",
     cta: "Meet the line-up",
-    ctaBook: "Booking request",
+    ctaBook: "Request a booking",
     facts: [
       { label: "Line-up", value: "{count} musicians incl. horn section" },
       { label: "Lyrics", value: "Turkish, original songs" },
@@ -610,9 +658,9 @@ const en: Dict = {
     intro: "Upcoming concerts. Tickets and details come straight from the promoter.",
     tickets: "Tickets",
     tba: "Date to be announced",
-    emptyTitle: "New dates are being planned.",
+    emptyTitle: "Available for bookings.",
     emptyBody: "Festival, club, city festival or corporate event: bring Typhoon to your stage.",
-    emptyCta: "Booking request",
+    emptyCta: "Request a booking",
     past: "Past shows",
     placeholderTitles: [
       "New dates in preparation",
@@ -672,7 +720,12 @@ const en: Dict = {
       other: "Other",
     },
     messageLabel: "Message",
-    messageHint: "Timing, audience, on-site tech, budget: every detail helps.",
+    messageHint: "A few lines are enough: timing, audience, on-site tech, budget.",
+    phoneHint: "If you would rather get a call back",
+    sendByMail: "Send the request by email",
+    copyDraft: "Copy the request",
+    copied: "Copied",
+    copyFailed: "Copying is not available here. Select the text and copy it yourself:",
     required: "required",
     optional: "optional",
     privacyNote: "We only use your details to handle this request. See our",
@@ -763,6 +816,36 @@ const en: Dict = {
     body: "Head back to the home page. The music is playing there.",
     cta: "Back to home",
   },
+  faq: {
+    title: "Questions from promoters",
+    intro: "The essentials before you send a request, answered briefly.",
+    items: [
+      {
+        q: "What kind of music does Typhoon play?",
+        a: "Original songs with Turkish lyrics: blues rock, funk, soul, jazz and southern rock with an American-European sound. Listen in the setlist at the top of the page.",
+      },
+      {
+        q: "How big is the line-up?",
+        a: "{count} musicians: vocals, a horn section and a rhythm section. You can meet them above under “The line-up”.",
+      },
+      {
+        q: "What occasions can we book Typhoon for?",
+        a: "Festivals, clubs, city festivals, corporate and private events. Tell us briefly what you are planning.",
+      },
+      {
+        q: "Does Typhoon play outside the region?",
+        a: "Yes. The band is based in Hechingen, Baden-Württemberg, and is happy to travel. Just tell us where your event takes place.",
+      },
+      {
+        q: "How much does a show cost?",
+        a: "We quote every request individually. Send us the key facts and we will reply personally with availability and terms.",
+      },
+      {
+        q: "How quickly will we hear back?",
+        a: "Usually within 48 hours. If it is urgent, give us a call.",
+      },
+    ],
+  },
   stage: {
     setlist: "Setlist",
     setlistNote: "Tap to play · streaming only, no download",
@@ -775,10 +858,10 @@ const en: Dict = {
 
 const tr: Dict = {
   meta: {
-    title: "Typhoon · Türkçe sözlerle blues rock, funk ve soul",
+    title: "Typhoon Band – Türkçe sözlü blues rock, funk ve soul",
     description:
-      "Hechingen'den Typhoon, Türkçe sözleri blues rock, funk, soul, jazz ve southern rock ile birleştirir. Demoları dinleyin, konserleri bulun, grubu davet edin.",
-    ogAlt: "Typhoon: altın imzalı sepya bir kolajda sekiz müzisyen",
+      "Hechingen'den canlı grup: nefeslilerle blues rock, funk, soul ve caz üzerine Türkçe sözler. Demoları dinleyin, Typhoon'u festival ya da etkinliğinize davet edin.",
+    ogAlt: "Typhoon müzisyenleri sepya bir kolajda",
     shareAlt: "Typhoon: altın imza, bant üzerinde „Smooth. Olağanüstü. Funk.“ ve kırmızı klavyelerde canlı solist",
   },
   a11y: {
@@ -794,7 +877,7 @@ const tr: Dict = {
     music: "Müzik",
     shows: "Konserler",
     media: "Fotoğraflar",
-    booking: "Booking",
+    booking: "BOOKING",
   },
   hero: {
     line1: "SMOOTH.",
@@ -802,10 +885,11 @@ const tr: Dict = {
     line3: "FUNK.",
     description:
       "Typhoon, Türkçe sözleri blues rock, funk, soul, caz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede enerji dolu.",
-    ctaListen: "Şarkıları dinle",
-    ctaBook: "Booking talebi",
-    playFeatured: "{title} dinle",
+    ctaListen: "Şarkıları dinleyin",
+    ctaBook: "Typhoon'u davet edin",
+    playFeatured: "Dinleyin: {title}",
     photoAlt: "Typhoon solisti kırmızı klavyelerde canlı",
+    facts: ["Nefesli grubuyla {count} müzisyen", "Hechingen'den canlı grup"],
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -837,7 +921,7 @@ const tr: Dict = {
     more: "Typhoon hakkında daha fazla",
     imageAlt: "Typhoon sahnede canlı söylüyor",
     cta: "Kadroyu tanıyın",
-    ctaBook: "Booking talebi",
+    ctaBook: "Typhoon'u davet edin",
     facts: [
       { label: "Kadro", value: "Nefesli grubuyla {count} müzisyen" },
       { label: "Sözler", value: "Türkçe, kendi şarkıları" },
@@ -854,9 +938,9 @@ const tr: Dict = {
     intro: "Sıradaki konserler. Bilet ve detaylar doğrudan organizatörde.",
     tickets: "Bilet",
     tba: "Tarih yakında",
-    emptyTitle: "Yeni tarihler planlanıyor.",
+    emptyTitle: "Davetlere açığız.",
     emptyBody: "Festival, kulüp, şehir şenliği ya da kurumsal etkinlik: Typhoon'u sahnenize davet edin.",
-    emptyCta: "Booking talebi",
+    emptyCta: "Typhoon'u davet edin",
     past: "Geçmiş konserler",
     placeholderTitles: [
       "Yeni tarihler hazırlanıyor",
@@ -916,12 +1000,17 @@ const tr: Dict = {
       other: "Diğer",
     },
     messageLabel: "Mesaj",
-    messageHint: "Zaman, izleyici, teknik imkânlar, bütçe: her detay işimize yarar.",
+    messageHint: "Birkaç cümle yeterli: zaman, izleyici, teknik imkânlar, bütçe.",
+    phoneHint: "Geri aranmayı tercih ederseniz",
+    sendByMail: "Talebi e-postayla gönderin",
+    copyDraft: "Talebi kopyalayın",
+    copied: "Kopyalandı",
+    copyFailed: "Burada kopyalanamıyor. Metni seçip kendiniz kopyalayın:",
     required: "zorunlu",
     optional: "isteğe bağlı",
     privacyNote: "Bilgilerinizi yalnızca bu talep için kullanıyoruz. Ayrıntılar:",
     privacyLink: "Gizlilik politikası",
-    submit: "Talebi gönder",
+    submit: "Talebi gönderin",
     submitting: "Gönderiliyor …",
     requiredErr: "Lütfen işaretli alanları doldurun.",
     networkErr:
@@ -930,7 +1019,7 @@ const tr: Dict = {
       "Çevrimiçi gönderim şu anda kullanılamıyor. Lütfen booking@typhoon.band adresine yazın.",
     submitOk: "Talebiniz için teşekkürler. En kısa sürede size dönüş yapacağız.",
     submitOkTitle: "Talebiniz ulaştı",
-    submitAnother: "Yeni talep gönder",
+    submitAnother: "Yeni talep gönderin",
     submitError:
       "Talep gönderilemedi. Lütfen daha sonra tekrar deneyin ya da bize doğrudan yazın.",
     errors: {
@@ -1007,9 +1096,39 @@ const tr: Dict = {
     body: "Ana sayfaya dönün. Müzik orada çalıyor.",
     cta: "Ana sayfaya dön",
   },
+  faq: {
+    title: "Organizatörlerden sorular",
+    intro: "Talep göndermeden önce en önemli bilgiler, kısaca.",
+    items: [
+      {
+        q: "Typhoon nasıl bir müzik yapıyor?",
+        a: "Türkçe sözlü kendi şarkıları: Amerikan-Avrupa soundu ile blues rock, funk, soul, caz ve southern rock. Demoları sayfanın en üstündeki setlist'te hemen dinleyebilirsiniz.",
+      },
+      {
+        q: "Kadro ne kadar büyük?",
+        a: "{count} müzisyen: vokal, nefesli grubu ve ritim grubu. Müzisyenleri yukarıda “Kadro” bölümünde tanıyabilirsiniz.",
+      },
+      {
+        q: "Typhoon'u hangi etkinlikler için davet edebiliriz?",
+        a: "Festivaller, kulüpler, şehir şenlikleri, kurumsal ve özel etkinlikler. Ne planladığınızı bize kısaca anlatın.",
+      },
+      {
+        q: "Typhoon bölge dışında da çalıyor mu?",
+        a: "Evet. Grubun merkezi Baden-Württemberg'deki Hechingen'de ve uzak yerlere de seve seve geliyor. Etkinliğinizin nerede olduğunu yazmanız yeterli.",
+      },
+      {
+        q: "Bir konser ne kadar tutar?",
+        a: "Her talebi ayrı değerlendiriyoruz. Temel bilgileri gönderin; uygunluk ve koşullarla size bizzat dönüş yapalım.",
+      },
+      {
+        q: "Ne kadar sürede yanıt alırız?",
+        a: "Genellikle 48 saat içinde. Acele bir talebiniz varsa bizi doğrudan arayın.",
+      },
+    ],
+  },
   stage: {
     setlist: "Set listesi",
-    setlistNote: "Dinlemek için dokun · yalnızca dinleme, indirme yok",
+    setlistNote: "Dinlemek için dokunun · yalnızca dinleme, indirme yok",
     previewTitle: "Talebin bize böyle ulaşır",
     previewTo: "Alıcı",
     previewFrom: "Gönderen",
