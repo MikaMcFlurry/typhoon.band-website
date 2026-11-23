@@ -40,7 +40,7 @@ possible.
 | Thin structured data, unconfirmed "Kanzlei Studio" (all three) | **Done:** one `@graph` (WebSite, WebPage, MusicGroup with tracks + booking ContactPoint + phone, FAQPage). Studio name removed until confirmed. |
 | Promoter questions not answered on the page (Google, xAI, OpenAI) | **Done:** FAQ after Booking, six answers built only from owner booking facts. |
 | Empty Shows section second on the page (OpenAI, xAI) | **Done:** without dates it moves above Booking as a short lead-in, tape "Auftritte auf Anfrage."; nav follows. With dates it stays second. |
-| Mobile LCP 3.4 s, poster preloaded below the fold (all three) | **Done:** poster eager but not preloaded, tighter `sizes`, header logo never lazy. Local Lighthouse mobile 88 → 96, LCP 3.7 → 2.5 s. |
+| Mobile LCP 3.4 s, poster preloaded below the fold (all three) | **Partly done:** poster eager but not preloaded, tighter `sizes`, header logo never lazy (11.8 → 5 KB). Local Lighthouse, median of 5 runs on the same machine: mobile performance 87 → 88, LCP 3.85 → 3.63 s (within run-to-run noise); desktop 100 → 100. An earlier median of 3 (96 / 2.5 s) was an outlier and is withdrawn. A smaller hero signature on phones was tried and reverted (the poster became the LCP element, no gain). A real LCP gain needs a follow-up (e.g. a lighter signature asset, less client JS). |
 | 44 px targets (Google, OpenAI, xAI) | **Done:** `btn-sm`, locale switcher, logo link, inline legal links. |
 | Player dock covers focused form fields (xAI) | **Done:** `scroll-padding-bottom`. |
 | 404 uses booking orange for "home", home title (Google, OpenAI, xAI) | **Done.** |
@@ -55,8 +55,16 @@ possible.
 
 ## Found during verification
 
-- Live imprint at 320 px clipped "Verbraucherstreitbeilegung" by 23 px.
-  Legal headings now hyphenate.
+- Live imprint at 320 px clipped "Verbraucherstreitbeilegung" by 23 px, and
+  the privacy title broke as "DATENSCHUTZERK/LÄRUNG". Legal headings now
+  carry soft hyphens at the compound joints.
+- The new hero fact line first wrapped differently with the fallback font
+  than with Martian Mono, which moved the vertically centred hero column on
+  font swap (local desktop CLS 0.02 → 0.08). It is now two short lines that
+  never wrap; CLS is back to the baseline (0.022).
+- Pre-existing, not changed: at 1280 × 800 the setlist is ~17 px taller with
+  the fallback font, so the centred hero column moves ~9 px on font swap
+  (same on `main`).
 
 ## Owner decisions (open)
 

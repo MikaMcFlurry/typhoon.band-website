@@ -324,7 +324,7 @@ const de: Dict = {
     ctaBook: "Booking anfragen",
     playFeatured: "{title} anhören",
     photoAlt: "Typhoon-Sänger live an den roten Keyboards",
-    facts: ["{count} Musiker mit Bläsersatz", "Live-Band aus Hechingen, Baden-Württemberg"],
+    facts: ["{count} Musiker mit Bläsersatz", "Live-Band aus Hechingen"],
   },
   brand: {
     genreLine: "BLUESROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -603,7 +603,7 @@ const en: Dict = {
     ctaBook: "Request a booking",
     playFeatured: "Play {title}",
     photoAlt: "Typhoon's singer live at the red keyboards",
-    facts: ["{count} musicians with horns", "Live band from Hechingen, Germany"],
+    facts: ["{count} musicians with horns", "Live band from Hechingen"],
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -880,7 +880,7 @@ const tr: Dict = {
     ctaBook: "Typhoon'u davet edin",
     playFeatured: "{title} dinle",
     photoAlt: "Typhoon solisti kırmızı klavyelerde canlı",
-    facts: ["Nefeslilerle {count} müzisyen", "Hechingen, Baden-Württemberg'den canlı grup"],
+    facts: ["Nefeslilerle {count} müzisyen", "Hechingen'den canlı grup"],
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",

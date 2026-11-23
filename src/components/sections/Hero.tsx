@@ -104,12 +104,13 @@ export function Hero({
             </a>
           </div>
           {/* What a booker needs to qualify the band at a glance: size
-              (from live data) and base. */}
-          <ul className="mono-cap mt-5 flex flex-wrap gap-x-2 gap-y-1 text-chalk-2 short:mt-4">
-            {dict.hero.facts.map((f, i, all) => (
-              <li key={f}>
+              (from live data) and base. One short line each, so the block
+              is two lines tall with or without the web font: a wrap that
+              changes on font swap would shift the centred hero column. */}
+          <ul className="mono-cap mt-5 flex flex-col gap-y-1 text-chalk-2 short:mt-4">
+            {dict.hero.facts.map((f) => (
+              <li className="whitespace-nowrap" key={f}>
                 {fill(f, { count: memberCount })}
-                {i < all.length - 1 ? <span aria-hidden className="ml-2 text-chalk-3">·</span> : null}
               </li>
             ))}
           </ul>
