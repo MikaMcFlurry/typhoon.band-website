@@ -36,7 +36,7 @@ possible.
 | Event type select, field order (OpenAI, Google) | **Done.** One-tap chips, core questions first, optional phone last. Same values, API unchanged. |
 | Fallback loses the visitor's draft (OpenAI) | **Done.** Fallback and delivery errors offer the draft as a prefilled e-mail. |
 | og:url/type/locale/site_name missing (all three) | **Done** for home and legal pages. |
-| H1 words concatenated, no location/offer near the hero (all three) | **Done:** spaced h1, data-driven fact line ("9 Musiker mit Bläsersatz · Live-Band aus Hechingen, Baden-Württemberg"), titles with "Typhoon Band". Tagline itself kept (owner copy). |
+| H1 words concatenated, no location/offer near the hero (all three) | **Done:** spaced h1, data-driven two-line fact block ("9 Musiker mit Bläsersatz" / "Live-Band aus Hechingen"), titles with "Typhoon Band". Tagline itself kept (owner copy). |
 | Thin structured data, unconfirmed "Kanzlei Studio" (all three) | **Done:** one `@graph` (WebSite, WebPage, MusicGroup with tracks + booking ContactPoint + phone, FAQPage). Studio name removed until confirmed. |
 | Promoter questions not answered on the page (Google, xAI, OpenAI) | **Done:** FAQ after Booking, six answers built only from owner booking facts. |
 | Empty Shows section second on the page (OpenAI, xAI) | **Done:** without dates it moves above Booking as a short lead-in, tape "Auftritte auf Anfrage."; nav follows. With dates it stays second. |
