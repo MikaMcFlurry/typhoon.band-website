@@ -38,6 +38,8 @@ export function Header({
   // Set when a menu link is used: focus then moves to that section's
   // heading instead of back to the menu toggle (Esc still returns it).
   const focusAfterClose = useRef<SectionId | null>(null);
+  // Pending heading-focus attempts; cancelled when the sheet opens again.
+  const focusRetries = useRef<{ raf: number; timer: number } | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
 
   const labels: Record<SectionId, string> = {
@@ -88,6 +90,11 @@ export function Header({
   // Mobile sheet: lock scroll, Esc closes, focus stays inside, focus returns.
   useEffect(() => {
     if (!open) return;
+    if (focusRetries.current) {
+      cancelAnimationFrame(focusRetries.current.raf);
+      window.clearTimeout(focusRetries.current.timer);
+      focusRetries.current = null;
+    }
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const sheet = sheetRef.current;
@@ -121,6 +128,7 @@ export function Header({
     document.addEventListener("keydown", onKey);
     const button = menuButtonRef.current;
     const pendingRef = focusAfterClose;
+    const retriesRef = focusRetries;
     return () => {
       document.body.style.overflow = prevOverflow;
       document.removeEventListener("keydown", onKey);
@@ -139,8 +147,13 @@ export function Header({
           const dropped = !active || active === document.body || (sheetNode?.contains(active) ?? false);
           if (dropped) heading.focus({ preventScroll: true });
         };
-        requestAnimationFrame(focusHeading);
-        window.setTimeout(focusHeading, 150);
+        retriesRef.current = {
+          raf: requestAnimationFrame(focusHeading),
+          timer: window.setTimeout(() => {
+            retriesRef.current = null;
+            focusHeading();
+          }, 150),
+        };
       } else {
         button?.focus();
       }

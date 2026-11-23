@@ -127,6 +127,16 @@ The round-4 OpenAI re-check confirmed the navigation fix in all engines
 | Legal pages repeated the home description (OpenAI, P3) | The content fallback only gives the home page a description; Admin entries still win. |
 | Turkish success/setlist/play wording (OpenAI, P3) | "Yeni talep gönderin", "dokunun", "Dinleyin: {title}". |
 
+## Re-check (round 5) and fixes
+
+The round-5 OpenAI re-check confirmed all round-4 scenarios in all three
+engines.
+
+| Finding | Fix |
+|---|---|
+| Reopening the menu within ~150 ms of a menu Booking tap let the pending heading-focus retry pull focus behind the open sheet (OpenAI, P2) | Pending retries are cancelled whenever the sheet opens. Journey check. |
+| A legal link inside the privacy settings dialog opened the page underneath the still-open dialog (OpenAI, P3, also on live) | Following a legal link closes the dialog. Journey check. |
+
 ## Owner decisions (open)
 
 1. Vercel: apex redirect 307 → 308.
