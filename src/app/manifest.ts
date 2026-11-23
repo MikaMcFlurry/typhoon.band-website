@@ -5,7 +5,9 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Typhoon",
     short_name: "Typhoon",
     description: "Bluesrock, Funk, Soul, Jazz & Southern Rock mit türkischen Texten.",
-    start_url: "/",
+    // Straight to the default locale (no redirect hop on launch).
+    start_url: "/de",
+    lang: "de",
     display: "standalone",
     background_color: "#121110",
     theme_color: "#121110",

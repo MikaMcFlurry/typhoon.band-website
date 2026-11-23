@@ -17,6 +17,11 @@
 export const CONSENT_STORAGE_KEY = "typhoon.consent.v1";
 export const CONSENT_CHANGE_EVENT = "typhoon:consent-changed";
 export const CONSENT_OPEN_EVENT = "typhoon:open-consent";
+// Fired by an ExternalMediaGate when it mounts: only then is there anything
+// on the page that needs a decision, so only then the first-visit notice
+// appears. Pages without third-party content never show it.
+export const CONSENT_NEEDED_EVENT = "typhoon:consent-needed";
+export const CONSENT_GATE_ATTR = "data-consent-gate";
 
 export type ConsentCategory = "necessary" | "external_media";
 

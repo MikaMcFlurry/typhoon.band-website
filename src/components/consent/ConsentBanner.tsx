@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CONSENT_CHANGE_EVENT,
+  CONSENT_GATE_ATTR,
+  CONSENT_NEEDED_EVENT,
   CONSENT_OPEN_EVENT,
   readConsent,
   writeConsent,
@@ -11,7 +13,11 @@ import {
 import { useDict } from "@/components/i18n/DictProvider";
 
 // Privacy notice + preferences.
-//   - First visit: a small, non-blocking notice (content stays usable).
+//   - First visit: a small, non-blocking notice, but only on a page that
+//     actually holds third-party content (an ExternalMediaGate). The site
+//     sets no cookies and loads nothing external by default, so without a
+//     gate there is nothing to decide and the notice would only cover the
+//     hero's play and booking buttons.
 //   - "Privacy settings" in the footer reopens it as a modal dialog with a
 //     focus trap, Esc and Cancel.
 // Nothing is tracked. The only stored item is this choice (localStorage).
@@ -27,8 +33,12 @@ export function ConsentBanner() {
 
   useEffect(() => {
     const state = readConsent();
-    if (!state.decided) setMode("notice");
-    else setExternal(state.choice.external_media);
+    if (state.decided) setExternal(state.choice.external_media);
+    const needNotice = () => {
+      if (!readConsent().decided) setMode((m) => (m === "hidden" ? "notice" : m));
+    };
+    // A gate may have mounted before this effect ran.
+    if (!state.decided && document.querySelector(`[${CONSENT_GATE_ATTR}]`)) needNotice();
 
     const onOpen = () => {
       const current = readConsent();
@@ -46,9 +56,11 @@ export function ConsentBanner() {
     };
     window.addEventListener(CONSENT_OPEN_EVENT, onOpen);
     window.addEventListener(CONSENT_CHANGE_EVENT, onChange);
+    window.addEventListener(CONSENT_NEEDED_EVENT, needNotice);
     return () => {
       window.removeEventListener(CONSENT_OPEN_EVENT, onOpen);
       window.removeEventListener(CONSENT_CHANGE_EVENT, onChange);
+      window.removeEventListener(CONSENT_NEEDED_EVENT, needNotice);
     };
   }, []);
 

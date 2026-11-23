@@ -49,7 +49,7 @@ function Linkify({ text }: { text: string }) {
           const isMail = part.includes("@") && !part.startsWith("http");
           return (
             <a
-              className="link-u break-words text-chalk"
+              className="link-u break-words py-3 text-chalk"
               href={isMail ? `mailto:${part}` : part}
               key={i}
               rel={isMail ? undefined : "noopener noreferrer"}

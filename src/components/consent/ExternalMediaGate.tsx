@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
   CONSENT_CHANGE_EVENT,
+  CONSENT_GATE_ATTR,
+  CONSENT_NEEDED_EVENT,
   CONSENT_OPEN_EVENT,
   hasCategoryConsent,
   writeConsent,
@@ -30,6 +32,8 @@ export function ExternalMediaGate({ provider, ratio = "16 / 9", children }: Prop
   useEffect(() => {
     const refresh = () => setAllowed(hasCategoryConsent("external_media"));
     refresh();
+    // Tell the privacy notice that this page now has content to decide on.
+    window.dispatchEvent(new CustomEvent(CONSENT_NEEDED_EVENT));
     window.addEventListener(CONSENT_CHANGE_EVENT, refresh);
     return () => window.removeEventListener(CONSENT_CHANGE_EVENT, refresh);
   }, []);
@@ -44,6 +48,7 @@ export function ExternalMediaGate({ provider, ratio = "16 / 9", children }: Prop
   return (
     <div
       className="flex flex-col items-start justify-center gap-4 border-2 border-rule-2 bg-deck-2 p-6"
+      {...{ [CONSENT_GATE_ATTR]: "" }}
       style={{ aspectRatio: ratio }}
     >
       <p className="mono-cap text-chalk-2">{dict.gate.title}</p>

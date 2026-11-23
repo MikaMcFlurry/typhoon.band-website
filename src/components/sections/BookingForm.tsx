@@ -15,14 +15,18 @@ type Status =
   | { kind: "submitting" }
   | { kind: "sent"; message: string }
   | { kind: "fallback"; message: string }
-  | { kind: "error"; message: string };
+  // `delivery`: the request itself was fine but could not be delivered
+  // (network or server); the visitor gets the draft as a ready e-mail.
+  | { kind: "error"; message: string; delivery?: boolean };
 
 type ApiResponse =
   | { ok: true; status: "sent" | "fallback"; message: string }
   | { ok: false; status: string; message: string; field?: string };
 
 const EVENT_TYPES: EventTypeKey[] = ["festival", "club", "cityfest", "corporate", "private", "other"];
-const ORDER: FieldKey[] = ["name", "email", "phone", "event_date", "event_location", "event_type", "message"];
+// Visual order of the fields (core questions first, optional last); the
+// first invalid field in this order gets focus.
+const ORDER: FieldKey[] = ["name", "email", "event_type", "event_location", "event_date", "message", "phone"];
 const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
 
 function todayIso() {
@@ -33,7 +37,18 @@ function todayIso() {
 
 type Draft = Partial<Record<FieldKey, string>>;
 
-export function BookingForm({ email, aside }: { email: string; aside?: React.ReactNode }) {
+// Layout (booker on a phone first): the rider heading and direct contact,
+// then the form, then the rider facts. From lg the heading and facts share
+// the left column and the form spans both rows on the right.
+export function BookingForm({
+  email,
+  intro,
+  facts,
+}: {
+  email: string;
+  intro?: React.ReactNode;
+  facts?: React.ReactNode;
+}) {
   const { dict, locale } = useDict();
   const t = dict.booking;
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -41,6 +56,7 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
   const [minDate, setMinDate] = useState<string | undefined>(undefined);
   const [draft, setDraft] = useState<Draft>({});
   const startedAt = useRef<number>(0);
+  const lastDraft = useRef<Draft>({});
   const formRef = useRef<HTMLFormElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
@@ -80,6 +96,7 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
       focusFirst(errs);
       return;
     }
+    lastDraft.current = data;
     setStatus({ kind: "submitting" });
     try {
       const res = await fetch("/api/booking", {
@@ -89,7 +106,7 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
       });
       const body = (await res.json().catch(() => null)) as ApiResponse | null;
       if (!body) {
-        setStatus({ kind: "error", message: t.networkErr });
+        setStatus({ kind: "error", message: t.networkErr, delivery: true });
         return;
       }
       if (!body.ok) {
@@ -99,7 +116,11 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
           setErrors(next);
           focusFirst(next);
         }
-        setStatus({ kind: "error", message: body.message || t.submitError });
+        setStatus({
+          kind: "error",
+          message: body.message || t.submitError,
+          delivery: !field && body.status !== "rate_limited",
+        });
         return;
       }
       form.reset();
@@ -111,8 +132,27 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
           : { kind: "sent", message: body.message || t.submitOk },
       );
     } catch {
-      setStatus({ kind: "error", message: t.networkErr });
+      setStatus({ kind: "error", message: t.networkErr, delivery: true });
     }
+  }
+
+  // The visitor's request as a ready-to-send e-mail, so nothing typed is
+  // lost when online delivery is unavailable.
+  function mailtoHref(d: Draft) {
+    const typeLabel = d.event_type && t.types[d.event_type as EventTypeKey];
+    const subject = [t.title, typeLabel, d.event_location?.trim()].filter(Boolean).join(" · ");
+    const lines = [
+      [t.nameLabel, d.name],
+      [t.emailLabel, d.email],
+      [t.phoneLabel, d.phone],
+      [t.dateLabel, d.event_date],
+      [t.locationLabel, d.event_location],
+      [t.typeLabel, typeLabel],
+    ]
+      .filter(([, v]) => v && String(v).trim())
+      .map(([k, v]) => `${k}: ${String(v).trim()}`);
+    const body = [...lines, "", d.message?.trim() ?? ""].join("\n").trim();
+    return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
   function onDraft(e: React.FormEvent<HTMLFormElement>) {
@@ -189,146 +229,193 @@ export function BookingForm({ email, aside }: { email: string; aside?: React.Rea
         timeZone: "UTC",
       }).format(new Date(`${draft.event_date}T00:00:00Z`))
     : null;
-  const empty = <span className="text-[rgba(18,17,16,0.62)]">{dict.stage.previewEmpty}</span>;
   const from = [draft.name?.trim(), draft.email?.trim() ? `<${draft.email.trim()}>` : ""].filter(Boolean).join(" ");
-  const previewRows: [string, React.ReactNode][] = [
-    [dict.stage.previewTo, email],
-    [dict.stage.previewFrom, from || empty],
-    [t.phoneLabel, draft.phone?.trim() || empty],
-    [t.dateLabel, dateText || empty],
-    [t.locationLabel, draft.event_location?.trim() || empty],
-    [t.typeLabel, typeKey && t.types[typeKey] ? t.types[typeKey] : empty],
-  ];
+  // The preview lists only what is already filled in (plus the address it
+  // goes to), so an empty form does not push the submit button a screen
+  // further down.
+  const previewRows = (
+    [
+      [dict.stage.previewTo, email],
+      [dict.stage.previewFrom, from],
+      [t.typeLabel, typeKey && t.types[typeKey] ? t.types[typeKey] : ""],
+      [t.locationLabel, draft.event_location?.trim() ?? ""],
+      [t.dateLabel, dateText ?? ""],
+      [t.phoneLabel, draft.phone?.trim() ?? ""],
+    ] as [string, string][]
+  ).filter(([, v]) => v);
+  const previewMessage = draft.message?.trim();
+  const typeErr = errors.event_type;
 
-  return (
-    <div className="grid gap-x-12 gap-y-12 lg:grid-cols-12">
-      <div className="lg:col-span-5">
-        {aside}
+  const form = done ? (
+    <div
+      className="flex min-h-[420px] flex-col items-start justify-center bg-deck-2 p-6 text-chalk outline-none md:p-10"
+      ref={resultRef}
+      role="status"
+      tabIndex={-1}
+    >
+      <h3 className="font-stage text-[2.5rem] font-black uppercase leading-[1.02]">
+        <span className="tape -rotate-[0.8deg]">
+          {status.kind === "sent" ? t.submitOkTitle : t.direct}
+        </span>
+      </h3>
+      <p className="copy mt-3">{status.message}</p>
+      {status.kind === "fallback" ? (
+        <>
+          <a className="btn-tape mt-6" href={mailtoHref(lastDraft.current)}>
+            <Icon name="mail" size={18} />
+            {t.sendByMail}
+          </a>
+          <p className="mono mt-3 text-chalk-2 [overflow-wrap:anywhere]">{email}</p>
+        </>
+      ) : (
+        <button
+          className="btn-line mt-6"
+          onClick={() => {
+            startedAt.current = Date.now();
+            setStatus({ kind: "idle" });
+          }}
+          type="button"
+        >
+          {t.submitAnother}
+        </button>
+      )}
+    </div>
+  ) : (
+    <form
+      className="relative bg-deck-2 p-5 text-chalk sm:p-7 md:p-9"
+      noValidate
+      onInput={onDraft}
+      onSubmit={onSubmit}
+      ref={formRef}
+    >
+      {/* Honeypot: off-screen, not focusable, ignored by assistive tech. */}
+      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label>
+          Website
+          <input autoComplete="off" name="hp_field" tabIndex={-1} type="text" />
+        </label>
       </div>
 
-      <div className="lg:col-span-7 [--focus:var(--chalk)]">
-        {done ? (
-          <div
-            className="flex min-h-[420px] flex-col items-start justify-center bg-deck-2 p-6 text-chalk outline-none md:p-10"
-            ref={resultRef}
-            role="status"
-            tabIndex={-1}
-          >
-            <h3 className="font-stage text-[2.5rem] font-black uppercase leading-[1.02]">
-              <span className="tape -rotate-[0.8deg]">
-                {status.kind === "sent" ? t.submitOkTitle : t.direct}
-              </span>
-            </h3>
-            <p className="copy mt-3">{status.message}</p>
-            {status.kind === "fallback" ? (
-              <a className="btn-tape mt-6" href={`mailto:${email}`}>
-                <Icon name="mail" size={18} />
-                {email}
-              </a>
-            ) : (
-              <button
-                className="btn-line mt-6"
-                onClick={() => {
-                  startedAt.current = Date.now();
-                  setStatus({ kind: "idle" });
-                }}
-                type="button"
-              >
-                {t.submitAnother}
-              </button>
-            )}
-          </div>
-        ) : (
-          <form
-            className="relative bg-deck-2 p-5 text-chalk sm:p-7 md:p-9"
-            noValidate
-            onInput={onDraft}
-            onSubmit={onSubmit}
-            ref={formRef}
-          >
-            {/* Honeypot: off-screen, not focusable, ignored by assistive tech. */}
-            <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
-              <label>
-                Website
-                <input autoComplete="off" name="hp_field" tabIndex={-1} type="text" />
+      <p className="mono-cap mb-6 text-chalk-3">
+        <span aria-hidden className="text-orange">* </span>
+        {t.required}
+      </p>
+
+      <div className="grid gap-x-5 gap-y-6 sm:grid-cols-2">
+        {field("name", t.nameLabel, <input {...a11y("name")} autoComplete="name" required type="text" />, { required: true })}
+        {field("email", t.emailLabel, <input {...a11y("email")} autoComplete="email" inputMode="email" required type="email" />, { required: true })}
+
+        {/* Event type as one-tap choices instead of a select menu. Same
+            values as before, so the API and the inbox stay unchanged. */}
+        <fieldset
+          aria-describedby={typeErr ? "bk-event_type-err" : undefined}
+          className="st-field st-choices sm:col-span-2"
+          data-invalid={typeErr ? "" : undefined}
+        >
+          <legend>
+            {t.typeLabel}
+            <span aria-hidden className="text-orange"> *</span>
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            {EVENT_TYPES.map((k) => (
+              <label className="st-chip" key={k}>
+                <input
+                  name="event_type"
+                  required
+                  type="radio"
+                  value={k}
+                />
+                <span>{t.types[k]}</span>
               </label>
-            </div>
+            ))}
+          </div>
+          {typeErr ? (
+            <p className="st-field-error" id="bk-event_type-err">
+              {typeErr}
+            </p>
+          ) : null}
+        </fieldset>
 
-            <div className="grid gap-x-5 gap-y-6 sm:grid-cols-2">
-              {field("name", t.nameLabel, <input {...a11y("name")} autoComplete="name" required type="text" />, { required: true })}
-              {field("email", t.emailLabel, <input {...a11y("email")} autoComplete="email" inputMode="email" required type="email" />, { required: true })}
-              {field("phone", t.phoneLabel, <input {...a11y("phone")} autoComplete="tel" inputMode="tel" type="tel" />)}
-              {field("event_date", t.dateLabel, <input {...a11y("event_date")} min={minDate} type="date" />)}
-              {field(
-                "event_location",
-                t.locationLabel,
-                <input {...a11y("event_location", true)} autoComplete="address-level2" required type="text" />,
-                { required: true, hint: t.locationHint },
-              )}
-              {field(
-                "event_type",
-                t.typeLabel,
-                <select {...a11y("event_type")} defaultValue="" required>
-                  <option disabled value="">
-                    {t.typePlaceholder}
-                  </option>
-                  {EVENT_TYPES.map((k) => (
-                    <option key={k} value={k}>
-                      {t.types[k]}
-                    </option>
-                  ))}
-                </select>,
-                { required: true },
-              )}
-              {field(
-                "message",
-                t.messageLabel,
-                <textarea {...a11y("message", true)} required rows={6} />,
-                { required: true, hint: t.messageHint, span: true },
-              )}
-            </div>
-
-            <aside aria-label={dict.stage.previewTitle} className="relative mt-10 bg-chalk p-4 text-[#121110] sm:p-5">
-              <span aria-hidden className="tape-piece -top-2.5 left-5 -rotate-3 !bg-orange" />
-              <p className="font-stage text-[1.375rem] font-extrabold uppercase leading-none">{dict.stage.previewTitle}</p>
-              <dl className="mono mt-4 flex flex-col gap-2.5 sm:gap-1.5">
-                {previewRows.map(([k, v]) => (
-                  <div className="grid grid-cols-1 gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,1fr)]" key={k}>
-                    <dt className="text-[rgba(18,17,16,0.66)]">{k}</dt>
-                    <dd className="min-w-0 [overflow-wrap:anywhere]">{v}</dd>
-                  </div>
-                ))}
-              </dl>
-              <p className="mt-4 whitespace-pre-line border-t border-[rgba(18,17,16,0.25)] pt-3 text-[0.9375rem] leading-relaxed [overflow-wrap:anywhere]">
-                {draft.message?.trim() ? draft.message.trim() : <>{t.messageLabel}: {empty}</>}
-              </p>
-            </aside>
-
-            <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <p className="max-w-[46ch] text-[0.875rem] leading-relaxed text-chalk-2">
-                {t.privacyNote}{" "}
-                <Link className="link-u text-chalk" href={`/${locale}/legal/privacy`}>
-                  {t.privacyLink}
-                </Link>
-                .
-              </p>
-              <button className="btn-tape flex-none" disabled={submitting} type="submit">
-                {submitting ? <Icon name="spinner" size={18} /> : null}
-                {submitting ? t.submitting : t.submit}
-                {submitting ? null : <Icon name="arrow-right" size={20} />}
-              </button>
-            </div>
-
-            <div aria-live="polite" className="min-h-0">
-              {status.kind === "error" ? (
-                <p className="mt-4 bg-[rgba(255,138,122,0.1)] px-4 py-3 text-[0.9375rem] text-alert" role="alert">
-                  {status.message}
-                </p>
-              ) : null}
-            </div>
-          </form>
+        {field(
+          "event_location",
+          t.locationLabel,
+          <input {...a11y("event_location", true)} autoComplete="address-level2" required type="text" />,
+          { required: true, hint: t.locationHint },
+        )}
+        {field("event_date", t.dateLabel, <input {...a11y("event_date")} min={minDate} type="date" />)}
+        {field(
+          "message",
+          t.messageLabel,
+          <textarea {...a11y("message", true)} required rows={5} />,
+          { required: true, hint: t.messageHint, span: true },
+        )}
+        {field(
+          "phone",
+          t.phoneLabel,
+          <input {...a11y("phone", true)} autoComplete="tel" inputMode="tel" type="tel" />,
+          { hint: t.phoneHint },
         )}
       </div>
+
+      <aside aria-label={dict.stage.previewTitle} className="relative mt-10 bg-chalk p-4 text-[#121110] sm:p-5">
+        <span aria-hidden className="tape-piece -top-2.5 left-5 -rotate-3 !bg-orange" />
+        <p className="font-stage text-[1.375rem] font-extrabold uppercase leading-none">{dict.stage.previewTitle}</p>
+        <dl className="mono mt-4 flex flex-col gap-2.5 sm:gap-1.5">
+          {previewRows.map(([k, v]) => (
+            <div className="grid grid-cols-1 gap-x-3 gap-y-0.5 sm:grid-cols-[12rem_minmax(0,1fr)]" key={k}>
+              <dt className="text-[rgba(18,17,16,0.66)]">{k}</dt>
+              <dd className="min-w-0 [overflow-wrap:anywhere]">{v}</dd>
+            </div>
+          ))}
+        </dl>
+        {previewMessage ? (
+          <p className="mt-4 whitespace-pre-line border-t border-[rgba(18,17,16,0.25)] pt-3 text-[0.9375rem] leading-relaxed [overflow-wrap:anywhere]">
+            {previewMessage}
+          </p>
+        ) : previewRows.length === 1 ? (
+          <p className="mt-3 text-[0.9375rem] text-[rgba(18,17,16,0.66)]">{dict.stage.previewEmpty}</p>
+        ) : null}
+      </aside>
+
+      <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+        <p className="max-w-[46ch] text-[0.875rem] leading-relaxed text-chalk-2">
+          {t.privacyNote}{" "}
+          <Link className="link-u py-3 text-chalk" href={`/${locale}/legal/privacy`}>
+            {t.privacyLink}
+          </Link>
+          .
+        </p>
+        <div className="flex flex-col gap-2 sm:items-end">
+          <button className="btn-tape flex-none" disabled={submitting} type="submit">
+            {submitting ? <Icon name="spinner" size={18} /> : null}
+            {submitting ? t.submitting : t.submit}
+            {submitting ? null : <Icon name="arrow-right" size={20} />}
+          </button>
+          <p className="text-[0.875rem] text-chalk-2 sm:whitespace-nowrap sm:text-right">{t.reply}</p>
+        </div>
+      </div>
+
+      <div aria-live="polite" className="min-h-0">
+        {status.kind === "error" ? (
+          <div className="mt-4 bg-[rgba(255,138,122,0.1)] px-4 py-3 text-[0.9375rem] text-alert" role="alert">
+            <p>{status.message}</p>
+            {status.delivery ? (
+              <a className="link-u mt-2 inline-flex min-h-11 items-center gap-2 text-chalk" href={mailtoHref(lastDraft.current)}>
+                <Icon name="mail" size={18} />
+                {t.sendByMail}
+              </a>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </form>
+  );
+
+  return (
+    <div className="grid gap-x-12 gap-y-10 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-y-8">
+      <div className="lg:col-span-5 lg:col-start-1 lg:row-start-1">{intro}</div>
+      <div className="lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 [--focus:var(--chalk)]">{form}</div>
+      {facts ? <div className="lg:col-span-5 lg:col-start-1 lg:row-start-2">{facts}</div> : null}
     </div>
   );
 }

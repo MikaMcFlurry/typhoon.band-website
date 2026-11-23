@@ -9,18 +9,25 @@ import { LocaleSwitcher } from "@/components/site/LocaleSwitcher";
 import { Icon } from "@/components/ui/Icon";
 
 // Top strip: small gold signature left (always, so the bar never reads
-// empty), mono nav, language switch, and the one orange booking tape.
+// empty), mono nav, language switch, and the one orange booking tape —
+// on every width, so a booker on a phone is always one tap from the form.
+// The nav follows the page order: Shows sits second only when real dates
+// exist (see the home page), otherwise just before Booking.
 
-const SECTIONS = ["music", "shows", "band", "media"] as const;
-type SectionId = (typeof SECTIONS)[number] | "booking";
+type SectionId = "music" | "shows" | "band" | "media" | "booking";
 
 export function Header({
   bookingEmail,
   phone,
+  showsFirst = false,
 }: {
   bookingEmail: string;
   phone: string;
+  showsFirst?: boolean;
 }) {
+  const SECTIONS: SectionId[] = showsFirst
+    ? ["music", "shows", "band", "media"]
+    : ["music", "band", "media", "shows"];
   const { dict, locale } = useDict();
   const pathname = usePathname() ?? "";
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
@@ -58,7 +65,7 @@ export function Header({
       setActive(null);
       return;
     }
-    const ids: SectionId[] = [...SECTIONS, "booking"];
+    const ids: SectionId[] = ["music", "shows", "band", "media", "booking"];
     const nodes = ids
       .map((id) => document.getElementById(id))
       .filter((n): n is HTMLElement => Boolean(n));
@@ -132,15 +139,18 @@ export function Header({
         <div className="shell flex h-full items-center justify-between gap-4">
           <Link
             aria-label={dict.a11y.home}
-            className="relative -ml-1 flex-none p-1"
+            className="relative -ml-1 flex min-h-11 flex-none items-center p-1"
             href={isHome ? "#top" : `/${locale}`}
           >
+            {/* Above the fold on every page: never lazy. On the home page it
+                is not preloaded, so it does not compete with the hero. */}
             <Image
               alt="Typhoon"
               className="h-8 w-auto md:h-10"
               height={724}
+              loading={isHome ? "eager" : undefined}
               priority={!isHome}
-              sizes="140px"
+              sizes="(min-width: 768px) 116px, 93px"
               src="/assets/branding/typhoon-signature-gold-bold.png"
               width={2099}
             />
@@ -172,7 +182,7 @@ export function Header({
 
           <div className="flex items-center gap-2 md:gap-4">
             <LocaleSwitcher className="hidden sm:flex" />
-            <a className="btn-tape btn-sm hidden sm:inline-flex" href={hrefFor("booking")}>
+            <a className="btn-tape btn-sm" href={hrefFor("booking")}>
               {dict.nav.booking}
             </a>
             <button
