@@ -1094,7 +1094,7 @@ const tr: Dict = {
       },
       {
         q: "Kadro ne kadar büyük?",
-        a: "{count} müzisyen: vokal, nefesli grubu ve ritim grubu. Müzisyenleri yukarıda „Kadro“ bölümünde tanıyabilirsiniz.",
+        a: "{count} müzisyen: vokal, nefesli grubu ve ritim grubu. Müzisyenleri yukarıda “Kadro” bölümünde tanıyabilirsiniz.",
       },
       {
         q: "Typhoon'u hangi etkinlikler için davet edebiliriz?",

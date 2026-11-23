@@ -29,11 +29,18 @@ export function MotionInit() {
       requestAnimationFrame(() => layNow.forEach((el) => el.classList.add("is-in"))),
     );
 
+    // A hidden `.lay` strip is fully clipped (clip-path inset 100%), and
+    // Chromium's IntersectionObserver counts the target's own clip-path, so
+    // it would never report it as visible and the strip (e.g. the Booking
+    // heading) stayed invisible. Observe the unclipped parent instead and
+    // reveal the strip through it.
+    const targetsOf = new Map<Element, HTMLElement[]>();
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            entry.target.classList.add("is-in");
+            for (const el of targetsOf.get(entry.target) ?? []) el.classList.add("is-in");
+            targetsOf.delete(entry.target);
             io.unobserve(entry.target);
           }
         }
@@ -42,7 +49,11 @@ export function MotionInit() {
     );
     pending
       .filter((el) => !el.classList.contains("is-in") && !layNow.includes(el))
-      .forEach((el) => io.observe(el));
+      .forEach((el) => {
+        const watch = el.classList.contains("lay") ? el.parentElement ?? el : el;
+        targetsOf.set(watch, [...(targetsOf.get(watch) ?? []), el]);
+        io.observe(watch);
+      });
     return () => {
       cancelAnimationFrame(raf);
       io.disconnect();

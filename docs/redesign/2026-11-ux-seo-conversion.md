@@ -55,6 +55,15 @@ possible.
 
 ## Found during verification
 
+- **Live bug, Chromium (Chrome, Edge, Android):** with normal motion settings
+  the tape headings below the first screen never appeared. "Typhoon buchen"
+  and the Shows tape stayed fully clipped, because Chromium's
+  IntersectionObserver counts the target's own `clip-path` and never reported
+  the clipped strip as visible (Firefox and WebKit did). Found by the Google
+  reviewer in the final review; reproduced on the live site. MotionInit now
+  observes the unclipped parent of each `.lay` strip; a motion-on journey
+  check covers it in all three engines.
+
 - Live imprint at 320 px clipped "Verbraucherstreitbeilegung" by 23 px, and
   the privacy title broke as "DATENSCHUTZERK/LÄRUNG". Legal headings now
   carry soft hyphens at the compound joints.
