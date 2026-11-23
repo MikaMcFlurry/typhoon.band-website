@@ -7,6 +7,22 @@ import type { LegalSection } from "@/content/legal";
 // is split into paragraphs/lists and only e-mail addresses and http(s)
 // URLs become links.
 
+// Soft hyphens at the joints of the long legal compounds, so a 320 px phone
+// breaks "Datenschutz-erklärung" at the joint instead of mid-syllable or off
+// screen. Works without a browser hyphenation dictionary (hyphens: manual).
+const SHY = "\u00ad";
+const JOINTS: [RegExp, string][] = [
+  [/(datenschutz)(erkl)/gi, `$1${SHY}$2`],
+  [/(verbraucher)(streit|schlichtung)/gi, `$1${SHY}$2`],
+  [/(streit)(beilegung)/gi, `$1${SHY}$2`],
+  [/(schlichtungs)(stelle)/gi, `$1${SHY}$2`],
+  [/(urheber)(recht)/gi, `$1${SHY}$2`],
+];
+
+export function softHyphenate(text: string) {
+  return JOINTS.reduce((t, [re, rep]) => t.replace(re, rep), text);
+}
+
 export function LegalShell({
   homeHref,
   backLabel,
@@ -30,9 +46,7 @@ export function LegalShell({
           <Icon name="arrow-left" size={16} />
           {backLabel}
         </Link>
-        {/* Long German compounds (Datenschutzerklärung) hyphenate instead of
-            breaking mid-word or running off a 320 px screen. */}
-        <h1 className="h-stage mt-6 hyphens-auto [overflow-wrap:anywhere]">{title}</h1>
+        <h1 className="h-stage mt-6 [overflow-wrap:anywhere]">{softHyphenate(title)}</h1>
         {meta ? <p className="mono mt-4 text-chalk-3">{meta}</p> : null}
         <div className="mt-10 border-t-2 border-chalk pt-2">{children}</div>
       </div>
@@ -89,8 +103,8 @@ function List({ items }: { items: string[] }) {
 
 function H2({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mt-12 hyphens-auto font-stage text-[1.75rem] font-extrabold uppercase leading-none [overflow-wrap:anywhere] md:text-[2rem]">
-      {children}
+    <h2 className="mt-12 font-stage text-[1.75rem] font-extrabold uppercase leading-none [overflow-wrap:anywhere] md:text-[2rem]">
+      {typeof children === "string" ? softHyphenate(children) : children}
     </h2>
   );
 }
