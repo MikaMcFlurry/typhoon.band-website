@@ -57,7 +57,7 @@ export function BookingForm({
   const [draft, setDraft] = useState<Draft>({});
   const startedAt = useRef<number>(0);
   const lastDraft = useRef<Draft>({});
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "ok" | "fail">("idle");
   const formRef = useRef<HTMLFormElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
@@ -167,9 +167,9 @@ export function BookingForm({
   async function copyDraft() {
     try {
       await navigator.clipboard.writeText(`${draftSubject(lastDraft.current)}\n\n${draftText(lastDraft.current)}`);
-      setCopied(true);
+      setCopyState("ok");
     } catch {
-      setCopied(false);
+      setCopyState("fail");
     }
   }
 
@@ -296,11 +296,23 @@ export function BookingForm({
               {t.sendByMail}
             </a>
             <button className="btn-line" onClick={copyDraft} type="button">
-              {copied ? <Icon name="check" size={18} /> : null}
-              {copied ? t.copied : t.copyDraft}
+              {copyState === "ok" ? <Icon name="check" size={18} /> : null}
+              {copyState === "ok" ? t.copied : t.copyDraft}
             </button>
           </div>
           <p className="mono mt-3 text-chalk-2 [overflow-wrap:anywhere]">{email}</p>
+          {copyState === "fail" ? (
+            <div className="st-field mt-6 w-full">
+              <label htmlFor="bk-draft-copy">{t.copyFailed}</label>
+              <textarea
+                id="bk-draft-copy"
+                onFocus={(e) => e.currentTarget.select()}
+                readOnly
+                rows={8}
+                value={`${draftSubject(lastDraft.current)}\n\n${draftText(lastDraft.current)}`}
+              />
+            </div>
+          ) : null}
         </>
       ) : (
         <button

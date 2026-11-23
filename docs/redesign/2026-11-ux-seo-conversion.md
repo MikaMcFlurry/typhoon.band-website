@@ -96,6 +96,23 @@ possible.
 | Vercel toolbar requests on the preview (OpenAI, preview gate) | Preview-only (production CSP never allows `vercel.live`); can be switched off per project in Vercel. Not a code change. |
 | Short-phone hero ~60 px longer (OpenAI design note) | Kept: the two fact lines are the booker qualifier; the header Booking button is always in reach. |
 
+## Re-check (round 3) and fixes
+
+An OpenAI re-check confirmed all round-2 fixes and found one more
+**live bug (P1)**; the Google design review signed off with non-blocking
+notes (`SHIP_WITH_NON_BLOCKING_FINDINGS`).
+
+| Finding | Fix |
+|---|---|
+| With normal motion, home → privacy page → "Zur Startseite" left the hero tapes and every reveal hidden for good (all engines, also live): MotionInit only registered the elements present on the first load, but the site layout survives client navigation (OpenAI, P1) | MotionInit also registers every `.reveal`/`.lay` inserted later (MutationObserver, before paint). Journey check: privacy page and back. |
+| Menu Booking left keyboard focus on `body` (OpenAI, P3) | Focus moves to the section heading after the menu closes (after the fragment navigation and the inert fix-up). |
+| 404/admin/legal inherited home share texts and description (OpenAI, P3) | The locale layout no longer sets description or share title/description; the home page sets its own. |
+| Turkish action labels mixed informal/formal (OpenAI, P3) | Formal register throughout (dinleyin, gönderin, kopyalayın). |
+| Copy request failed silently (OpenAI, P3) | Visible message plus a selectable draft. |
+| Consent dialog links and switches under 44 px (Google, P3) | 44+ px targets. |
+| "BOOKİNG" under `lang="tr"` (Google, P3) | Label stored in capitals, so Turkish casing cannot dot the I. |
+| Vercel toolbar requests `vercel.live` on previews (OpenAI, P2 for the owner preview) | Owner decision, see below: preview-only by the repo's own CSP design (comments for reviewers); production never loads it. |
+
 ## Owner decisions (open)
 
 1. Vercel: apex redirect 307 → 308.
@@ -108,3 +125,7 @@ possible.
    whether weddings should be named explicitly (the form option says
    "Private Feier / Hochzeit"; the FAQ currently says "Privatevents").
 8. Whether any consented, cookieless measurement of requests is wanted.
+9. Vercel toolbar on preview deployments: it loads `vercel.live` scripts
+   before any consent on previews only (production CSP blocks it). Keep it
+   for review comments, or switch it off for previews in the Vercel
+   project settings.

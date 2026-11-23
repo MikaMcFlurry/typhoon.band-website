@@ -35,6 +35,9 @@ export function Header({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<SectionId | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  // Set when a menu link is used: focus then moves to that section's
+  // heading instead of back to the menu toggle (Esc still returns it).
+  const focusAfterClose = useRef<SectionId | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
 
   const labels: Record<SectionId, string> = {
@@ -117,10 +120,25 @@ export function Header({
     };
     document.addEventListener("keydown", onKey);
     const button = menuButtonRef.current;
+    const pendingRef = focusAfterClose;
     return () => {
       document.body.style.overflow = prevOverflow;
       document.removeEventListener("keydown", onKey);
-      button?.focus();
+      const target = pendingRef.current;
+      pendingRef.current = null;
+      const section = target ? document.getElementById(target) : null;
+      const heading = section?.querySelector<HTMLElement>("h2, h3") ?? section;
+      if (heading) {
+        if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
+        // After the link's own fragment navigation and the browser's focus
+        // fix-up for the now inert sheet, both of which reset focus (Firefox
+        // does the latter a little later, hence the second attempt).
+        const focusHeading = () => heading.focus({ preventScroll: true });
+        requestAnimationFrame(focusHeading);
+        window.setTimeout(focusHeading, 150);
+      } else {
+        button?.focus();
+      }
     };
   }, [open]);
 
@@ -228,7 +246,10 @@ export function Header({
                 <a
                   className="flex items-center justify-between py-3 font-stage text-[2.5rem] font-extrabold uppercase leading-none"
                   href={hrefFor(id)}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    if (isHome) focusAfterClose.current = id;
+                    setOpen(false);
+                  }}
                 >
                   <span className={id === "booking" ? "tape tape-orange" : active === id ? "tape" : ""}>
                     {labels[id]}

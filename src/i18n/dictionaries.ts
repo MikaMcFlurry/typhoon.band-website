@@ -129,6 +129,7 @@ export type Dict = {
     sendByMail: string;
     copyDraft: string;
     copied: string;
+    copyFailed: string;
     required: string;
     optional: string;
     privacyNote: string;
@@ -443,6 +444,7 @@ const de: Dict = {
     sendByMail: "Anfrage per E-Mail senden",
     copyDraft: "Anfrage kopieren",
     copied: "Kopiert",
+    copyFailed: "Kopieren geht hier nicht. Markiert den Text und kopiert ihn selbst:",
     required: "Pflichtfeld",
     optional: "optional",
     privacyNote:
@@ -723,6 +725,7 @@ const en: Dict = {
     sendByMail: "Send the request by email",
     copyDraft: "Copy the request",
     copied: "Copied",
+    copyFailed: "Copying is not available here. Select the text and copy it yourself:",
     required: "required",
     optional: "optional",
     privacyNote: "We only use your details to handle this request. See our",
@@ -874,7 +877,7 @@ const tr: Dict = {
     music: "Müzik",
     shows: "Konserler",
     media: "Fotoğraflar",
-    booking: "Booking",
+    booking: "BOOKING",
   },
   hero: {
     line1: "SMOOTH.",
@@ -882,9 +885,9 @@ const tr: Dict = {
     line3: "FUNK.",
     description:
       "Typhoon, Türkçe sözleri blues rock, funk, soul, caz ve southern rock ile birleştirir — güçlü, sıcak ve sahnede enerji dolu.",
-    ctaListen: "Şarkıları dinle",
+    ctaListen: "Şarkıları dinleyin",
     ctaBook: "Typhoon'u davet edin",
-    playFeatured: "{title} dinle",
+    playFeatured: "{title} dinleyin",
     photoAlt: "Typhoon solisti kırmızı klavyelerde canlı",
     facts: ["Nefesli grubuyla {count} müzisyen", "Hechingen'den canlı grup"],
   },
@@ -999,14 +1002,15 @@ const tr: Dict = {
     messageLabel: "Mesaj",
     messageHint: "Birkaç cümle yeterli: zaman, izleyici, teknik imkânlar, bütçe.",
     phoneHint: "Geri aranmayı tercih ederseniz",
-    sendByMail: "Talebi e-postayla gönder",
-    copyDraft: "Talebi kopyala",
+    sendByMail: "Talebi e-postayla gönderin",
+    copyDraft: "Talebi kopyalayın",
     copied: "Kopyalandı",
+    copyFailed: "Burada kopyalanamıyor. Metni seçip kendiniz kopyalayın:",
     required: "zorunlu",
     optional: "isteğe bağlı",
     privacyNote: "Bilgilerinizi yalnızca bu talep için kullanıyoruz. Ayrıntılar:",
     privacyLink: "Gizlilik politikası",
-    submit: "Talebi gönder",
+    submit: "Talebi gönderin",
     submitting: "Gönderiliyor …",
     requiredErr: "Lütfen işaretli alanları doldurun.",
     networkErr:

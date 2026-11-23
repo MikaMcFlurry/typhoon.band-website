@@ -116,11 +116,11 @@ export function ConsentBanner() {
 
   const links = (
     <p className="mono text-[rgba(18,17,16,0.72)]">
-      <Link className="underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/privacy`}>
+      <Link className="inline-block py-3 underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/privacy`}>
         {dict.cookies.privacyLink}
       </Link>
       <span aria-hidden> · </span>
-      <Link className="underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/cookies`}>
+      <Link className="inline-block py-3 underline underline-offset-4 hover:text-[#121110]" href={`/${locale}/legal/cookies`}>
         {dict.cookies.cookiesLink}
       </Link>
     </p>
@@ -218,7 +218,7 @@ function Switch({
     <button
       aria-checked={checked}
       aria-label={label}
-      className={`relative mt-1 inline-flex h-7 w-12 flex-none items-center border-2 border-[#121110] transition-colors ${
+      className={`relative inline-flex h-7 w-12 flex-none items-center border-2 border-[#121110] transition-colors before:absolute before:-inset-x-1 before:-inset-y-[10px] before:content-[''] ${
         checked ? "bg-green" : "bg-transparent"
       } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
       disabled={disabled}
