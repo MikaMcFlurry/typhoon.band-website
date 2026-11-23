@@ -30,7 +30,9 @@ export function LegalShell({
           <Icon name="arrow-left" size={16} />
           {backLabel}
         </Link>
-        <h1 className="h-stage mt-6 [overflow-wrap:anywhere]">{title}</h1>
+        {/* Long German compounds (Datenschutzerklärung) hyphenate instead of
+            breaking mid-word or running off a 320 px screen. */}
+        <h1 className="h-stage mt-6 hyphens-auto [overflow-wrap:anywhere]">{title}</h1>
         {meta ? <p className="mono mt-4 text-chalk-3">{meta}</p> : null}
         <div className="mt-10 border-t-2 border-chalk pt-2">{children}</div>
       </div>
@@ -87,7 +89,7 @@ function List({ items }: { items: string[] }) {
 
 function H2({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mt-12 font-stage text-[1.75rem] font-extrabold uppercase leading-none md:text-[2rem]">
+    <h2 className="mt-12 hyphens-auto font-stage text-[1.75rem] font-extrabold uppercase leading-none [overflow-wrap:anywhere] md:text-[2rem]">
       {children}
     </h2>
   );
