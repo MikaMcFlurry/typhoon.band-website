@@ -5,7 +5,7 @@ import { NotFoundView } from "@/components/site/NotFoundView";
 // title and no canonical/hreflang: the layout's point at the home page.
 export const metadata: Metadata = {
   title: "404",
-  alternates: { canonical: null, languages: {} },
+  robots: { index: false, follow: true },
 };
 
 export default function NotFound() {

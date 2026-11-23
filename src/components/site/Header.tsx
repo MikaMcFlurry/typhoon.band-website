@@ -182,7 +182,16 @@ export function Header({
 
           <div className="flex items-center gap-2 md:gap-4">
             <LocaleSwitcher className="hidden sm:flex" />
-            <a className="btn-tape btn-sm" href={hrefFor("booking")}>
+            {/* While the menu sheet is open its own orange Booking row is the
+                action, so this one steps aside (keeps its space, not
+                focusable); it always closes the sheet when used. */}
+            <a
+              aria-hidden={open || undefined}
+              className={`btn-tape btn-sm ${open ? "invisible" : ""}`}
+              href={hrefFor("booking")}
+              onClick={() => setOpen(false)}
+              tabIndex={open ? -1 : undefined}
+            >
               {dict.nav.booking}
             </a>
             <button

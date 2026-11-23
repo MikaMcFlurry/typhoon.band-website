@@ -127,6 +127,8 @@ export type Dict = {
     messageHint: string;
     phoneHint: string;
     sendByMail: string;
+    copyDraft: string;
+    copied: string;
     required: string;
     optional: string;
     privacyNote: string;
@@ -439,6 +441,8 @@ const de: Dict = {
     messageHint: "Ein paar Sätze reichen: Zeitrahmen, Publikum, Technik vor Ort, Budget.",
     phoneHint: "Falls ihr lieber einen Rückruf möchtet",
     sendByMail: "Anfrage per E-Mail senden",
+    copyDraft: "Anfrage kopieren",
+    copied: "Kopiert",
     required: "Pflichtfeld",
     optional: "optional",
     privacyNote:
@@ -536,7 +540,7 @@ const de: Dict = {
     items: [
       {
         q: "Was für Musik spielt Typhoon?",
-        a: "Eigene Songs mit türkischen Texten: Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Die Demos laufen direkt oben in der Setlist.",
+        a: "Eigene Songs mit türkischen Texten: Bluesrock, Funk, Soul, Jazz und Southern Rock mit amerikanisch-europäischem Sound. Reinhören könnt ihr direkt oben in der Setlist.",
       },
       {
         q: "Wie groß ist die Besetzung?",
@@ -544,7 +548,7 @@ const de: Dict = {
       },
       {
         q: "Für welche Anlässe können wir Typhoon buchen?",
-        a: "Für Festivals, Clubs, Stadtfeste, Firmenevents und private Feiern, auch Hochzeiten. Erzählt uns in der Anfrage kurz, was ihr plant.",
+        a: "Für Festivals, Clubs, Stadtfeste, Firmen- und Privatevents. Erzählt uns in der Anfrage kurz, was ihr plant.",
       },
       {
         q: "Spielt Typhoon auch außerhalb der Region?",
@@ -552,7 +556,7 @@ const de: Dict = {
       },
       {
         q: "Was kostet ein Auftritt?",
-        a: "Das hängt vor allem von Datum, Ort, Zeitrahmen und Technik vor Ort ab. Schickt uns eure Eckdaten, wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
+        a: "Das klären wir für jede Anfrage einzeln. Schickt uns eure Eckdaten, wir melden uns persönlich mit Verfügbarkeit und Konditionen.",
       },
       {
         q: "Wie schnell bekommen wir eine Antwort?",
@@ -629,7 +633,7 @@ const en: Dict = {
     eyebrow: "Typhoon",
     headline: "American feeling. European soul. Turkish lyrics.",
     body:
-      "Typhoon breaks genre boundaries without losing their handwriting: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
+      "Typhoon breaks genre boundaries without losing their signature sound: punchy blues riffs, funky grooves, soulful melodies, jazz finesse and Turkish-language lyrics. An experienced band that ignites the moment they hit the stage.",
     lead:
       "Typhoon delivers a powerful mix of blues rock, funk, soul, jazz and southern rock with an American-European sound. Self-written songs combine punchy blues riffs, funky grooves, soulful melodies and jazz finesse. Turkish-language lyrics give the songs depth and a cultural identity of their own.\n\nAt its core is a well-rehearsed collective of experienced musicians, built on vocals, a horn section and a grooving rhythm section.",
     more: "More about Typhoon",
@@ -652,7 +656,7 @@ const en: Dict = {
     intro: "Upcoming concerts. Tickets and details come straight from the promoter.",
     tickets: "Tickets",
     tba: "Date to be announced",
-    emptyTitle: "Shows on request.",
+    emptyTitle: "Available for bookings.",
     emptyBody: "Festival, club, city festival or corporate event: bring Typhoon to your stage.",
     emptyCta: "Request a booking",
     past: "Past shows",
@@ -717,6 +721,8 @@ const en: Dict = {
     messageHint: "A few lines are enough: timing, audience, on-site tech, budget.",
     phoneHint: "If you would rather get a call back",
     sendByMail: "Send the request by email",
+    copyDraft: "Copy the request",
+    copied: "Copied",
     required: "required",
     optional: "optional",
     privacyNote: "We only use your details to handle this request. See our",
@@ -813,7 +819,7 @@ const en: Dict = {
     items: [
       {
         q: "What kind of music does Typhoon play?",
-        a: "Original songs with Turkish lyrics: blues rock, funk, soul, jazz and southern rock with an American-European sound. The demos play right at the top of the page in the setlist.",
+        a: "Original songs with Turkish lyrics: blues rock, funk, soul, jazz and southern rock with an American-European sound. Listen in the setlist at the top of the page.",
       },
       {
         q: "How big is the line-up?",
@@ -821,7 +827,7 @@ const en: Dict = {
       },
       {
         q: "What occasions can we book Typhoon for?",
-        a: "Festivals, clubs, city festivals, corporate events and private parties, weddings included. Tell us briefly what you are planning.",
+        a: "Festivals, clubs, city festivals, corporate and private events. Tell us briefly what you are planning.",
       },
       {
         q: "Does Typhoon play outside the region?",
@@ -829,7 +835,7 @@ const en: Dict = {
       },
       {
         q: "How much does a show cost?",
-        a: "It mainly depends on the date, location, timing and the tech on site. Send us the key facts and we will reply personally with availability and terms.",
+        a: "We quote every request individually. Send us the key facts and we will reply personally with availability and terms.",
       },
       {
         q: "How quickly will we hear back?",
@@ -880,7 +886,7 @@ const tr: Dict = {
     ctaBook: "Typhoon'u davet edin",
     playFeatured: "{title} dinle",
     photoAlt: "Typhoon solisti kırmızı klavyelerde canlı",
-    facts: ["Nefeslilerle {count} müzisyen", "Hechingen'den canlı grup"],
+    facts: ["Nefesli grubuyla {count} müzisyen", "Hechingen'den canlı grup"],
   },
   brand: {
     genreLine: "BLUES ROCK • FUNK • SOUL • JAZZ • SOUTHERN ROCK",
@@ -929,7 +935,7 @@ const tr: Dict = {
     intro: "Sıradaki konserler. Bilet ve detaylar doğrudan organizatörde.",
     tickets: "Bilet",
     tba: "Tarih yakında",
-    emptyTitle: "Konserler talep üzerine.",
+    emptyTitle: "Davetlere açığız.",
     emptyBody: "Festival, kulüp, şehir şenliği ya da kurumsal etkinlik: Typhoon'u sahnenize davet edin.",
     emptyCta: "Typhoon'u davet edin",
     past: "Geçmiş konserler",
@@ -994,6 +1000,8 @@ const tr: Dict = {
     messageHint: "Birkaç cümle yeterli: zaman, izleyici, teknik imkânlar, bütçe.",
     phoneHint: "Geri aranmayı tercih ederseniz",
     sendByMail: "Talebi e-postayla gönder",
+    copyDraft: "Talebi kopyala",
+    copied: "Kopyalandı",
     required: "zorunlu",
     optional: "isteğe bağlı",
     privacyNote: "Bilgilerinizi yalnızca bu talep için kullanıyoruz. Ayrıntılar:",
@@ -1098,19 +1106,19 @@ const tr: Dict = {
       },
       {
         q: "Typhoon'u hangi etkinlikler için davet edebiliriz?",
-        a: "Festivaller, kulüpler, şehir şenlikleri, kurumsal etkinlikler ve düğünler dahil özel davetler. Ne planladığınızı bize kısaca anlatın.",
+        a: "Festivaller, kulüpler, şehir şenlikleri, kurumsal ve özel etkinlikler. Ne planladığınızı bize kısaca anlatın.",
       },
       {
         q: "Typhoon bölge dışında da çalıyor mu?",
-        a: "Evet. Grup Baden-Württemberg'deki Hechingen'de yaşıyor ve uzak yerlere de seve seve geliyor. Etkinliğinizin nerede olduğunu yazmanız yeterli.",
+        a: "Evet. Grubun merkezi Baden-Württemberg'deki Hechingen'de ve uzak yerlere de seve seve geliyor. Etkinliğinizin nerede olduğunu yazmanız yeterli.",
       },
       {
         q: "Bir konser ne kadar tutar?",
-        a: "Bu en çok tarih, yer, süre ve mekândaki teknik imkânlara bağlı. Temel bilgileri gönderin; uygunluk ve koşullarla size bizzat dönüş yapalım.",
+        a: "Her talebi ayrı değerlendiriyoruz. Temel bilgileri gönderin; uygunluk ve koşullarla size bizzat dönüş yapalım.",
       },
       {
         q: "Ne kadar sürede yanıt alırız?",
-        a: "Genellikle 48 saat içinde. Acil durumlarda bizi doğrudan arayın.",
+        a: "Genellikle 48 saat içinde. Acele bir talebiniz varsa bizi doğrudan arayın.",
       },
     ],
   },

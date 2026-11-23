@@ -23,7 +23,10 @@ possible.
 3. Implementation in two commits, local gates (tsc, lint, build), journey
    checks on the Vercel preview in Chromium, Firefox and WebKit with live
    data (the booking API is always intercepted; no request was sent).
-4. Fresh independent review of the final preview.
+4. Fresh independent review of the final preview (OpenAI GPT-6.2 Sol as
+   release red team, Google Gemini 4 Hydrogen for design). Findings and
+   fixes are listed below; every blocking finding got its own regression
+   check in the journey suite.
 
 ## Council findings and decisions
 
@@ -75,6 +78,24 @@ possible.
   the fallback font, so the centred hero column moves ~9 px on font swap
   (same on `main`).
 
+## Final review (round 2) and fixes
+
+| Finding | Fix |
+|---|---|
+| Header Booking left the open menu sheet over the form (OpenAI, P2) | Header button steps aside while the sheet is open and closes it when used. |
+| E-mail recovery link kept the draft from before a correction; LF line breaks (OpenAI, P2) | Built from the current fields while the form is on screen; CRLF per RFC 6068; "copy request" in the terminal fallback. |
+| FAQ promised weddings and named pricing factors not confirmed by the owner (OpenAI, P2) | Weddings removed (owner facts: "Firmen- und Privatevents"); price answer: "we quote every request individually". The 48-hour reply stays (already live owner copy). |
+| Privacy link 42 px, chip outline 2.6:1 (OpenAI, P2) | 44+ px hit area; chip outline `chalk-3` (5.4:1 on deck). |
+| 404 head switched back to the home title/canonical after hydration (OpenAI, P2) | Canonical/hreflang/og:url moved from the locale layout to the home and legal pages; 404 metadata also on the matched catch-all route. |
+| Tape headings below the fold never appeared in Chromium (Google, see above) | MotionInit observes the unclipped parent. |
+| WebKit scrolls focused fields behind the player dock (OpenAI, non-blocking) | Form nudges a focused field above the dock. |
+| Sitemap image refresh, fake `lastmod` (OpenAI, non-blocking) | Hourly revalidation, only the image loaders, no `lastmod`. |
+| `primaryImageOfPage`, unverified contact languages, legal Twitter title (OpenAI, P3) | Hero `ImageObject`; `availableLanguage`/`knowsLanguage` removed; legal Twitter title. |
+| EN/TR wording (OpenAI, P3) | EN "Available for bookings.", "Listen in the setlist…", "signature sound"; TR "Davetlere açığız.", "Grubun merkezi …", "Nefesli grubuyla …", "Acele bir talebiniz varsa …". |
+| FAQ answer below a tall intro on phones (OpenAI design note) | Phones: heading, questions, then the booking tape. |
+| Vercel toolbar requests on the preview (OpenAI, preview gate) | Preview-only (production CSP never allows `vercel.live`); can be switched off per project in Vercel. Not a code change. |
+| Short-phone hero ~60 px longer (OpenAI design note) | Kept: the two fact lines are the booker qualifier; the header Booking button is always in reach. |
+
 ## Owner decisions (open)
 
 1. Vercel: apex redirect 307 → 308.
@@ -83,6 +104,7 @@ possible.
 4. Track spelling "Sakli Kalan" vs. Turkish "Saklı Kalan" (Admin → Music).
 5. Gallery curation and a whole-band live photo for the band section.
 6. Real platform links (enables `sameAs` and the "Auch auf" row).
-7. Confirm FAQ wording, in particular "auch Hochzeiten" (taken from the
-   form option "Private Feier / Hochzeit") and the 48-hour reply time.
+7. Confirm the FAQ wording, in particular the 48-hour reply time and
+   whether weddings should be named explicitly (the form option says
+   "Private Feier / Hochzeit"; the FAQ currently says "Privatevents").
 8. Whether any consented, cookieless measurement of requests is wanted.

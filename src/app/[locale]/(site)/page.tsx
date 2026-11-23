@@ -35,6 +35,10 @@ export async function generateMetadata({
   return {
     title: { absolute: title },
     description,
+    alternates: {
+      canonical: `/${locale}`,
+      languages: { de: "/de", en: "/en", tr: "/tr", "x-default": "/de" },
+    },
     openGraph: {
       type: "website",
       siteName: "Typhoon",
@@ -84,6 +88,7 @@ export default async function HomePage({
     images: ["/og-image.jpg", content.hero.imageUrl, content.bandInfo.imageUrl].filter(
       (src, i, all) => src && all.indexOf(src) === i,
     ),
+    heroImage: content.hero.imageUrl,
     shows: upcoming
       .filter((s) => s.date)
       .map((s) => ({

@@ -63,15 +63,9 @@ export async function generateMetadata({
     },
     description: dict.meta.description,
     applicationName: "Typhoon",
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        de: "/de",
-        en: "/en",
-        tr: "/tr",
-        "x-default": "/de",
-      },
-    },
+    // Canonical, hreflang and og:url are route-specific and live on each
+    // page (home, legal); set here they leaked into routes without their
+    // own, e.g. the 404 page ended up pointing at the home page.
     openGraph: {
       type: "website",
       siteName: "Typhoon",
@@ -81,7 +75,6 @@ export async function generateMetadata({
       alternateLocale: LOCALES.filter((l) => l !== locale).map(
         (l) => OG_LOCALE[l],
       ),
-      url: `/${locale}`,
       images: [
         {
           url: "/og-image.jpg",

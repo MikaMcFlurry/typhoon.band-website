@@ -56,6 +56,7 @@ export async function legalMetadata(type: LegalPageType, rawLocale: string): Pro
       title: `${title} · Typhoon`,
       images: [{ url: image, width: 1200, height: 630, alt: dict.meta.shareAlt }],
     },
+    twitter: { card: "summary_large_image", title: `${title} · Typhoon`, images: [image] },
   };
 }
 

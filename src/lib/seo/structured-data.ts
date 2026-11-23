@@ -25,6 +25,8 @@ export type HomeJsonLdInput = {
   email: string;
   phone: string;
   images: string[];
+  /** The visible hero image (band collage). */
+  heroImage: string;
   shows: JsonLdShow[];
   faq: { q: string; a: string }[];
 };
@@ -52,7 +54,6 @@ export function buildHomeJsonLd(input: HomeJsonLdInput): string {
       height: 724,
     },
     genre: ["Blues rock", "Funk", "Soul", "Jazz", "Southern rock"],
-    knowsLanguage: ["tr", "de", "en"],
     // Base town only: the studio name is not an owner-approved public
     // attribution yet (PRODUCT.md, "Undecided").
     location: {
@@ -71,7 +72,6 @@ export function buildHomeJsonLd(input: HomeJsonLdInput): string {
       contactType: "booking",
       email: input.email,
       telephone: input.phone.replace(/\s+/g, ""),
-      availableLanguage: ["German", "English", "Turkish"],
       url: `${pageUrl}#booking`,
     },
     member: input.members.map((m) => ({
@@ -142,7 +142,7 @@ export function buildHomeJsonLd(input: HomeJsonLdInput): string {
       inLanguage: input.locale,
       isPartOf: { "@id": siteId },
       about: { "@id": bandId },
-      primaryImageOfPage: input.images[0] ? absoluteUrl(input.images[0]) : undefined,
+      primaryImageOfPage: { "@type": "ImageObject", url: absoluteUrl(input.heroImage) },
     },
     band,
   ];

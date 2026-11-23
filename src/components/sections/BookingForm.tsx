@@ -57,6 +57,7 @@ export function BookingForm({
   const [draft, setDraft] = useState<Draft>({});
   const startedAt = useRef<number>(0);
   const lastDraft = useRef<Draft>({});
+  const [copied, setCopied] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
@@ -136,11 +137,17 @@ export function BookingForm({
     }
   }
 
-  // The visitor's request as a ready-to-send e-mail, so nothing typed is
-  // lost when online delivery is unavailable.
-  function mailtoHref(d: Draft) {
+  // The visitor's request as plain text and as a ready-to-send e-mail, so
+  // nothing typed is lost when online delivery is unavailable. While the
+  // form is still on screen (delivery error) it is built from the current
+  // fields, so a correction made after the error is what gets sent; after
+  // the fallback the form is gone and the submitted snapshot is used.
+  function draftSubject(d: Draft) {
     const typeLabel = d.event_type && t.types[d.event_type as EventTypeKey];
-    const subject = [t.title, typeLabel, d.event_location?.trim()].filter(Boolean).join(" · ");
+    return [t.title, typeLabel, d.event_location?.trim()].filter(Boolean).join(" · ");
+  }
+  function draftText(d: Draft) {
+    const typeLabel = d.event_type && t.types[d.event_type as EventTypeKey];
     const lines = [
       [t.nameLabel, d.name],
       [t.emailLabel, d.email],
@@ -151,8 +158,30 @@ export function BookingForm({
     ]
       .filter(([, v]) => v && String(v).trim())
       .map(([k, v]) => `${k}: ${String(v).trim()}`);
-    const body = [...lines, "", d.message?.trim() ?? ""].join("\n").trim();
-    return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return [...lines, "", d.message?.trim() ?? ""].join("\n").trim();
+  }
+  function mailtoHref(d: Draft) {
+    const body = draftText(d).replace(/\r?\n/g, "\r\n");
+    return `mailto:${email}?subject=${encodeURIComponent(draftSubject(d))}&body=${encodeURIComponent(body)}`;
+  }
+  async function copyDraft() {
+    try {
+      await navigator.clipboard.writeText(`${draftSubject(lastDraft.current)}\n\n${draftText(lastDraft.current)}`);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  // WebKit ignores scroll-padding when it scrolls a focused field into
+  // view, so a field can end up behind the player dock: nudge it up.
+  function keepClearOfDock(e: React.FocusEvent<HTMLFormElement>) {
+    const el = e.target as HTMLElement;
+    const dock = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+    if (!dock || !el.getBoundingClientRect) return;
+    const r = el.getBoundingClientRect();
+    const limit = window.innerHeight - dock - 12;
+    if (r.bottom > limit) window.scrollBy({ top: Math.min(r.bottom - limit, r.top - 96) });
   }
 
   function onDraft(e: React.FormEvent<HTMLFormElement>) {
@@ -261,10 +290,16 @@ export function BookingForm({
       <p className="copy mt-3">{status.message}</p>
       {status.kind === "fallback" ? (
         <>
-          <a className="btn-tape mt-6" href={mailtoHref(lastDraft.current)}>
-            <Icon name="mail" size={18} />
-            {t.sendByMail}
-          </a>
+          <div className="mt-6 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
+            <a className="btn-tape" href={mailtoHref(lastDraft.current)}>
+              <Icon name="mail" size={18} />
+              {t.sendByMail}
+            </a>
+            <button className="btn-line" onClick={copyDraft} type="button">
+              {copied ? <Icon name="check" size={18} /> : null}
+              {copied ? t.copied : t.copyDraft}
+            </button>
+          </div>
           <p className="mono mt-3 text-chalk-2 [overflow-wrap:anywhere]">{email}</p>
         </>
       ) : (
@@ -284,6 +319,7 @@ export function BookingForm({
     <form
       className="relative bg-deck-2 p-5 text-chalk sm:p-7 md:p-9"
       noValidate
+      onFocus={keepClearOfDock}
       onInput={onDraft}
       onSubmit={onSubmit}
       ref={formRef}
@@ -380,7 +416,7 @@ export function BookingForm({
       <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <p className="max-w-[46ch] text-[0.875rem] leading-relaxed text-chalk-2">
           {t.privacyNote}{" "}
-          <Link className="link-u py-3 text-chalk" href={`/${locale}/legal/privacy`}>
+          <Link className="link-u py-[15px] text-chalk" href={`/${locale}/legal/privacy`}>
             {t.privacyLink}
           </Link>
           .
@@ -400,7 +436,7 @@ export function BookingForm({
           <div className="mt-4 bg-[rgba(255,138,122,0.1)] px-4 py-3 text-[0.9375rem] text-alert" role="alert">
             <p>{status.message}</p>
             {status.delivery ? (
-              <a className="link-u mt-2 inline-flex min-h-11 items-center gap-2 text-chalk" href={mailtoHref(lastDraft.current)}>
+              <a className="link-u mt-2 inline-flex min-h-11 items-center gap-2 text-chalk" href={mailtoHref({ ...lastDraft.current, ...draft })}>
                 <Icon name="mail" size={18} />
                 {t.sendByMail}
               </a>
