@@ -167,16 +167,29 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
   }, []);
 
+  // The analyser graph is decoration only: it runs exactly while the
+  // element plays. Re-checking after each resume/suspend settles covers a
+  // pause that lands mid-resume (double tap) and a play() that fails.
+  const syncAnalyserClock = useCallback(() => {
+    const ac = audioCtxRef.current;
+    if (!ac || ac.state === "closed") return;
+    const playing = () => Boolean(audioRef.current && !audioRef.current.paused);
+    const settle = () => {
+      if (ac.state === "closed") return;
+      if (playing() !== (ac.state === "running")) syncAnalyserClock();
+    };
+    if (playing() && ac.state === "suspended") {
+      ac.resume().then(settle, () => {});
+    } else if (!playing() && ac.state === "running") {
+      ac.suspend().then(settle, () => {});
+    }
+  }, []);
+
   const ensureAnalyser = useCallback(() => {
     if (typeof window === "undefined") return null;
     const el = audioRef.current as CapturableAudio | null;
     if (!el) return null;
-    if (analyserRef.current) {
-      if (audioCtxRef.current?.state === "suspended") {
-        audioCtxRef.current.resume().catch(() => {});
-      }
-      return analyserRef.current;
-    }
+    if (analyserRef.current) return analyserRef.current;
     // Only a spec-style, non-invasive capture is acceptable (see header):
     // Safari has no captureStream, and Firefox (mozCaptureStream) reroutes
     // playback when capturing — both keep plain native playback.
@@ -190,8 +203,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     const Ctor = w.AudioContext ?? w.webkitAudioContext;
     if (!Ctor) return null;
     let ac: AudioContext | null = null;
+    let stream: MediaStream | null = null;
     try {
-      const stream = el.captureStream();
+      stream = el.captureStream();
       ac = new Ctor();
       const analyser = ac.createAnalyser();
       analyser.fftSize = FFT_SIZE;
@@ -210,6 +224,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       syncTap();
       return analyser;
     } catch {
+      stream?.getTracks().forEach((t) => t.stop());
       ac?.close().catch(() => {});
       return null;
     }
@@ -238,9 +253,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       };
       el.onplay = () => {
         // Also covers play() from the lock screen / media keys.
-        if (audioCtxRef.current?.state === "suspended") {
-          audioCtxRef.current.resume().catch(() => {});
-        }
+        syncAnalyserClock();
         setPlayback((s) => ({ ...s, currentId: id, isPlaying: true, hasError: false }));
       };
       el.onplaying = () => {
@@ -250,10 +263,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       el.onwaiting = () => setPlayback((s) => ({ ...s, isLoading: true }));
       el.oncanplay = () => setPlayback((s) => ({ ...s, isLoading: false }));
       el.onpause = () => {
-        // The analyser graph is decoration only — idle it while paused.
-        if (audioCtxRef.current?.state === "running") {
-          audioCtxRef.current.suspend().catch(() => {});
-        }
+        syncAnalyserClock();
         setPlayback((s) => ({ ...s, isPlaying: false }));
       };
       el.onended = () => {
@@ -280,7 +290,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       el.onvolumechange = () =>
         setPlayback((s) => ({ ...s, volume: el.volume, muted: el.muted }));
     },
-    [syncTap],
+    [syncAnalyserClock, syncTap],
   );
 
   const loadAndPlay = useCallback(
@@ -310,11 +320,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         p.catch((err: unknown) => {
           // AbortError = superseded by another play() — not a failure.
           if (err instanceof DOMException && err.name === "AbortError") return;
+          syncAnalyserClock();
           setPlayback((s) => ({ ...s, isPlaying: false, isLoading: false }));
         });
       }
     },
-    [attachListeners, ensureAnalyser, ensureAudio],
+    [attachListeners, ensureAnalyser, ensureAudio, syncAnalyserClock],
   );
   loadAndPlayRef.current = loadAndPlay;
 
@@ -331,13 +342,14 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         }
         ensureAnalyser();
         el.play().catch(() => {
+          syncAnalyserClock();
           setPlayback((s) => ({ ...s, isPlaying: false, isLoading: false }));
         });
         return;
       }
       loadAndPlay({ id, src: resolved });
     },
-    [ensureAnalyser, ensureAudio, findTrack, loadAndPlay],
+    [ensureAnalyser, ensureAudio, findTrack, loadAndPlay, syncAnalyserClock],
   );
 
   const seek = useCallback((id: string, ratio: number) => {
@@ -495,6 +507,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
+      captureRef.current?.getTracks().forEach((t) => t.stop());
       audioCtxRef.current?.close().catch(() => {});
     };
   }, []);
