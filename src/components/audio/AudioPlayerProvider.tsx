@@ -5,10 +5,21 @@
 //   - one shared HTMLAudioElement → only one song plays at a time
 //   - Web Audio AnalyserNode (fftSize 256, smoothing 0.78) for live waveforms,
 //     best-effort: playback never depends on it
-//   - crossOrigin="anonymous" before any src so Supabase-hosted MP3s are not
-//     silenced by the analyser
+//   - crossOrigin="anonymous" before any src so the analyser tap on
+//     Supabase-hosted MP3s is not CORS-tainted
 //   - auto-advance to the next playlist entry on `ended`
 //   - previous() restarts the track when >3s in, otherwise skips back
+//
+// Audio path (fix 2026-11): the <audio> element ALWAYS plays natively. The
+// analyser only listens to a copy of the signal taken with captureStream()
+// and is never in the audible path. The old createMediaElementSource()
+// routing pushed playback through Web Audio's resampler; WebKit (Safari and
+// every iOS browser) then audibly sped demos up and slowed them down when
+// the file and device sample rates differ (WebKit bug 239696), and degraded
+// the sound on iOS. Browsers without a non-invasive tap (Safari: no
+// captureStream; Firefox: capturing moves playback onto its media graph)
+// get no analyser — the waveform then shows its idle shape plus progress,
+// exactly like the reduced-motion state.
 //
 // Redesign changes:
 //   - playback state and time state live in two contexts, so the 4 Hz
@@ -83,6 +94,14 @@ const initialPlayback: PlaybackState = {
 const FFT_SIZE = 256;
 const ARTIST = "Typhoon";
 
+type CapturableAudio = HTMLAudioElement & {
+  captureStream?: () => MediaStream;
+  mozCaptureStream?: () => MediaStream;
+};
+
+/** The tap currently feeding the analyser (one captured audio track). */
+type AnalyserTap = { trackId: string; node: MediaStreamAudioSourceNode };
+
 function toTrack(entry: PlaylistEntry): Track {
   return {
     id: entry.id,
@@ -96,6 +115,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const captureRef = useRef<MediaStream | null>(null);
+  const tapRef = useRef<AnalyserTap | null>(null);
   const playlistRef = useRef<Track[]>([]);
   const currentIdRef = useRef<string | null>(null);
   const [playlist, setPlaylistState] = useState<Track[]>([]);
@@ -114,9 +135,41 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     return audioRef.current;
   }, []);
 
+  // Point the analyser at the captured stream's newest audio track. Every
+  // new `src` adds a new captured track (Chromium keeps the previous one
+  // "live" but silent), so this re-runs on `addtrack` and on every
+  // `playing`, and retires the older tracks.
+  const syncTap = useCallback(() => {
+    const ac = audioCtxRef.current;
+    const analyser = analyserRef.current;
+    const stream = captureRef.current;
+    if (!ac || !analyser || !stream) return;
+    const live = stream.getAudioTracks().filter((t) => t.readyState === "live");
+    const track = live[live.length - 1];
+    if (!track || tapRef.current?.trackId === track.id) return;
+    try {
+      tapRef.current?.node.disconnect();
+    } catch {}
+    tapRef.current = null;
+    try {
+      const node = ac.createMediaStreamSource(new MediaStream([track]));
+      node.connect(analyser);
+      tapRef.current = { trackId: track.id, node };
+    } catch {
+      // No tap → idle waveform. Playback is unaffected either way.
+    }
+    for (const old of live) {
+      if (old === track) continue;
+      try {
+        stream.removeTrack(old);
+        old.stop();
+      } catch {}
+    }
+  }, []);
+
   const ensureAnalyser = useCallback(() => {
     if (typeof window === "undefined") return null;
-    const el = audioRef.current;
+    const el = audioRef.current as CapturableAudio | null;
     if (!el) return null;
     if (analyserRef.current) {
       if (audioCtxRef.current?.state === "suspended") {
@@ -124,27 +177,43 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       }
       return analyserRef.current;
     }
+    // Only a spec-style, non-invasive capture is acceptable (see header):
+    // Safari has no captureStream, and Firefox (mozCaptureStream) reroutes
+    // playback when capturing — both keep plain native playback.
+    if (typeof el.captureStream !== "function" || "mozCaptureStream" in el) {
+      return null;
+    }
     const w = window as unknown as {
       AudioContext?: typeof AudioContext;
       webkitAudioContext?: typeof AudioContext;
     };
     const Ctor = w.AudioContext ?? w.webkitAudioContext;
     if (!Ctor) return null;
+    let ac: AudioContext | null = null;
     try {
-      const ac = new Ctor();
-      const src = ac.createMediaElementSource(el);
+      const stream = el.captureStream();
+      ac = new Ctor();
       const analyser = ac.createAnalyser();
       analyser.fftSize = FFT_SIZE;
       analyser.smoothingTimeConstant = 0.78;
-      src.connect(analyser);
-      analyser.connect(ac.destination);
+      // A muted sink keeps the analyser pulled by the graph on every
+      // engine without making the copy audible (the element is the
+      // only thing anyone hears).
+      const silent = ac.createGain();
+      silent.gain.value = 0;
+      analyser.connect(silent);
+      silent.connect(ac.destination);
+      stream.addEventListener("addtrack", () => syncTap());
+      captureRef.current = stream;
       audioCtxRef.current = ac;
       analyserRef.current = analyser;
+      syncTap();
       return analyser;
     } catch {
+      ac?.close().catch(() => {});
       return null;
     }
-  }, []);
+  }, [syncTap]);
 
   const findTrack = useCallback(
     (id: string | null) =>
@@ -167,12 +236,26 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
           progress: dur > 0 ? el.currentTime / dur : 0,
         });
       };
-      el.onplay = () =>
+      el.onplay = () => {
+        // Also covers play() from the lock screen / media keys.
+        if (audioCtxRef.current?.state === "suspended") {
+          audioCtxRef.current.resume().catch(() => {});
+        }
         setPlayback((s) => ({ ...s, currentId: id, isPlaying: true, hasError: false }));
-      el.onplaying = () => setPlayback((s) => ({ ...s, isLoading: false }));
+      };
+      el.onplaying = () => {
+        syncTap();
+        setPlayback((s) => ({ ...s, isLoading: false }));
+      };
       el.onwaiting = () => setPlayback((s) => ({ ...s, isLoading: true }));
       el.oncanplay = () => setPlayback((s) => ({ ...s, isLoading: false }));
-      el.onpause = () => setPlayback((s) => ({ ...s, isPlaying: false }));
+      el.onpause = () => {
+        // The analyser graph is decoration only — idle it while paused.
+        if (audioCtxRef.current?.state === "running") {
+          audioCtxRef.current.suspend().catch(() => {});
+        }
+        setPlayback((s) => ({ ...s, isPlaying: false }));
+      };
       el.onended = () => {
         const list = playlistRef.current;
         const idx = list.findIndex((p) => p.id === id);
@@ -197,7 +280,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       el.onvolumechange = () =>
         setPlayback((s) => ({ ...s, volume: el.volume, muted: el.muted }));
     },
-    [],
+    [syncTap],
   );
 
   const loadAndPlay = useCallback(

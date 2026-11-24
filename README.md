@@ -185,7 +185,10 @@ DB rows that hold the asset URL. Missing URLs fall back to the static asset.
 - Behaviour ported from `MikaMcFlurry/typhoon.band` branch
   `claude/typhoon-premium-redesign-x01JL` (docs/13-audio-player-source.md):
   one shared `HTMLAudioElement`, one song at a time, lazy `AudioContext` +
-  `AnalyserNode` (fftSize 256, smoothing 0.78), live FFT waveform with a
+  `AnalyserNode` (fftSize 256, smoothing 0.78) fed from
+  `audio.captureStream()` — the element itself always plays natively, never
+  through Web Audio (fixes the Safari/iOS speed wobble; no live analyser
+  where no safe tap exists), live FFT waveform with a
   deterministic idle shape per song, auto-advance, `previous()` restarts
   after 3 s, `crossOrigin="anonymous"` before every `src`.
 - Redesign additions: separate playback/time contexts (no full re-render

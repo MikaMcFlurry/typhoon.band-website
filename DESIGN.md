@@ -352,7 +352,7 @@ A `deck-2` bar with a 3px pink progress line on top, a 44px cover thumbnail (`li
 ### Motion
 - **Lay:** tape strips are revealed with `clip-path: inset(0 100% 0 0)` to full over 460ms, staggered through `--reveal-delay` (120ms plus 140ms per strip in the hero).
 - **Reveal:** everything else fades up 16px over 560ms. Both only apply under `html[data-motion="on"]`, which MotionInit sets when JS runs and reduced motion is off, so content is visible by default.
-- **Live level:** LiveLevel writes the analyser's bass energy (0 to 1) as `--lvl` onto `[data-live]` elements while a song plays. `.live-mark` scales to at most 1.18 with a 90ms linear transition.
+- **Live level:** LiveLevel writes the analyser's bass energy (0 to 1) as `--lvl` onto `[data-live]` elements while a song plays. `.live-mark` scales to at most 1.18 with a 90ms linear transition. The analyser only exists where the browser can tap a copy of the audio without touching playback (Chromium); in Safari, iOS and Firefox the marks and waveform stay in their idle state while the song plays, like reduced motion.
 - **Reduced motion:** reveals and lays render in their final state, live marks stay static, the level loop never starts, smooth scrolling is off, and all transitions and animations are cut to 0.01ms.
 
 ## Do's and Don'ts
